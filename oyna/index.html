@@ -106,8 +106,8 @@ body{display:flex;justify-content:center;align-items:stretch;padding:var(--safe-
 .shelf-label{font-size:.68rem;font-weight:700;color:var(--cream);letter-spacing:.04em;text-transform:uppercase;padding:0 4px 5px;opacity:.9;flex-shrink:0}
 .shelf{flex:1;min-height:0;height:100%;overflow:hidden;overscroll-behavior:none;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;align-content:stretch;align-items:stretch;padding:0}
 .cubby{min-height:0;height:100%;aspect-ratio:auto;background:linear-gradient(180deg,#6B4A18 0%,#5A3C10 40%,#4A3208 100%);border:2.5px solid var(--ink);border-radius:12px;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:inset 0 2px 4px rgba(0,0,0,.25);touch-action:manipulation;pointer-events:none}
-.cubby .shelf-item{width:94%;height:94%;background:var(--white);border:2px solid var(--ink);border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:2px 2px 0 rgba(0,0,0,.2);transition:transform .12s,box-shadow .12s;touch-action:manipulation;-webkit-user-select:none;user-select:none;overflow:hidden;pointer-events:auto;position:relative;z-index:2}
-.cubby .shelf-item svg{width:88%;height:88%;min-width:88%;min-height:88%;pointer-events:none;display:block}
+.cubby .shelf-item{width:min(94%,92%);aspect-ratio:1/1;height:auto;max-height:92%;background:var(--white);border:2px solid var(--ink);border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:2px 2px 0 rgba(0,0,0,.2);transition:transform .12s,box-shadow .12s;touch-action:manipulation;-webkit-user-select:none;user-select:none;overflow:hidden;pointer-events:auto;position:relative;z-index:2}
+.cubby .shelf-item svg{width:96%;height:96%;min-width:96%;min-height:96%;pointer-events:none;display:block}
 .cubby .shelf-item.dragging{transform:scale(1.12) rotate(-3deg);z-index:10;box-shadow:4px 8px 0 rgba(0,0,0,.28)}.cubby .shelf-item:active{transform:scale(1.06)}
 .cubby .shelf-item.bounce{animation:bouncePick .28s ease}
 @keyframes bouncePick{0%{transform:scale(1)}40%{transform:scale(1.14) rotate(-3deg)}100%{transform:scale(1.08)}}
@@ -214,6 +214,28 @@ body{display:flex;justify-content:center;align-items:stretch;padding:var(--safe-
 .album-card{display:flex;gap:12px;align-items:center;background:#FFF8EC;border:2px solid #3D2B1F;border-radius:12px;padding:10px}
 .album-card .art{width:72px;height:72px;flex-shrink:0}
 .album-card .art svg{width:100%;height:100%}
+
+/* —— Storage sorting (ch2) —— */
+.storage-root{display:none;position:absolute;inset:0;z-index:40;background:rgba(30,22,12,.55);align-items:stretch;justify-content:center;padding:8px;box-sizing:border-box}
+.storage-root.show{display:flex}
+.storage-panel{background:var(--cream,#F5EBD8);border:3px solid var(--ink,#3D2B1F);border-radius:16px;width:100%;max-width:420px;margin:auto;max-height:100%;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:10px;box-shadow:4px 6px 0 rgba(0,0,0,.2)}
+.storage-head h3{margin:0 0 4px;font-size:1.1rem}
+.storage-hint{margin:0;font-size:.82rem;line-height:1.35}
+.storage-crate{display:flex;flex-wrap:wrap;gap:8px;min-height:72px;padding:8px;background:#E8DCC4;border:2px dashed var(--ink);border-radius:12px}
+.storage-crate-item{width:64px;height:64px;padding:4px;border:2.5px solid var(--ink);border-radius:10px;background:#FFF8EC;cursor:pointer}
+.storage-crate-item.selected{outline:3px solid var(--mustard,#C4A35A);outline-offset:2px;background:#FFF}
+.storage-crate-item svg{width:100%;height:100%;display:block}
+.storage-zones{display:flex;flex-direction:column;gap:8px}
+.storage-zone{border:2.5px solid var(--ink);border-radius:12px;padding:6px;background:#FFF8EC}
+.storage-zone.full{opacity:.75}
+.storage-zone-label{font-size:.78rem;font-weight:700;margin-bottom:4px;display:flex;justify-content:space-between}
+.storage-zone-cells{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.storage-cell{aspect-ratio:1;border:2px solid var(--ink);border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;padding:2px}
+.storage-cell.empty{background:repeating-linear-gradient(45deg,#eee 0 4px,#f7f0e4 4px 8px);opacity:.55}
+.storage-cell svg{width:92%;height:92%}
+.shelf-item.zone-glow{box-shadow:0 0 0 3px #C4A35A, 2px 2px 0 rgba(0,0,0,.2);background:#FFF8E0}
+.shelf-item.zone-misfiled{filter:saturate(.7)}
+.mechanic-overlay{position:fixed;inset:0;background:rgba(30,20,10,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:18px}
 
 /* 2.0.0 motion — respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
@@ -433,7 +455,7 @@ function lo(hex){ return shade(hex, -32); }
 /** Fit content drawn in 0..64 into card safely (no edge clipping). */
 function svgWrap(inner, vb){
   /* Crop viewBox to zoom content; artists draw in ~8..56. Target ~75% card fill. */
-  vb = vb || "6 4 52 56";
+  vb = vb || "0 0 64 64";
   return `<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><g stroke="${C.ink}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none" vector-effect="non-scaling-stroke">${inner}</g></svg>`;
 }
 function patternFill(pattern, base, pid){
@@ -447,23 +469,22 @@ function pf(pattern, pid){ return (pattern === "cizgili" || pattern === "benekli
 const ItemDraw = {
   semsiye(item){
     const col = COLOR_HEX[item.color] || C.red, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
-    const canopy = "M12 32 Q18 22 24 28 Q32 16 40 28 Q46 22 52 32 Q44 38 32 36 Q20 38 12 32Z";
-    const ribs = `<path d="M24 28 Q32 24 32 35" fill="none" stroke="${C.ink}" stroke-width="1" opacity=".38"/><path d="M40 28 Q32 24 32 35" fill="none" stroke="${C.ink}" stroke-width="1" opacity=".38"/><path d="M32 18 Q32 26 32 35" fill="none" stroke="${C.ink}" stroke-width="1" opacity=".32"/>`;
+    const canopy = "M8 30 Q16 14 24 26 Q32 8 40 26 Q48 14 56 30 Q46 40 32 38 Q18 40 8 30Z";
+    const ribs = `<path d="M24 26 Q32 20 32 36" fill="none" stroke="${C.ink}" stroke-width="1.1" opacity=".4"/><path d="M40 26 Q32 20 32 36" fill="none" stroke="${C.ink}" stroke-width="1.1" opacity=".4"/><path d="M32 12 Q32 24 32 36" fill="none" stroke="${C.ink}" stroke-width="1.1" opacity=".35"/>`;
     let handle = "";
     if (item.detail === "ordek") {
-      handle = `<path d="M31 42 L31 48 Q31 54 26 55 Q20 55 19 50 Q19 46 24 46 Q29 46 31 49" fill="${C.yellow}"/><circle cx="21" cy="49" r="1.1" fill="${C.ink}" stroke="none"/><path d="M19 51 L15 52.5 L19 53.5Z" fill="${C.orange}" stroke="${C.ink}" stroke-width="1"/>`;
+      handle = `<path d="M31 40 L31 48 Q31 56 24 57 Q18 57 17 51 Q17 46 23 46 Q29 46 31 50" fill="${C.yellow}"/><circle cx="20" cy="50" r="1.2" fill="${C.ink}" stroke="none"/><path d="M17 52 L12 54 L17 55Z" fill="${C.orange}" stroke="${C.ink}" stroke-width="1"/>`;
     } else if (item.detail === "j_sap") {
-      handle = `<path d="M31 42 L31 50 Q31 56 25 56" fill="none" stroke="${C.wood}" stroke-width="2.6"/><path d="M31 42 L31 50 Q31 56 25 56" fill="none" stroke="${C.ink}" stroke-width="1.5"/>`;
+      handle = `<path d="M31 40 L31 50 Q31 58 23 58" fill="none" stroke="${C.wood}" stroke-width="3"/><path d="M31 40 L31 50 Q31 58 23 58" fill="none" stroke="${C.ink}" stroke-width="1.6"/>`;
     } else {
-      handle = `<line x1="31" y1="42" x2="31" y2="54" stroke="${C.wood}" stroke-width="2.6"/><line x1="31" y1="42" x2="31" y2="54" stroke="${C.ink}" stroke-width="1.5"/><circle cx="31" cy="55.5" r="2.1" fill="${C.wood}"/>`;
+      handle = `<line x1="31" y1="40" x2="31" y2="56" stroke="${C.wood}" stroke-width="3"/><line x1="31" y1="40" x2="31" y2="56" stroke="${C.ink}" stroke-width="1.6"/><circle cx="31" cy="57.5" r="2.4" fill="${C.wood}"/>`;
     }
     return svgWrap(`${pat}<defs><clipPath id="uc${_pid}"><path d="${canopy}"/></clipPath></defs>
       <path d="${canopy}" fill="${fill}"/>
-      <path d="M16 28 Q32 18 48 28" fill="${hi(col)}" opacity=".26" stroke="none"/>
+      <path d="M14 24 Q32 12 50 24" fill="${hi(col)}" opacity=".28" stroke="none"/>
       <g clip-path="url(#uc${_pid})">${ribs}</g>
-      <circle cx="24" cy="34" r="1.1" fill="${lo(col)}" stroke="none"/><circle cx="32" cy="36" r="1.1" fill="${lo(col)}" stroke="none"/><circle cx="40" cy="34" r="1.1" fill="${lo(col)}" stroke="none"/>
-      <circle cx="32" cy="17" r="2.3" fill="${lo(col)}"/><circle cx="32" cy="17" r="2.3" fill="none"/>
-      <line x1="31" y1="34" x2="31" y2="42" stroke="${C.ink}" stroke-width="2"/>
+      <circle cx="32" cy="12" r="2.6" fill="${lo(col)}"/>
+      <line x1="31" y1="36" x2="31" y2="40" stroke="${C.ink}" stroke-width="2.2"/>
       ${handle}`);
   },
   cuzdan(item){
@@ -516,37 +537,34 @@ const ItemDraw = {
     return svgWrap(`<circle cx="20" cy="20" r="6" fill="${col}"/><circle cx="44" cy="20" r="6" fill="${col}"/><ellipse cx="32" cy="34" rx="14" ry="12" fill="${col}"/><ellipse cx="26" cy="30" rx="3" ry="2.2" fill="${hi(col)}" opacity=".3" stroke="none"/><ellipse cx="32" cy="48" rx="10" ry="8" fill="${col}"/><circle cx="26" cy="32" r="1.6" fill="${C.ink}"/><circle cx="38" cy="32" r="1.6" fill="${C.ink}"/><ellipse cx="32" cy="38" rx="2.5" ry="1.6" fill="${C.blush}"/>${b}`);
   },
   gozluk(item){
+    /* Chunky glasses — fill square card */
     const col = COLOR_HEX[item.color] || C.black;
     const round = item.detail === "yuvarlak" || item.detail === "eski";
-    const bridge = `<path d="M30 32 H34" stroke="${col}" stroke-width="2"/>`;
     const lenses = round
-      ? `<circle cx="22" cy="32" r="9" fill="${C.cream}" stroke="${col}" stroke-width="2.2"/><circle cx="42" cy="32" r="9" fill="${C.cream}" stroke="${col}" stroke-width="2.2"/><path d="M16 28 Q22 26 28 28" fill="none" stroke="${hi(C.cream)}" stroke-width="1.1" opacity=".65"/>`
-      : `<rect x="14" y="24" width="16" height="14" rx="2" fill="${C.cream}" stroke="${col}" stroke-width="2.2"/><rect x="34" y="24" width="16" height="14" rx="2" fill="${C.cream}" stroke="${col}" stroke-width="2.2"/>`;
-    return svgWrap(`${lenses}${bridge}<path d="M14 30 Q9 28 8 26" fill="none" stroke="${col}" stroke-width="1.8"/><path d="M50 30 Q55 28 56 26" fill="none" stroke="${col}" stroke-width="1.8"/>`);
+      ? `<circle cx="20" cy="30" r="12" fill="${C.cream}" stroke="${col}" stroke-width="2.6"/><circle cx="44" cy="30" r="12" fill="${C.cream}" stroke="${col}" stroke-width="2.6"/><path d="M12 24 Q20 20 28 24" fill="none" stroke="${hi(C.cream)}" stroke-width="1.3" opacity=".7"/>`
+      : `<rect x="8" y="20" width="20" height="18" rx="3" fill="${C.cream}" stroke="${col}" stroke-width="2.6"/><rect x="36" y="20" width="20" height="18" rx="3" fill="${C.cream}" stroke="${col}" stroke-width="2.6"/>`;
+    return svgWrap(`${lenses}<path d="M28 30 H36" stroke="${col}" stroke-width="2.4"/><path d="M8 28 Q2 22 4 14" fill="none" stroke="${col}" stroke-width="2.2"/><path d="M56 28 Q62 22 60 14" fill="none" stroke="${col}" stroke-width="2.2"/><path d="M4 14 L4 48 M60 14 L60 48" stroke="${col}" stroke-width="2"/>`);
   },
   atki(item){
-    /* Classic draped scarf: neck loop + two long hanging ends + fringe */
+    /* Large draped scarf filling the card */
     const col = COLOR_HEX[item.color] || C.brick, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
-    // Soft oval loop (worn around neck)
-    const loop = "M14 20 C14 8 50 8 50 20 C50 28 42 32 32 32 C22 32 14 28 14 20Z";
-    const left = "M16 30 L12 54 Q12 58 16 58 L28 58 Q30 54 28 30Z";
-    const right = "M36 30 L34 54 Q34 58 38 58 L52 58 Q52 54 48 30Z";
-    const knot = "M22 26 Q32 36 42 26 Q36 34 32 36 Q28 34 22 26Z";
-    let fringe = "";
-    // Always show fringe — signature of a scarf
-    fringe = `<g stroke="${lo(col)}" stroke-width="1.8">
-      <line x1="15" y1="58" x2="14" y2="64"/><line x1="20" y1="58" x2="19" y2="65"/><line x1="25" y1="58" x2="25" y2="64"/>
-      <line x1="39" y1="58" x2="38" y2="64"/><line x1="44" y1="58" x2="44" y2="65"/><line x1="49" y1="58" x2="50" y2="64"/>
+    const loop = "M10 18 C10 4 54 4 54 18 C54 28 44 34 32 34 C20 34 10 28 10 18Z";
+    const left = "M14 32 L8 56 Q8 60 14 60 L28 60 Q30 56 28 32Z";
+    const right = "M36 32 L34 56 Q34 60 40 60 L56 60 Q56 56 50 32Z";
+    const knot = "M20 28 Q32 40 44 28 Q38 38 32 40 Q26 38 20 28Z";
+    const fringe = `<g stroke="${lo(col)}" stroke-width="2">
+      <line x1="12" y1="60" x2="10" y2="66"/><line x1="18" y1="60" x2="17" y2="67"/><line x1="24" y1="60" x2="24" y2="66"/>
+      <line x1="40" y1="60" x2="39" y2="66"/><line x1="46" y1="60" x2="46" y2="67"/><line x1="52" y1="60" x2="54" y2="66"/>
     </g>`;
     return svgWrap(`${pat}
       <defs><clipPath id="atL${_pid}"><path d="${left}"/></clipPath>
       <clipPath id="atR${_pid}"><path d="${right}"/></clipPath>
       <clipPath id="atO${_pid}"><path d="${loop}"/></clipPath></defs>
       <path d="${loop}" fill="${fill}"/>
-      <g clip-path="url(#atO${_pid})"><path d="M22 16 Q32 12 42 16" fill="${hi(col)}" opacity=".3" stroke="none"/></g>
+      <g clip-path="url(#atO${_pid})"><path d="M18 12 Q32 6 46 12" fill="${hi(col)}" opacity=".3" stroke="none"/></g>
       <path d="${left}" fill="${fill}"/><path d="${right}" fill="${fill}"/>
-      <g clip-path="url(#atL${_pid})"><path d="M18 32 L26 30 L26 50 L18 52Z" fill="${hi(col)}" opacity=".22" stroke="none"/></g>
-      <g clip-path="url(#atR${_pid})"><path d="M36 32 L44 30 L44 50 L36 52Z" fill="${hi(col)}" opacity=".18" stroke="none"/></g>
+      <g clip-path="url(#atL${_pid})"><path d="M12 36 L26 34 L26 56 L12 58Z" fill="${hi(col)}" opacity=".22" stroke="none"/></g>
+      <g clip-path="url(#atR${_pid})"><path d="M38 36 L50 34 L50 56 L38 58Z" fill="${hi(col)}" opacity=".18" stroke="none"/></g>
       <path d="${knot}" fill="${lo(col)}" opacity=".85"/>
       ${fringe}`);
   },
@@ -562,15 +580,15 @@ const ItemDraw = {
   tespih(item){
     const col = COLOR_HEX[item.color] || C.brown;
     const beads = [];
-    for (let i = 0; i < 10; i++) {
-      const a = -1.0 + i * 0.2;
-      const x = 32 + Math.cos(a) * 14;
-      const y = 30 + Math.sin(a) * 12;
-      beads.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="${col}"/>`);
+    for (let i = 0; i < 12; i++) {
+      const a = -Math.PI * 0.85 + i * (Math.PI * 1.7 / 11);
+      const x = 32 + Math.cos(a) * 18;
+      const y = 28 + Math.sin(a) * 16;
+      beads.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.2" fill="${col}"/>`);
     }
-    let tip = `<ellipse cx="32" cy="48" rx="3.2" ry="4.5" fill="${lo(col)}"/><circle cx="32" cy="54" r="2.2" fill="${C.mustard}"/>`;
-    if (item.detail === "gumus") tip = `<rect x="29" y="46" width="6" height="10" rx="1" fill="${C.gray}"/><circle cx="32" cy="56" r="2" fill="${C.gray}"/>`;
-    if (item.detail === "imame") tip = `<ellipse cx="32" cy="48" rx="4" ry="6" fill="${lo(col)}"/><circle cx="32" cy="56" r="2.2" fill="${C.mustard}"/>`;
+    let tip = `<ellipse cx="32" cy="50" rx="4" ry="6" fill="${lo(col)}"/><circle cx="32" cy="58" r="2.8" fill="${C.mustard}"/>`;
+    if (item.detail === "gumus") tip = `<rect x="28" y="46" width="8" height="12" rx="1.5" fill="${C.gray}"/><circle cx="32" cy="58" r="2.4" fill="${C.gray}"/>`;
+    if (item.detail === "imame") tip = `<ellipse cx="32" cy="50" rx="5" ry="7" fill="${lo(col)}"/><circle cx="32" cy="58" r="2.8" fill="${C.mustard}"/>`;
     return svgWrap(`${beads.join("")}${tip}`);
   },
   nazarlik(item){
@@ -583,10 +601,9 @@ const ItemDraw = {
   },
   termos(item){
     const col = COLOR_HEX[item.color] || C.teal, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
-    let extra = `<rect x="24" y="10" width="16" height="7" rx="2" fill="${lo(col)}"/>`;
-    if (item.detail === "kulp") extra += `<path d="M40 28 Q50 34 40 44" fill="none" stroke="${C.ink}" stroke-width="2"/>`;
-    if (item.detail === "kayis") extra += `<path d="M22 20 Q12 34 22 48" fill="none" stroke="${C.mustard}" stroke-width="2"/>`;
-    return svgWrap(`${pat}<rect x="22" y="16" width="20" height="36" rx="5" fill="${fill}"/><rect x="24" y="18" width="6" height="32" rx="2" fill="${hi(col)}" opacity=".25" stroke="none"/><ellipse cx="32" cy="16" rx="10" ry="2.5" fill="${lo(col)}"/>${extra}`);
+    let top = `<ellipse cx="32" cy="12" rx="14" ry="5" fill="${lo(col)}"/><rect x="26" y="6" width="12" height="8" rx="2" fill="${C.gray}"/>`;
+    if (item.detail === "kulplu") top += `<path d="M46 28 Q56 32 46 44" fill="none" stroke="${C.ink}" stroke-width="2.2"/>`;
+    return svgWrap(`${pat}<rect x="16" y="14" width="32" height="42" rx="6" fill="${fill}"/><rect x="18" y="16" width="10" height="38" rx="3" fill="${hi(col)}" opacity=".28" stroke="none"/><ellipse cx="32" cy="14" rx="16" ry="6" fill="${fill}"/><line x1="18" y1="36" x2="46" y2="36" stroke="${C.ink}" stroke-width="1.2" opacity=".35"/>${top}`);
   },
   cayseti(item){
     const col = COLOR_HEX[item.color] || C.cream;
@@ -632,12 +649,14 @@ const ItemDraw = {
     return svgWrap(`<path d="M18 28 Q18 14 32 12 Q46 14 46 28" fill="none" stroke="${col}" stroke-width="3"/><rect x="14" y="26" width="10" height="16" rx="3" fill="${col}"/><rect x="40" y="26" width="10" height="16" rx="3" fill="${col}"/><rect x="16" y="28" width="6" height="12" rx="2" fill="${hi(col)}" opacity=".3" stroke="none"/>${e}`);
   },
   kalemlik(item){
-    /* Clear: open cup with pens sticking out */
-    const col = COLOR_HEX[item.color] || C.teal, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
-    let pens = `<rect x="24" y="10" width="3.5" height="20" rx="1" fill="${C.red}"/><rect x="30" y="8" width="3.5" height="22" rx="1" fill="${C.blue}"/><rect x="36" y="12" width="3.5" height="18" rx="1" fill="${C.yellow}"/>`;
-    if (item.detail === "boş") pens = "";
-    if (item.detail === "cetvel") pens += `<rect x="42" y="14" width="2.5" height="16" fill="${C.cream}"/>`;
-    return svgWrap(`${pat}<path d="M18 30 L18 52 Q18 56 32 56 Q46 56 46 52 L46 30Z" fill="${fill}"/><ellipse cx="32" cy="30" rx="14" ry="4" fill="${hi(col)}"/><ellipse cx="32" cy="30" rx="14" ry="4" fill="none"/>${pens}`);
+    const col = COLOR_HEX[item.color] || C.wood, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
+    return svgWrap(`${pat}
+      <rect x="14" y="28" width="36" height="28" rx="4" fill="${fill}"/>
+      <rect x="16" y="30" width="10" height="24" rx="2" fill="${hi(col)}" opacity=".25" stroke="none"/>
+      <rect x="22" y="10" width="5" height="24" rx="1.5" fill="${C.brick}"/>
+      <rect x="30" y="6" width="5" height="28" rx="1.5" fill="${C.teal}"/>
+      <rect x="38" y="12" width="5" height="22" rx="1.5" fill="${C.mustard}"/>
+      <ellipse cx="32" cy="28" rx="18" ry="5" fill="${fill}"/>`);
   },
   foto(item){
     const col = COLOR_HEX[item.color] || C.black;
@@ -843,7 +862,7 @@ function fitItemSvg(svgStr){
     const bb = g.getBBox();
     if (!bb.width || !bb.height || !isFinite(bb.width)) return svgStr;
     /* Target: content spans ~76% of square viewBox → pad ≈ 12% each side of max axis */
-    const pad = Math.max(bb.width, bb.height) * 0.14;
+    const pad = Math.max(bb.width, bb.height) * 0.10;
     const side = Math.max(bb.width, bb.height) + pad * 2;
     const cx = bb.x + bb.width / 2;
     const cy = bb.y + bb.height / 2;
@@ -1713,6 +1732,190 @@ const EXTRA_NAMES = [
   { name: "Deniz", tone: "turist" },
 ];
 
+/** Chapter 2 — Storage sorting: crate → labeled zone cubbies; sorting affects search. */
+const STORAGE_ZONES = [
+  { id: "iskele", label: "İskele / Vapur", match: /vapur|iskele|liman|sahil/i, capacity: 3 },
+  { id: "sokak", label: "Sokak / Durak", match: /otobüs|durak|market|postane|gazete/i, capacity: 3 },
+  { id: "park", label: "Park / Kafe", match: /park|kafe|çay|simit|pazar|festival/i, capacity: 3 },
+  { id: "diger", label: "Diğer", match: /.*/, capacity: 3 }
+];
+
+function storageZoneForTag(tag) {
+  const place = (tag || "").split(",")[0].trim();
+  for (const z of STORAGE_ZONES) {
+    if (z.id === "diger") continue;
+    if (z.match.test(place)) return z.id;
+  }
+  return "diger";
+}
+
+function StorageSys() {
+  return {
+    active: false,
+    crate: [],
+    zones: {}, // zoneId -> item[]
+    map: {},   // itemId -> zoneId (where player placed it)
+    ideal: {}, // itemId -> correct zoneId
+    tutorialStep: 0,
+    onDone: null,
+
+    begin(items, onDone) {
+      this.active = true;
+      this.onDone = onDone;
+      this.crate = items.slice();
+      this.zones = {};
+      this.map = {};
+      this.ideal = {};
+      STORAGE_ZONES.forEach(z => { this.zones[z.id] = []; });
+      items.forEach(it => { this.ideal[itemId(it)] = storageZoneForTag(it.tag); });
+      this.tutorialStep = 0;
+      this.render();
+      this.showTutorial(0);
+    },
+
+    showTutorial(step) {
+      this.tutorialStep = step;
+      const texts = [
+        "Teslimat kutusu geldi! Eşyaları etiket yerlerine göre gözlere yerleştir.",
+        "Her gözün bir yeri var (İskele, Sokak, Park…). Kapasite sınırlı — 3’er eşya.",
+        "Doğru yerleştirirsen sonra aramak kolaylaşır: doğru göz parlar. Yanlışta sabır yer."
+      ];
+      let ov = document.getElementById("storage-tut");
+      if (!ov) {
+        ov = document.createElement("div");
+        ov.id = "storage-tut";
+        ov.className = "mechanic-overlay";
+        document.body.appendChild(ov);
+      }
+      ov.innerHTML = `<div class="mechanic-panel"><h3>Depo Sıralama</h3><p>${texts[step] || texts[0]}</p>
+        <button class="btn primary" id="storage-tut-next" type="button">${step < texts.length - 1 ? "Devam" : "Kutuyu aç"}</button></div>`;
+      ov.style.display = "flex";
+      ov.querySelector("#storage-tut-next").onclick = () => {
+        if (step < texts.length - 1) this.showTutorial(step + 1);
+        else { ov.style.display = "none"; }
+      };
+    },
+
+    render() {
+      let root = document.getElementById("storage-root");
+      if (!root) {
+        root = document.createElement("div");
+        root.id = "storage-root";
+        const game = document.getElementById("screen-game");
+        (game || document.getElementById("app")).appendChild(root);
+      }
+      root.className = "storage-root show";
+      root.setAttribute("aria-label", "Depo sıralama");
+
+      const zoneHtml = STORAGE_ZONES.map(z => {
+        const filled = (this.zones[z.id] || []).length;
+        const full = filled >= z.capacity ? " full" : "";
+        const cells = (this.zones[z.id] || []).map((it, i) =>
+          `<div class="storage-cell" data-zone="${z.id}" data-idx="${i}">${drawItem(it)}</div>`
+        ).join("") + Array.from({ length: Math.max(0, z.capacity - filled) }, () =>
+          `<div class="storage-cell empty" data-zone="${z.id}"></div>`
+        ).join("");
+        return `<div class="storage-zone${full}" data-zone="${z.id}">
+          <div class="storage-zone-label">${z.label} <span>${filled}/${z.capacity}</span></div>
+          <div class="storage-zone-cells">${cells}</div>
+        </div>`;
+      }).join("");
+
+      const crateHtml = this.crate.map((it, i) =>
+        `<button type="button" class="storage-crate-item${this._sel === i ? " selected" : ""}" data-crate="${i}">${drawItem(it)}</button>`
+      ).join("");
+
+      root.innerHTML = `
+        <div class="storage-panel">
+          <header class="storage-head"><h3>Gelen kutu</h3>
+            <p class="storage-hint">Eşyaya dokun, sonra bir göze yerleştir. Kalan: <b id="storage-left">${this.crate.length}</b></p>
+          </header>
+          <div class="storage-crate" id="storage-crate">${crateHtml || "<p class='day-meta'>Kutu boş.</p>"}</div>
+          <div class="storage-zones">${zoneHtml}</div>
+          <button type="button" class="btn primary" id="storage-done" ${this.crate.length ? "disabled" : ""}>
+            ${this.crate.length ? "Önce hepsini yerleştir" : "Rafa geç"}
+          </button>
+        </div>`;
+
+      root.querySelectorAll(".storage-crate-item").forEach(btn => {
+        btn.addEventListener("click", () => {
+          this._sel = Number(btn.dataset.crate);
+          this.render();
+        });
+      });
+      root.querySelectorAll(".storage-zone").forEach(zEl => {
+        zEl.addEventListener("click", () => {
+          if (this._sel == null) return;
+          this.place(this._sel, zEl.dataset.zone);
+        });
+      });
+      root.querySelector("#storage-done")?.addEventListener("click", () => {
+        if (this.crate.length) return;
+        this.finish();
+      });
+    },
+
+    place(crateIdx, zoneId) {
+      const z = STORAGE_ZONES.find(x => x.id === zoneId);
+      if (!z) return;
+      if ((this.zones[zoneId] || []).length >= z.capacity) {
+        AudioSys.bad && AudioSys.bad();
+        const hint = document.querySelector(".storage-hint");
+        if (hint) hint.textContent = z.label + " dolu! Başka göz dene.";
+        return;
+      }
+      const item = this.crate.splice(crateIdx, 1)[0];
+      if (!item) return;
+      this.zones[zoneId].push(item);
+      this.map[itemId(item)] = zoneId;
+      this._sel = null;
+      AudioSys.click && AudioSys.click();
+      this.render();
+    },
+
+    finish() {
+      this.active = false;
+      const root = document.getElementById("storage-root");
+      if (root) root.classList.remove("show");
+      const tut = document.getElementById("storage-tut");
+      if (tut) tut.remove();
+      state.storageMap = Object.assign({}, this.map);
+      state.storageIdeal = Object.assign({}, this.ideal);
+      // Flatten zones into shelf order: correct zones first for nicer layout
+      const shelf = [];
+      STORAGE_ZONES.forEach(z => { (this.zones[z.id] || []).forEach(it => shelf.push(it)); });
+      state.storageShelf = shelf;
+      if (typeof this.onDone === "function") this.onDone(shelf);
+    },
+
+    /** Correct-zone glow / wrong-zone patience cost helpers */
+    isCorrectlySorted(item) {
+      if (!item || !state.storageMap) return true;
+      const id = itemId(item);
+      return state.storageMap[id] === state.storageIdeal[id];
+    },
+    applyShelfHints(shelfEl) {
+      if (!shelfEl || !state.storageMap) return;
+      shelfEl.querySelectorAll(".shelf-item").forEach(el => {
+        const idx = Number(el.dataset.idx);
+        const cv = currentVisitor && currentVisitor();
+        const item = cv && cv.shelf && cv.shelf[idx];
+        if (!item) return;
+        el.classList.toggle("zone-glow", this.isCorrectlySorted(item));
+        el.classList.toggle("zone-misfiled", !this.isCorrectlySorted(item));
+      });
+    },
+    wrongZonePenalty() {
+      // Extra patience drain when giving/asking about misfiled items
+      return 1;
+    }
+  };
+}
+
+const Storage = StorageSys();
+Storage.ZONES = STORAGE_ZONES;
+Storage.zoneForTag = storageZoneForTag;
+
 function rand(a){return a[Math.floor(Math.random()*a.length)]}
 function shuffle(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
 function similarItem(base,hard){const v=Object.assign({},base);const which=rand(hard?["color","pattern","detail","type","tag"]:["color","pattern","detail","tag"]);
@@ -1840,13 +2043,8 @@ function renderDaySelect(){
   refreshTitleCoins();
 }
 
-function runStorageTutorial(){
-  const overlay=document.createElement("div");
-  overlay.id="mechanic-overlay";
-  overlay.innerHTML=`<div class="mechanic-panel"><h3>Depo Sıralama</h3><p>Gelen kutudaki eşyaları boş gözlere yerleştir. Göz sayısı sınırlı — yanlış yer yok, ama dolunca taşıyamırsın.</p><button class="btn primary" id="mech-ok">Anladım</button></div>`;
-  document.body.appendChild(overlay);
-  overlay.querySelector("#mech-ok").onclick=()=>overlay.remove();
-}
+/* runStorageTutorial → Storage.begin */
+
 function runLedgerCheck(cv){
   if(!cv||!cv.target) return true;
   const want=cv.target.tag||"";
@@ -1893,9 +2091,34 @@ function startChapter(chId){
   state.mode="day"; state.dayIndex=chId-1; state.visitorIndex=0; state.patience=Math.max(3,5-Math.floor(chId/4)); state.maxPatience=state.patience;
   state.asked=false; state.correct=0; state.wrong=0; state.dayCoins=0; state.failed=false; state.expr="neutral";
   showScreen("screen-game"); $("hud-day-text").textContent=ch.name; $("hud-coin-text").textContent=String(save.coins); refreshOffice();
-  if(ch.mechanic==="storage") setTimeout(runStorageTutorial, 400);
-  if(ch.mechanic==="ledger"){ /* ledger gate on give */ state.ledgerGate=true; }
+  if(ch.mechanic==="ledger"){ state.ledgerGate=true; }
   if(ch.mechanic==="queue"||ch.mechanic==="timer"){ state.shiftTimer=60+chId*8; state.queueLen=visitors.length; }
+  if(ch.mechanic==="storage" && typeof Storage!=="undefined"){
+    // Build delivery crate from all visitor shelves (unique by id), then sort before serving
+    const crate=[]; const seen=new Set();
+    visitors.forEach(v=>{
+      (v.shelf||[]).forEach(it=>{ const id=itemId(it); if(!seen.has(id)){ seen.add(id); crate.push(it); }});
+      if(v.target){ const id=itemId(v.target); if(!seen.has(id)){ seen.add(id); crate.push(v.target);} }
+    });
+    // Cap crate so zones can hold them (4 zones × 3 = 12)
+    const capped=crate.slice(0,12);
+    // Hide visitor UI while sorting
+    const hideSel=["#visitor-stage",".dialogue-panel",".action-row"];
+    hideSel.forEach(sel=>{ const el=document.querySelector(sel); if(el) el.style.visibility="hidden"; });
+    state.mode="storage";
+    Storage.begin(capped, (shelf)=>{
+      visitors.forEach(v=>{
+        if(v.trick){ v.shelf=shuffle(shelf.slice(0, Math.min(6,shelf.length))); return; }
+        const others=shelf.filter(it=>itemId(it)!==itemId(v.target));
+        v.shelf=shuffle([v.target].concat(others.slice(0,5)));
+      });
+      state.dayData.visitors=visitors;
+      hideSel.forEach(sel=>{ const el=document.querySelector(sel); if(el) el.style.visibility=""; });
+      state.mode="day";
+      loadVisitor();
+    });
+    return;
+  }
   loadVisitor();
 }
 function renderShop(){
@@ -1946,6 +2169,7 @@ function loadVisitor(){
   $("payoff").classList.remove("show");$("stamp-overlay").classList.remove("show");$("between-msg").classList.remove("show");$("inspect-modal").classList.remove("show");
   renderShelf(cv.shelf||[]);
   applyNightLamp();
+  if(typeof Storage!=="undefined"&&state.storageMap) Storage.applyShelfHints($("shelf"));
 }
 function applyNightLamp(){
   const night=!!(state.dayData&&state.dayData.night);
@@ -2001,7 +2225,7 @@ function bindItem(el,item,idx){
   const clearHold=()=>{if(holdTimer){clearTimeout(holdTimer);holdTimer=null}};
   const cleanup=()=>{clearHold();active=false;pid=null;el.classList.remove("dragging","bounce");const g=$("drag-ghost");if(g)g.classList.remove("show");try{el.releasePointerCapture&&el.releasePointerCapture(pid)}catch(_){}};
   const onStart=(x,y,e)=>{
-    if(state.mode!=="game"||state.failed||(state.tutStep>=0&&state.tutStep<3))return;
+    if((state.mode!=="game"&&state.mode!=="day")||state.failed||(state.tutStep>=0&&state.tutStep<3))return;
     AudioSys.unlock();active=true;moved=false;inspected=false;startX=x;startY=y;
     if(e&&e.pointerId!=null){pid=e.pointerId;try{el.setPointerCapture(e.pointerId)}catch(_){}}
     el.classList.add("bounce","dragging");
@@ -2034,7 +2258,7 @@ function bindItem(el,item,idx){
   el.addEventListener("pointercancel",()=>{cleanup()});
   // Plain click fallback (iOS Safari / accessibility) — ignore if we already handled as drag/long-press
   el.addEventListener("click",e=>{
-    if(state.mode!=="game"||state.failed||(state.tutStep>=0&&state.tutStep<3))return;
+    if((state.mode!=="game"&&state.mode!=="day")||state.failed||(state.tutStep>=0&&state.tutStep<3))return;
     if(inspected||moved)return;
     // If pointer path already fired tryGive via pointerup, skip double; use a short guard
     if(el._kebGave)return;
@@ -2070,9 +2294,17 @@ function onWrong(el,msg){ if(window.Motion&&Motion.ambient&&el) Motion.ambient.w
   if(state.patience<=0){state.failed=true;setTimeout(()=>endDay(false),700)}
 }
 function askQuestion(){
-  if(state.asked||state.failed)return;AudioSys.ask();AudioSys.unlock();state.asked=true;
-  state.patience=Math.max(0,state.patience-1);updatePatience();$("btn-ask").disabled=true;
-  const cv=currentVisitor();$("speech").textContent=cv.extraClue||cv.clue;
+  if(state.asked||state.failed||state.mode==="storage")return;AudioSys.ask();AudioSys.unlock();state.asked=true;
+  let cost=1;
+  const cv=currentVisitor();
+  if(cv&&cv.target&&state.storageMap&&typeof Storage!=="undefined"&&!Storage.isCorrectlySorted(cv.target)){
+    cost+=Storage.wrongZonePenalty();
+  }
+  state.patience=Math.max(0,state.patience-cost);updatePatience();$("btn-ask").disabled=true;
+  let tip=cv.extraClue||cv.clue||"";
+  if(cost>1) tip+=" (Yanlış gözdeydi — aramak zor oldu.)";
+  if(window.Motion) Motion.typewrite($("speech"), tip);
+  else $("speech").textContent=tip;
   if(state.patience<=0){state.failed=true;setTimeout(()=>endDay(false),700)}
 }
 function rejectTrick(){
@@ -2186,7 +2418,7 @@ document.querySelectorAll("button.btn, button.btn-back").forEach(b=>{
 
 renderTitle();AudioSys.init();
 
-window.Motion=Motion;window.CHAPTERS=CHAPTERS;window.generateVisitor=generateVisitor;window.buildClue=typeof buildClue!=="undefined"?buildClue:null;try{window.renderAlbum=renderAlbum;window.ensureAlbumUI=ensureAlbumUI;}catch(_e){}window.__KEB__={getSave:()=>save,setSave:(s)=>{save=s;writeSave(save)},state,DAYS,VISITORS,TYPE_KEYS,DECORS,CHAPTERS,Motion,generateVisitor,buildClue,renderAlbum,ensureAlbumUI,startDay,startChapter,startEndless,showScreen,itemId,currentVisitor,tryGive,askQuestion,rejectTrick,endDay,calcStars,generateEndlessDay,renderDaySelect,renderShop,openInspect,closeInspect,startTutorial,endTutorial,refreshOffice,writeSave,loadSave,SAVE_KEY,drawVisitor,drawTitleFacade,drawItem,itemLabel,generateVisitor,buildClue,EXTRA_NAMES,TYPE_TR,DETAIL_TR,PROC_DETAILS,PROC_COLORS,PROC_PATTERNS,COLOR_TR,PATTERN_TR};
+window.Motion=Motion;window.CHAPTERS=CHAPTERS;window.generateVisitor=generateVisitor;window.buildClue=typeof buildClue!=="undefined"?buildClue:null;try{window.renderAlbum=renderAlbum;window.ensureAlbumUI=ensureAlbumUI;}catch(_e){}window.Storage=Storage;window.__KEB__={getSave:()=>save,setSave:(s)=>{save=s;writeSave(save)},state,DAYS,VISITORS,TYPE_KEYS,DECORS,CHAPTERS,Motion,generateVisitor,buildClue,renderAlbum,ensureAlbumUI,Storage,startDay,startChapter,startEndless,showScreen,itemId,currentVisitor,tryGive,askQuestion,rejectTrick,endDay,calcStars,generateEndlessDay,renderDaySelect,renderShop,openInspect,closeInspect,startTutorial,endTutorial,refreshOffice,writeSave,loadSave,SAVE_KEY,drawVisitor,drawTitleFacade,drawItem,itemLabel,generateVisitor,buildClue,EXTRA_NAMES,TYPE_TR,DETAIL_TR,PROC_DETAILS,PROC_COLORS,PROC_PATTERNS,COLOR_TR,PATTERN_TR};
 })();
 
 </script>
