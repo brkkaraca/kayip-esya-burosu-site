@@ -252,6 +252,18 @@ body{display:flex;justify-content:center;align-items:stretch;padding:var(--safe-
 .ledger-actions .btn{flex:1}
 #btn-ledger{background:#5C6B4A;color:#fff}
 
+/* —— Queue + shift timer —— */
+.queue-rail{display:none;gap:6px;padding:4px 8px;overflow-x:auto;flex-shrink:0;background:rgba(245,235,216,.92);border-bottom:2px solid var(--ink)}
+.queue-rail.show{display:flex}
+.queue-chip{flex:0 0 auto;border:2px solid var(--ink);border-radius:10px;padding:4px 8px;background:#FFF8EC;font-size:.72rem;cursor:pointer;min-width:72px}
+.queue-chip.active{background:var(--mustard,#C4A35A);font-weight:700}
+.queue-chip.low{border-color:#A63D2F}
+.queue-chip.done{opacity:.4;pointer-events:none}
+.queue-name{display:block;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.queue-pat{color:#A63D2F;letter-spacing:1px;font-size:.65rem}
+.shift-clock{font-weight:700;font-size:.85rem;padding:4px 8px;border:2px solid var(--ink);border-radius:8px;background:#FFF8EC;margin-left:6px}
+.shift-clock.urgent{background:#F5D0C8;animation:lampFlicker 1s ease-in-out infinite}
+
 /* 2.0.0 motion — respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
@@ -2094,6 +2106,157 @@ const LedgerSys = {
 
 const Ledger = LedgerSys;
 
+/** Chapters 4+ — Multi-visitor queue + shift timer. */
+const QueueSys = {
+  active: false,
+  line: [],       // visitor indices waiting
+  current: 0,     // active visitor index into dayData.visitors
+  patienceMap: {}, // idx -> patience remaining
+  timer: null,
+  secondsLeft: 0,
+  timerId: null,
+
+  begin(visitors, seconds) {
+    this.active = true;
+    this.line = visitors.map((_, i) => i);
+    this.current = 0;
+    this.patienceMap = {};
+    visitors.forEach((v, i) => {
+      this.patienceMap[i] = Math.max(3, (state.maxPatience || 5) - (v.trick ? 0 : 0));
+    });
+    this.secondsLeft = seconds || 90;
+    state.visitorIndex = 0;
+    this.renderRail();
+    this.startTimer();
+    this.ensureSwitchUI();
+  },
+
+  ensureSwitchUI() {
+    let rail = document.getElementById("queue-rail");
+    if (!rail) {
+      rail = document.createElement("div");
+      rail.id = "queue-rail";
+      const office = document.getElementById("office") || document.getElementById("screen-game");
+      office?.insertBefore(rail, office.firstChild?.nextSibling || null);
+      // place above shelf / under dialogue
+      const panel = document.querySelector(".dialogue-panel");
+      if (panel && panel.parentNode) panel.parentNode.insertBefore(rail, panel);
+    }
+    let clock = document.getElementById("shift-clock");
+    if (!clock) {
+      clock = document.createElement("div");
+      clock.id = "shift-clock";
+      clock.className = "shift-clock";
+      document.querySelector(".game-hud")?.appendChild(clock) || document.getElementById("screen-game")?.prepend(clock);
+    }
+  },
+
+  renderRail() {
+    this.ensureSwitchUI();
+    const rail = document.getElementById("queue-rail");
+    if (!rail || !state.dayData) return;
+    const visitors = state.dayData.visitors || [];
+    rail.className = "queue-rail show";
+    rail.innerHTML = visitors.map((v, i) => {
+      if (this.patienceMap[i] <= 0 && i !== this.current) return "";
+      const name = v.visitorName || (VISITORS[v.visitor] || {}).name || ("#" + (i + 1));
+      const active = i === this.current ? " active" : "";
+      const low = this.patienceMap[i] <= 2 ? " low" : "";
+      const done = v._served ? " done" : "";
+      return `<button type="button" class="queue-chip${active}${low}${done}" data-qi="${i}">
+        <span class="queue-name">${name}</span>
+        <span class="queue-pat">${"●".repeat(Math.max(0, this.patienceMap[i]))}</span>
+      </button>`;
+    }).join("");
+    rail.querySelectorAll(".queue-chip").forEach(btn => {
+      btn.addEventListener("click", () => this.switchTo(Number(btn.dataset.qi)));
+    });
+    this.updateClock();
+  },
+
+  updateClock() {
+    const el = document.getElementById("shift-clock");
+    if (!el) return;
+    const m = Math.floor(this.secondsLeft / 60);
+    const s = this.secondsLeft % 60;
+    el.textContent = `⏱ ${m}:${String(s).padStart(2, "0")}`;
+    el.classList.toggle("urgent", this.secondsLeft <= 20);
+    el.style.display = this.active ? "" : "none";
+  },
+
+  startTimer() {
+    this.stopTimer();
+    this.timerId = setInterval(() => {
+      if (!this.active) return;
+      this.secondsLeft -= 1;
+      this.updateClock();
+      if (this.secondsLeft <= 0) {
+        this.stopTimer();
+        this.active = false;
+        state.failed = true;
+        $("speech") && ($("speech").textContent = "Vardiya bitti — sıra bekleyemedi.");
+        setTimeout(() => endDay(false), 900);
+      }
+    }, 1000);
+  },
+
+  stopTimer() {
+    if (this.timerId) { clearInterval(this.timerId); this.timerId = null; }
+  },
+
+  switchTo(idx) {
+    if (!this.active || !state.dayData) return;
+    const v = state.dayData.visitors[idx];
+    if (!v || v._served) return;
+    // Save patience for current
+    this.patienceMap[state.visitorIndex] = state.patience;
+    this.current = idx;
+    state.visitorIndex = idx;
+    state.patience = this.patienceMap[idx];
+    state.maxPatience = Math.max(state.maxPatience, state.patience);
+    state.asked = false;
+    state.failed = false;
+    this.renderRail();
+    loadVisitor();
+    // restore patience after loadVisitor resets it
+    state.patience = this.patienceMap[idx];
+    updatePatience();
+  },
+
+  onVisitorServed() {
+    const i = state.visitorIndex;
+    if (state.dayData?.visitors?.[i]) state.dayData.visitors[i]._served = true;
+    this.patienceMap[i] = 0;
+    // Find next unserved
+    const next = (state.dayData.visitors || []).findIndex(v => !v._served);
+    this.renderRail();
+    if (next < 0) {
+      this.stopTimer();
+      this.active = false;
+      const clock = document.getElementById("shift-clock");
+      if (clock) clock.style.display = "none";
+      endDay(true);
+      return true;
+    }
+    this.switchTo(next);
+    return true;
+  },
+
+  tickPatienceDrain() {
+    // Passive drain for waiting visitors
+    if (!this.active) return;
+    Object.keys(this.patienceMap).forEach(k => {
+      const i = Number(k);
+      if (i === this.current) return;
+      if (state.dayData.visitors[i]?._served) return;
+      this.patienceMap[i] = Math.max(0, this.patienceMap[i] - 0);
+    });
+    this.renderRail();
+  }
+};
+
+const Queue = QueueSys;
+
 function rand(a){return a[Math.floor(Math.random()*a.length)]}
 function shuffle(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
 function similarItem(base,hard){const v=Object.assign({},base);const which=rand(hard?["color","pattern","detail","type","tag"]:["color","pattern","detail","tag"]);
@@ -2283,7 +2446,9 @@ function startChapter(chId){
       }catch(_e){}
     }
   }
-  if(ch.mechanic==="queue"||ch.mechanic==="timer"){ state.shiftTimer=60+chId*8; state.queueLen=visitors.length; }
+  if(ch.mechanic==="queue"||ch.mechanic==="timer"||ch.mechanic==="vague"){
+    state.shiftTimer=75+chId*10; state.queueLen=visitors.length; state.queueMode=true;
+  } else { state.queueMode=false; }
   if(ch.mechanic==="storage" && typeof Storage!=="undefined"){
     // Build delivery crate from all visitor shelves (unique by id), then sort before serving
     const crate=[]; const seen=new Set();
@@ -2314,6 +2479,13 @@ function startChapter(chId){
     Ledger.showTutorial().then(()=>loadVisitor());
   } else {
     loadVisitor();
+    if(state.queueMode&&typeof Queue!=="undefined"){
+      Queue.begin(visitors, state.shiftTimer||90);
+      // re-sync patience after begin
+      state.patience=Queue.patienceMap[0]||state.patience;
+      updatePatience();
+      Queue.renderRail();
+    }
   }
 }
 function renderShop(){
@@ -2528,12 +2700,17 @@ function rejectTrick(){
   setTimeout(()=>{$("stamp-overlay").classList.remove("show");payoff.classList.remove("show");nextVisitorOrEnd()},1600);
 }
 function nextVisitorOrEnd(){
+  if(typeof Queue!=="undefined"&&Queue.active){
+    const done=Queue.onVisitorServed();
+    if(done) return;
+    return;
+  }
   if(state.visitorIndex>=state.dayData.visitors.length-1){endDay(true);return}
   state.visitorIndex++;$("between-text").textContent="Sıradaki ziyaretçi geliyor…";$("between-msg").classList.add("show");
   setTimeout(()=>{$("between-msg").classList.remove("show");loadVisitor()},850);
 }
 function calcStars(){if(state.failed)return state.correct>=1?1:0;const total=state.dayData.visitors.length;if(state.wrong===0&&state.correct===total)return 3;if(state.wrong<=2)return 2;return 1}
-function endDay(won){
+function endDay(won){ if(typeof Queue!=="undefined"){ Queue.stopTimer(); Queue.active=false; const c=$("shift-clock"); if(c) c.style.display="none"; const r=$("queue-rail"); if(r) r.classList.remove("show"); }
   const stars=calcStars();const dayId=state.dayData.id;
   if(!state.dayData.endless&&won){const prev=save.dayStars[dayId]||0;if(stars>prev)save.dayStars[dayId]=stars;if(save.unlockedDay<dayId+1)save.unlockedDay=dayId+1;if(dayId>=5)save.endlessUnlocked=true;writeSave(save)}
   if(state.dayData.endless&&won){state.endlessRound=(state.dayData.round||1)+1;writeSave(save)}
@@ -2629,7 +2806,7 @@ document.querySelectorAll("button.btn, button.btn-back").forEach(b=>{
 
 renderTitle();AudioSys.init();
 
-window.Motion=Motion;window.CHAPTERS=CHAPTERS;window.generateVisitor=generateVisitor;window.buildClue=typeof buildClue!=="undefined"?buildClue:null;try{window.renderAlbum=renderAlbum;window.ensureAlbumUI=ensureAlbumUI;}catch(_e){}window.Storage=Storage;window.Ledger=Ledger;window.__KEB__={getSave:()=>save,setSave:(s)=>{save=s;writeSave(save)},state,DAYS,VISITORS,TYPE_KEYS,DECORS,CHAPTERS,Motion,generateVisitor,buildClue,renderAlbum,ensureAlbumUI,Storage,Ledger,startDay,startChapter,startEndless,showScreen,itemId,currentVisitor,tryGive,askQuestion,rejectTrick,endDay,calcStars,generateEndlessDay,renderDaySelect,renderShop,openInspect,closeInspect,startTutorial,endTutorial,refreshOffice,writeSave,loadSave,SAVE_KEY,drawVisitor,drawTitleFacade,drawItem,itemLabel,generateVisitor,buildClue,EXTRA_NAMES,TYPE_TR,DETAIL_TR,PROC_DETAILS,PROC_COLORS,PROC_PATTERNS,COLOR_TR,PATTERN_TR};
+window.Motion=Motion;window.CHAPTERS=CHAPTERS;window.generateVisitor=generateVisitor;window.buildClue=typeof buildClue!=="undefined"?buildClue:null;try{window.renderAlbum=renderAlbum;window.ensureAlbumUI=ensureAlbumUI;}catch(_e){}window.Storage=Storage;window.Ledger=Ledger;window.Queue=Queue;window.__KEB__={getSave:()=>save,setSave:(s)=>{save=s;writeSave(save)},state,DAYS,VISITORS,TYPE_KEYS,DECORS,CHAPTERS,Motion,generateVisitor,buildClue,renderAlbum,ensureAlbumUI,Storage,Ledger,Queue,startDay,startChapter,startEndless,showScreen,itemId,currentVisitor,tryGive,askQuestion,rejectTrick,endDay,calcStars,generateEndlessDay,renderDaySelect,renderShop,openInspect,closeInspect,startTutorial,endTutorial,refreshOffice,writeSave,loadSave,SAVE_KEY,drawVisitor,drawTitleFacade,drawItem,itemLabel,generateVisitor,buildClue,EXTRA_NAMES,TYPE_TR,DETAIL_TR,PROC_DETAILS,PROC_COLORS,PROC_PATTERNS,COLOR_TR,PATTERN_TR};
 })();
 
 </script>
