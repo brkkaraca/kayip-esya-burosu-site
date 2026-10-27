@@ -99,7 +99,7 @@ body{display:flex;justify-content:center;align-items:stretch;padding:var(--safe-
 .action-row{display:flex;gap:7px;padding:7px 10px;background:var(--cream);flex-shrink:0}
 .action-row .btn{flex:1;padding:9px 6px;font-size:.78rem;border-radius:11px}
 .btn-ask{background:var(--teal);color:var(--white)}
-.btn-reject{background:var(--brick);color:var(--white);display:none}
+.btn-reject{background:var(--brick);color:var(--white);display:block}
 .btn-reject.show{display:block}
 
 .shelf-wrap{flex:1;min-height:0;background:repeating-linear-gradient(90deg,#7A5A28 0 4px,#6E5020 4px 6px,#7A5A28 6px 10px,#5C4010 10px 11px),linear-gradient(180deg,#7A5A28,#5C4010);padding:6px 8px max(8px, env(safe-area-inset-bottom, 0px));display:flex;flex-direction:column;border-top:2.5px solid var(--ink)}
@@ -551,12 +551,33 @@ function svgWrap(inner, vb){
   return `<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><g stroke="${C.ink}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none" vector-effect="non-scaling-stroke">${inner}</g></svg>`;
 }
 function patternFill(pattern, base, pid){
-  if (pattern === "cizgili") return `<defs><pattern id="${pid}" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(28)"><rect width="7" height="7" fill="${base}"/><rect width="2" height="7" fill="${C.ink}" opacity=".16"/></pattern></defs>`;
-  if (pattern === "benekli") return `<defs><pattern id="${pid}" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="${base}"/><circle cx="2.2" cy="2.2" r="1.2" fill="${C.ink}" opacity=".28"/><circle cx="6" cy="5.8" r="1" fill="${C.ink}" opacity=".22"/></pattern></defs>`;
-  if (pattern === "kareli") return `<defs><pattern id="${pid}" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="${base}"/><path d="M0 5 H10 M5 0 V10" stroke="${C.ink}" stroke-width="1.1" opacity=".2" fill="none"/></pattern></defs>`;
+  /* Fabric: soft tone-on-tone bands/dots (no ink wire-grid). Callers inset-clip. */
+  const d = lo(base), h = hi(base);
+  if (pattern === "cizgili") return `<defs><pattern id="${pid}" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(16)"><rect width="7" height="7" fill="${base}"/><rect x="0" y="0" width="2.4" height="7" fill="${d}" opacity=".26"/><rect x="4.2" y="0" width=".9" height="7" fill="${h}" opacity=".2"/></pattern></defs>`;
+  if (pattern === "benekli") return `<defs><pattern id="${pid}" width="11" height="11" patternUnits="userSpaceOnUse"><rect width="11" height="11" fill="${base}"/><circle cx="3.2" cy="3.2" r="1.85" fill="${d}" opacity=".32"/><circle cx="8.2" cy="7.6" r="1.45" fill="${h}" opacity=".34"/><circle cx="7.5" cy="2.4" r="1.1" fill="${d}" opacity=".2"/></pattern></defs>`;
+  if (pattern === "kareli") return `<defs><pattern id="${pid}" width="11" height="11" patternUnits="userSpaceOnUse"><rect width="11" height="11" fill="${base}"/><rect width="5.5" height="5.5" fill="${d}" opacity=".22"/><rect x="5.5" y="5.5" width="5.5" height="5.5" fill="${d}" opacity=".22"/><rect x="5.5" y="0" width="5.5" height="5.5" fill="${h}" opacity=".14"/><rect x="0" y="5.5" width="5.5" height="5.5" fill="${h}" opacity=".14"/></pattern></defs>`;
   return "";
 }
 function pf(pattern, pid){ return (pattern === "cizgili" || pattern === "benekli" || pattern === "kareli") ? "url(#" + pid + ")" : null; }
+/** Solid base + inset patterned fill so fabric stops short of the outline (no clipped wire edges). */
+function fabricPath(d, fill, col, pid, sw){
+  sw = sw || 1.6;
+  if (fill && String(fill).indexOf("url(") === 0) {
+    return `<path d="${d}" fill="${col}" stroke="${C.ink}" stroke-width="${sw}"/>
+      <defs><clipPath id="in${pid}"><path d="${d}" transform="translate(32 32) scale(0.84) translate(-32 -32)"/></clipPath></defs>
+      <path d="${d}" fill="${fill}" stroke="none" clip-path="url(#in${pid})"/>`;
+  }
+  return `<path d="${d}" fill="${fill||col}" stroke="${C.ink}" stroke-width="${sw}"/>`;
+}
+function fabricEllipse(cx,cy,rx,ry,fill,col,pid,sw){
+  sw = sw || 1.5;
+  if (fill && String(fill).indexOf("url(") === 0) {
+    return `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${col}" stroke="${C.ink}" stroke-width="${sw}"/>
+      <defs><clipPath id="ine${pid}"><ellipse cx="${cx}" cy="${cy}" rx="${rx*0.84}" ry="${ry*0.84}"/></clipPath></defs>
+      <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${fill}" stroke="none" clip-path="url(#ine${pid})"/>`;
+  }
+  return `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${fill||col}" stroke="${C.ink}" stroke-width="${sw}"/>`;
+}
 
 const ItemDraw = {
   semsiye(item){
@@ -620,11 +641,14 @@ const ItemDraw = {
   },
   sapka(item){
     const col = COLOR_HEX[item.color] || C.brown, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
+    const crown = "M16 42 Q16 24 32 22 Q48 24 48 42";
     let r = "";
     if (item.detail === "fiyonk") r = `<path d="M26 34 Q20 30 18 34 Q20 38 26 36 Q32 38 34 34 Q32 30 26 34" fill="${C.brick}"/>`;
     if (item.detail === "tüylü") r = `<path d="M40 24 Q48 12 46 26 Q44 30 40 28" fill="${C.blush}"/>`;
     if (item.detail === "bant") r = `<rect x="18" y="34" width="28" height="4" rx="1" fill="${C.mustard}"/>`;
-    return svgWrap(`${pat}<ellipse cx="32" cy="44" rx="20" ry="5" fill="${fill}"/><path d="M16 42 Q16 24 32 22 Q48 24 48 42" fill="${fill}"/><path d="M20 30 Q32 22 44 30" fill="${hi(col)}" opacity=".25" stroke="none"/><line x1="16" y1="40" x2="48" y2="40" stroke="${C.ink}" stroke-width="1.4"/>${r}`);
+    return svgWrap(`${pat}${fabricEllipse(32,44,20,5,fill,col,_pid+"b")}
+      ${fabricPath(crown, fill, col, _pid+"c")}
+      <path d="M20 30 Q32 22 44 30" fill="${hi(col)}" opacity=".25" stroke="none"/><line x1="16" y1="40" x2="48" y2="40" stroke="${C.ink}" stroke-width="1.4"/>${r}`);
   },
   eldiven(item){
     const col = COLOR_HEX[item.color] || C.blush, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
@@ -632,7 +656,7 @@ const ItemDraw = {
     let patch = "";
     if (item.detail === "yama") patch = `<rect x="34" y="36" width="8" height="7" rx="1" fill="${C.mustard}"/>`;
     if (item.detail === "bant") patch = `<rect x="22" y="44" width="18" height="4" rx="1" fill="${C.mustard}"/>`;
-    return svgWrap(`${pat}<defs><clipPath id="gl${_pid}"><path d="${shape}"/></clipPath></defs><path d="${shape}" fill="${fill}"/><g clip-path="url(#gl${_pid})"><path d="M22 26 Q28 20 30 30" fill="${hi(col)}" opacity=".3" stroke="none"/></g>${patch}`);
+    return svgWrap(`${pat}${fabricPath(shape, fill, col, _pid)}${patch}`);
   },
   kitap(item){
     const col = COLOR_HEX[item.color] || C.brick;
@@ -667,15 +691,9 @@ const ItemDraw = {
     const right = "M38 28 C40 40 44 50 42 58 L52 58 C54 48 50 38 48 28Z";
     const knot = "M24 26 C30 34 36 34 40 26 C36 36 32 38 28 36Z";
     return svgWrap(`${pat}
-      <defs>
-        <clipPath id="atL${_pid}"><path d="${left}"/></clipPath>
-        <clipPath id="atR${_pid}"><path d="${right}"/></clipPath>
-        <clipPath id="atO${_pid}"><path d="${loop}"/></clipPath>
-      </defs>
-      <path d="${loop}" fill="${fill}" stroke="${C.ink}" stroke-width="1.6"/>
-      <g clip-path="url(#atO${_pid})"><path d="M20 10 Q32 4 44 12" fill="${hi(col)}" opacity=".3" stroke="none"/></g>
-      <path d="${left}" fill="${fill}" stroke="${C.ink}" stroke-width="1.5"/>
-      <path d="${right}" fill="${fill}" stroke="${C.ink}" stroke-width="1.5"/>
+      ${fabricPath(loop, fill, col, _pid+"o", 1.6)}
+      ${fabricPath(left, fill, col, _pid+"l", 1.5)}
+      ${fabricPath(right, fill, col, _pid+"r", 1.5)}
       <path d="${knot}" fill="${lo(col)}" stroke="${C.ink}" stroke-width="1.2"/>
       <g stroke="${lo(col)}" stroke-width="1.7" stroke-linecap="round">
         <line x1="15" y1="58" x2="13" y2="65"/><line x1="19" y1="58" x2="18" y2="66"/><line x1="23" y1="58" x2="23" y2="65"/>
@@ -684,11 +702,13 @@ const ItemDraw = {
   },
   telefon(item){
     const col = COLOR_HEX[item.color] || C.teal, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
+    const body=`M20 12 h24 a4 4 0 0 1 4 4 v32 a4 4 0 0 1-4 4 h-24 a4 4 0 0 1-4-4 v-32 a4 4 0 0 1 4-4Z`;
     let d = "";
     if (item.detail === "kalpli") d = `<path d="M32 30 Q28 26 26 30 Q28 36 32 40 Q36 36 38 30 Q36 26 32 30" fill="${C.brick}"/>`;
     if (item.detail === "yıldızlı") d = `<polygon points="32,25 34,31 40,31 35,35 37,41 32,37 27,41 29,35 24,31 30,31" fill="${C.mustard}"/>`;
     if (item.detail === "şeffaf") d = `<rect x="24" y="20" width="16" height="22" rx="1" fill="${C.cream}" opacity=".35" stroke="none"/>`;
-    return svgWrap(`${pat}<rect x="20" y="12" width="24" height="40" rx="4" fill="${fill}"/><rect x="22" y="14" width="8" height="36" rx="2" fill="${hi(col)}" opacity=".22" stroke="none"/><rect x="24" y="18" width="16" height="24" rx="2" fill="${C.cream}"/><circle cx="32" cy="48" r="1.8" fill="${C.ink}"/>${d}`);
+    return svgWrap(`${pat}${fabricPath(body, fill, col, _pid, 1.5)}
+      <rect x="24" y="18" width="16" height="24" rx="2" fill="${C.cream}" stroke="${C.ink}" stroke-width="1"/><circle cx="32" cy="48" r="1.8" fill="${C.ink}" stroke="none"/>${d}`);
   },
   /* —— Turkish / daily —— */
   tespih(item){
@@ -734,10 +754,13 @@ const ItemDraw = {
   },
   bere(item){
     const col = COLOR_HEX[item.color] || C.brick, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
+    const body = "M12 40 Q12 18 32 14 Q52 18 52 40 Q52 48 32 50 Q12 48 12 40Z";
     let pom = "";
-    if (item.detail === "ponpon") pom = `<circle cx="32" cy="16" r="4.5" fill="${hi(col)}"/><circle cx="32" cy="16" r="4.5" fill="none"/>`;
-    if (item.detail === "katlamalı") pom = `<path d="M18 36 Q32 30 46 36" fill="none" stroke="${lo(col)}" stroke-width="1.5"/>`;
-    return svgWrap(`${pat}<path d="M16 40 Q16 20 32 16 Q48 20 48 40Z" fill="${fill}"/><ellipse cx="32" cy="40" rx="18" ry="5.5" fill="${fill}"/><path d="M20 28 Q32 18 44 28" fill="${hi(col)}" opacity=".25" stroke="none"/>${pom}`);
+    if (item.detail === "ponpon") pom = `<circle cx="32" cy="14" r="6" fill="${hi(col)}" stroke="${C.ink}" stroke-width="1.2"/><circle cx="30" cy="12" r="2" fill="${C.cream}" opacity=".35" stroke="none"/>`;
+    if (item.detail === "katlamalı") pom = `<path d="M16 36 Q32 28 48 36" fill="none" stroke="${C.ink}" stroke-width="1.3" opacity=".35"/>`;
+    return svgWrap(`${pat}${fabricPath(body, fill, col, _pid)}
+      <path d="M14 42 Q32 46 50 42" fill="none" stroke="${C.ink}" stroke-width="1.2" opacity=".35"/>
+      ${pom}`);
   },
   cantasirt(item){
     const col = COLOR_HEX[item.color] || C.navy, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
@@ -764,12 +787,14 @@ const ItemDraw = {
   },
   kalemlik(item){
     const col = COLOR_HEX[item.color] || C.wood, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
+    let pens = `<rect x="22" y="10" width="5" height="24" rx="1.5" fill="${C.brick}"/><rect x="30" y="6" width="5" height="28" rx="1.5" fill="${C.teal}"/><rect x="38" y="12" width="5" height="22" rx="1.5" fill="${C.mustard}"/>`;
+    if (item.detail === "boş") pens = "";
+    if (item.detail === "cetvel") pens += `<rect x="42" y="12" width="2.2" height="18" rx="0.6" fill="${C.cream}"/>`;
+    const body = "M14 28 h36 a4 4 0 0 1 0 0 v24 a4 4 0 0 1-4 4 h-28 a4 4 0 0 1-4-4 z";
     return svgWrap(`${pat}
       <rect x="14" y="28" width="36" height="28" rx="4" fill="${fill}"/>
       <rect x="16" y="30" width="10" height="24" rx="2" fill="${hi(col)}" opacity=".25" stroke="none"/>
-      <rect x="22" y="10" width="5" height="24" rx="1.5" fill="${C.brick}"/>
-      <rect x="30" y="6" width="5" height="28" rx="1.5" fill="${C.teal}"/>
-      <rect x="38" y="12" width="5" height="22" rx="1.5" fill="${C.mustard}"/>
+      ${pens}
       <ellipse cx="32" cy="28" rx="18" ry="5" fill="${fill}"/>`);
   },
   foto(item){
@@ -839,7 +864,7 @@ const ItemDraw = {
   mendil(item){
     const col = COLOR_HEX[item.color] || C.white, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
     let e = "";
-    if (item.detail === "nakışlı") e = `<circle cx="32" cy="32" r="5" fill="none" stroke="${C.brick}" stroke-width="1.4"/><path d="M32 28 L32 36 M28 32 L36 32" stroke="${C.brick}" stroke-width="1.2"/>`;
+    if (item.detail === "nakışlı") e = `<path d="M32 26 Q36 30 32 34 Q28 30 32 26" fill="${C.brick}"/><circle cx="32" cy="30" r="1.4" fill="${C.mustard}" stroke="none"/>`;
     if (item.detail === "katlı") e = `<path d="M18 32 L46 30" stroke="${C.ink}" stroke-width="1.2" opacity=".45"/>`;
     return svgWrap(`${pat}<rect x="14" y="16" width="36" height="36" rx="2" fill="${fill}" transform="rotate(-8 32 34)"/>
       <rect x="16" y="18" width="32" height="10" fill="${hi(col)}" opacity=".3" stroke="none" transform="rotate(-8 32 34)"/>
@@ -884,10 +909,24 @@ const ItemDraw = {
     return svgWrap(`<rect x="16" y="20" width="32" height="28" rx="2" fill="${col}"/><rect x="18" y="22" width="10" height="24" fill="${hi(col)}" opacity=".25" stroke="none"/><line x1="16" y1="28" x2="48" y2="28" stroke="${C.ink}" stroke-width="1"/>${e}`);
   },
   anahtar(item){
+    /* Classic house key — bow, shaft, bit teeth. Never a magnifying glass. */
     const col = COLOR_HEX[item.color] || C.mustard;
-    let e = "";
-    if (item.detail === "çift") e = `<circle cx="40" cy="22" r="6" fill="none" stroke="${col}" stroke-width="2.2"/><path d="M40 28 L40 44 L36 48 M40 40 L44 44" stroke="${col}" stroke-width="2"/>`;
-    return svgWrap(`<circle cx="24" cy="22" r="8" fill="none" stroke="${col}" stroke-width="2.5"/><circle cx="24" cy="22" r="3.5" fill="none" stroke="${col}" stroke-width="1.5"/><path d="M30 26 L42 40 L38 44 L36 40 L32 44 L30 40 L34 36Z" fill="${col}"/>${e}`);
+    const metal = col;
+    let second = "";
+    if (item.detail === "çift") {
+      second = `<g transform="translate(10,4) rotate(18)" opacity=".9">
+        <circle cx="18" cy="16" r="7" fill="${metal}" stroke="${C.ink}" stroke-width="1.4"/>
+        <circle cx="18" cy="16" r="3" fill="${C.cream}" stroke="${C.ink}" stroke-width="1"/>
+        <rect x="16" y="22" width="4" height="20" rx="1" fill="${metal}" stroke="${C.ink}" stroke-width="1.2"/>
+        <path d="M20 34 h7 v3 h-3 v3 h3 v3 h-7" fill="${metal}" stroke="${C.ink}" stroke-width="1.1"/>
+      </g>`;
+    }
+    return svgWrap(`${second}
+      <circle cx="20" cy="18" r="9" fill="${metal}" stroke="${C.ink}" stroke-width="1.6"/>
+      <circle cx="20" cy="18" r="4" fill="${C.cream}" stroke="${C.ink}" stroke-width="1.2"/>
+      <rect x="17.5" y="26" width="5" height="22" rx="1.2" fill="${metal}" stroke="${C.ink}" stroke-width="1.3"/>
+      <path d="M22.5 36 h8 v3.5 h-3.5 v3 h3.5 v3.5 h-8" fill="${metal}" stroke="${C.ink}" stroke-width="1.2"/>
+      ${item.detail==="metal"?`<rect x="17" y="28" width="6" height="3" fill="${C.gray}" stroke="none"/>`:""}`);
   },
   cuzdan_kart(item){
     /* Transit/ID card */
@@ -947,10 +986,8 @@ const ItemDraw = {
       <line x1="32" y1="40" x2="32" y2="54"/><line x1="38" y1="42" x2="38" y2="54"/>
       <line x1="44" y1="44" x2="46" y2="55"/><line x1="50" y1="46" x2="52" y2="56"/>
     </g>`;
-    return svgWrap(`${pat}<defs><clipPath id="sh${_pid}"><path d="${shape}"/></clipPath></defs>
-      <path d="${shape}" fill="${fill}" stroke="${C.ink}" stroke-width="1.5"/>
+    return svgWrap(`${pat}${fabricPath(shape, fill, col, _pid, 1.5)}
       <path d="${fold}" fill="${hi(col)}" opacity=".35" stroke="${C.ink}" stroke-width="1"/>
-      <g clip-path="url(#sh${_pid})"><path d="M16 28 Q32 20 48 28" fill="${hi(col)}" opacity=".2" stroke="none"/></g>
       ${fringe}`);
   },
   ceptelefonu(item){
@@ -1029,95 +1066,143 @@ function drawVisitor(v,expr){
   expr=expr||"neutral";
   const skin=v.skin||"#E8C4A8",hair=v.hair||C.brown,shirt=v.shirt||C.teal;
   const skinHi=hi(skin), shirtHi=hi(shirt);
+  const age=v.age||"adult";
+  const face=v.face||"round";
+  const cloth=v.cloth||"shirt";
   const bid="blink"+(_uid++);
+  const breath="br"+(_uid++);
+  const scale=age==="child"?0.88:(age==="elder"?1.02:1);
+  // Head shape
+  let headShape;
+  if(face==="oval") headShape=`<ellipse cx="50" cy="42" rx="19" ry="23" fill="${skin}" stroke="${C.ink}" stroke-width="1.6"/>`;
+  else if(face==="square") headShape=`<rect x="30" y="22" width="40" height="40" rx="10" fill="${skin}" stroke="${C.ink}" stroke-width="1.6"/>`;
+  else if(face==="heart") headShape=`<path d="M32 40 Q30 22 50 20 Q70 22 68 40 Q70 54 50 62 Q30 54 32 40Z" fill="${skin}" stroke="${C.ink}" stroke-width="1.6"/>`;
+  else headShape=`<circle cx="50" cy="42" r="22" fill="${skin}" stroke="${C.ink}" stroke-width="1.6"/>`;
+
+  let torso;
+  if(cloth==="coat"){
+    torso=`<path d="M30 76 Q32 58 50 56 Q68 58 70 76 L72 108 Q50 112 28 108Z" fill="${shirt}"/>
+      <path d="M50 60 L50 108" stroke="${C.ink}" stroke-width="1.3" opacity=".4"/>
+      <path d="M32 78 L24 100" stroke="${lo(shirt)}" stroke-width="4" stroke-linecap="round"/>
+      <path d="M68 78 L76 100" stroke="${lo(shirt)}" stroke-width="4" stroke-linecap="round"/>`;
+  } else if(cloth==="apron"){
+    torso=`<path d="M30 76 Q32 58 50 56 Q68 58 70 76 L72 108 Q50 112 28 108Z" fill="${shirt}"/>
+      <path d="M38 74 H62 V106 Q50 110 38 106Z" fill="${C.cream}" stroke="${C.ink}" stroke-width="1.3"/>
+      <path d="M36 72 H64" stroke="${C.ink}" stroke-width="1.5"/>`;
+  } else if(cloth==="sweater"){
+    torso=`<path d="M28 74 Q30 58 50 56 Q70 58 72 74 L74 108 Q50 112 26 108Z" fill="${shirt}"/>
+      <path d="M36 66 Q50 74 64 66" fill="none" stroke="${hi(shirt)}" stroke-width="2.2" opacity=".55"/>
+      <path d="M34 78 Q50 86 66 78" fill="none" stroke="${hi(shirt)}" stroke-width="2" opacity=".4"/>
+      <path d="M38 62 Q50 58 62 62" fill="${C.cream}" opacity=".25" stroke="none"/>`;
+  } else if(cloth==="uniform"){
+    torso=`<path d="M30 76 Q32 58 50 56 Q68 58 70 76 L72 108 Q50 112 28 108Z" fill="${shirt}"/>
+      <rect x="44" y="70" width="12" height="18" rx="1" fill="${C.mustard}" stroke="${C.ink}" stroke-width="1.2"/>
+      <circle cx="50" cy="75" r="1.3" fill="${C.ink}" stroke="none"/><circle cx="50" cy="81" r="1.3" fill="${C.ink}" stroke="none"/><circle cx="50" cy="87" r="1.3" fill="${C.ink}" stroke="none"/>`;
+  } else {
+    torso=`<path d="M30 76 Q32 58 50 56 Q68 58 70 76 L72 108 Q50 112 28 108Z" fill="${shirt}"/>
+      <path d="M36 64 Q50 60 64 64 L65 78 Q50 82 35 78Z" fill="${shirtHi}" opacity=".3" stroke="none"/>
+      <ellipse cx="50" cy="70" rx="7" ry="4" fill="${C.cream}" stroke="${C.ink}" stroke-width="1.3"/>`;
+  }
+
+  let facial="";
+  if(v.mustache) facial+=`<path d="M40 54 Q50 58 60 54" fill="${v.mustache}" stroke="${C.ink}" stroke-width="1.1"/>`;
+  if(v.beard) facial+=`<path d="M38 56 Q50 72 62 56 Q50 62 38 56" fill="${v.beard}" stroke="${C.ink}" stroke-width="1.1"/>`;
+  let wrinkles="";
+  if(age==="elder"){
+    wrinkles=`<path d="M34 36 Q38 34 41 37" fill="none" stroke="${C.ink}" stroke-width="1" opacity=".4"/>
+      <path d="M59 37 Q62 34 66 36" fill="none" stroke="${C.ink}" stroke-width="1" opacity=".4"/>
+      <path d="M44 58 Q50 60 56 58" fill="none" stroke="${C.ink}" stroke-width=".9" opacity=".35"/>`;
+  }
+  const eyeR=age==="child"?2.0:2.35;
+
+  const yOff = age==="child" ? 10 : 0;
   return `<svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" overflow="visible">
     <style>
       @keyframes ${bid}{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.08)}}
-      .e${bid}{transform-origin:center;transform-box:fill-box;animation:${bid} 3.6s ease-in-out infinite}
+      @keyframes ${breath}{0%,100%{transform:translateY(0)}50%{transform:translateY(1.15px)}}
+      .e${bid}{transform-origin:center;transform-box:fill-box;animation:${bid} 3.8s ease-in-out infinite}
+      .idle${breath}{transform-origin:50px 110px;animation:${breath} 3.1s ease-in-out infinite}
     </style>
-    <g stroke="${C.ink}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <g class="idle${breath}" transform="translate(0 ${yOff}) scale(${scale})" style="transform-origin:50px 110px" stroke="${C.ink}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
       ${v.behind||""}
-      <path d="M30 76 Q32 58 50 56 Q68 58 70 76 L72 108 Q50 112 28 108Z" fill="${shirt}"/>
-      <path d="M36 64 Q50 60 64 64 L65 78 Q50 82 35 78Z" fill="${shirtHi}" opacity=".3" stroke="none"/>
-      <ellipse cx="50" cy="70" rx="7" ry="4" fill="${C.cream}" stroke="${C.ink}" stroke-width="1.3"/>
-      <circle cx="50" cy="82" r="1.6" fill="${C.mustard}" stroke="none"/><circle cx="50" cy="90" r="1.6" fill="${C.mustard}" stroke="none"/>
+      ${torso}
       <path d="M30 80 Q14 86 16 98 Q20 102 34 96" fill="${shirt}"/>
       <path d="M70 80 Q86 86 84 98 Q80 102 66 96" fill="${shirt}"/>
       <ellipse cx="18" cy="100" rx="8" ry="5.5" fill="${skin}"/><ellipse cx="82" cy="100" rx="8" ry="5.5" fill="${skin}"/>
       <path d="${v.hairPath||"M26 40 Q24 14 50 10 Q76 14 74 40 Q68 26 50 24 Q32 26 26 40"}" fill="${hair}"/>
-      <circle cx="50" cy="42" r="22" fill="${skin}" stroke="${C.ink}" stroke-width="1.6"/>
+      ${headShape}
       <ellipse cx="42" cy="38" rx="7" ry="5" fill="${skinHi}" opacity=".28" stroke="none"/>
       <path d="${browPath(expr,"L")}" fill="none" stroke="${C.ink}" stroke-width="1.5"/>
       <path d="${browPath(expr,"R")}" fill="none" stroke="${C.ink}" stroke-width="1.5"/>
-      <g class="e${bid}"><circle cx="41" cy="44" r="2.4" fill="${C.ink}" stroke="none"/><circle cx="40" cy="43.2" r=".65" fill="${C.cream}" stroke="none"/></g>
-      <g class="e${bid}" style="animation-delay:.08s"><circle cx="59" cy="44" r="2.4" fill="${C.ink}" stroke="none"/><circle cx="58" cy="43.2" r=".65" fill="${C.cream}" stroke="none"/></g>
+      ${wrinkles}
+      <g class="e${bid}"><circle cx="41" cy="44" r="${eyeR}" fill="${C.ink}" stroke="none"/><circle cx="40" cy="43.2" r=".55" fill="${C.cream}" stroke="none"/></g>
+      <g class="e${bid}" style="animation-delay:.08s"><circle cx="59" cy="44" r="${eyeR}" fill="${C.ink}" stroke="none"/><circle cx="58" cy="43.2" r=".55" fill="${C.cream}" stroke="none"/></g>
       <ellipse cx="40" cy="52" rx="3" ry="1.5" fill="${C.blush}" opacity=".4" stroke="none"/>
       <ellipse cx="60" cy="52" rx="3" ry="1.5" fill="${C.blush}" opacity=".4" stroke="none"/>
+      ${facial}
       <path d="${mouthPath(expr)}" fill="none" stroke="${C.ink}" stroke-width="1.5"/>
       ${v.extras||""}
     </g></svg>`;
 }
 
-
-
 const VISITORS={
-  nermin:{id:"nermin",name:"Nermin Teyze",skin:"#E8C4A8",hair:"#5A4030",shirt:C.brick,
+  nermin:{id:"nermin",name:"Nermin Teyze",skin:"#E8C4A8",hair:"#5A4030",shirt:C.brick,age:"elder",face:"oval",cloth:"coat",
     hairPath:"M26 40 Q24 14 50 8 Q76 14 74 40 Q66 26 50 24 Q34 26 26 40",
     behind:`<ellipse cx="50" cy="38" rx="33" ry="36" fill="${C.brick}"/><path d="M20 50 Q12 70 22 88 Q32 82 28 60Z" fill="${C.brick}"/><path d="M80 50 Q88 70 78 88 Q68 82 72 60Z" fill="${C.brick}"/><path d="M28 20 Q50 6 72 20" fill="none" stroke="${C.mustard}" stroke-width="1.8"/>`,
-    extras:`<circle cx="50" cy="72" r="4.2" fill="${C.mustard}"/><circle cx="50" cy="72" r="1.7" fill="${C.brick}" stroke="none"/>`},
-  ahmet:{id:"ahmet",name:"Simitçi Ahmet",skin:"#D4A574",hair:"#2A2218",shirt:C.mustard,
+    extras:`<circle cx="50" cy="72" r="4.2" fill="${C.mustard}"/><circle cx="50" cy="72" r="1.7" fill="${C.brick}" stroke="none"/><circle cx="28" cy="56" r="2" fill="${C.mustard}"/><circle cx="72" cy="56" r="2" fill="${C.mustard}"/>`},
+  ahmet:{id:"ahmet",name:"Simitçi Ahmet",skin:"#D4A574",hair:"#2A2218",shirt:C.mustard,age:"adult",face:"square",cloth:"apron",mustache:"#2A2218",
     hairPath:"M26 40 Q28 12 50 8 Q72 12 74 40 Q64 22 50 22 Q36 22 26 40",
-    extras:`<ellipse cx="50" cy="98" rx="24" ry="5.5" fill="${C.wood}"/><ellipse cx="40" cy="91" rx="7.5" ry="4.2" fill="${C.blush}" transform="rotate(-16 40 91)"/><ellipse cx="60" cy="91" rx="7.5" ry="4.2" fill="${C.blush}" transform="rotate(16 60 91)"/><circle cx="40" cy="91" r="1.3" fill="${C.cream}" stroke="none"/><circle cx="60" cy="91" r="1.3" fill="${C.cream}" stroke="none"/><path d="M28 98 Q50 104 72 98" fill="none" stroke="${C.ink}" stroke-width="1.2" opacity=".4"/>`},
-  elif:{id:"elif",name:"Elif",skin:"#F0D0B0",hair:"#3D2B1F",shirt:C.teal,
+    extras:`<ellipse cx="50" cy="98" rx="24" ry="5.5" fill="${C.wood}"/><ellipse cx="40" cy="91" rx="7.5" ry="4.2" fill="${C.blush}" transform="rotate(-16 40 91)"/><ellipse cx="60" cy="91" rx="7.5" ry="4.2" fill="${C.blush}" transform="rotate(16 60 91)"/><circle cx="40" cy="91" r="1.3" fill="${C.cream}" stroke="none"/><circle cx="60" cy="91" r="1.3" fill="${C.cream}" stroke="none"/>`},
+  elif:{id:"elif",name:"Elif",skin:"#F0D0B0",hair:"#3D2B1F",shirt:C.teal,age:"young",face:"heart",cloth:"sweater",
     hairPath:"M22 48 Q14 18 50 6 Q86 18 78 48 Q72 26 50 20 Q28 26 22 48",
-    extras:`<path d="M70 76 Q80 68 84 80 Q78 88 68 82Z" fill="${C.mustard}"/><circle cx="76" cy="78" r="1.6" fill="${C.brick}" stroke="none"/>`},
-  kemal:{id:"kemal",name:"Kemal Bey",skin:"#E0B890",hair:"#6B6B6B",shirt:C.navy,
+    extras:`<path d="M70 76 Q80 68 84 80 Q78 88 68 82Z" fill="${C.mustard}"/><circle cx="76" cy="78" r="1.6" fill="${C.brick}" stroke="none"/><circle cx="30" cy="54" r="2.2" fill="${C.mustard}"/><circle cx="70" cy="54" r="2.2" fill="${C.mustard}"/>`},
+  kemal:{id:"kemal",name:"Kemal Bey",skin:"#E0B890",hair:"#6B6B6B",shirt:C.navy,age:"elder",face:"oval",cloth:"coat",mustache:"#6B6B6B",
     hairPath:"M28 38 Q30 14 50 10 Q70 14 72 38 Q62 24 50 24 Q38 24 28 38",
     extras:`<rect x="34" y="40" width="12" height="7" rx="1" fill="none" stroke="${C.ink}" stroke-width="1.3"/><rect x="54" y="40" width="12" height="7" rx="1" fill="none" stroke="${C.ink}" stroke-width="1.3"/><line x1="46" y1="43" x2="54" y2="43" stroke="${C.ink}" stroke-width="1.2"/><g transform="translate(72,68)"><rect x="0" y="0" width="16" height="20" rx="1.2" fill="${C.cream}"/><line x1="2.5" y1="4" x2="13.5" y2="4" stroke="${C.ink}" stroke-width=".9"/><line x1="2.5" y1="8" x2="12" y2="8" stroke="${C.ink}" stroke-width=".9"/><line x1="2.5" y1="12" x2="11" y2="12" stroke="${C.ink}" stroke-width=".9"/><rect x="-2" y="0" width="3.5" height="20" fill="${C.brick}"/></g>`},
-  zeynep:{id:"zeynep",name:"Zeynep",skin:"#C9956C",hair:"#1A1510",shirt:C.purple,
+  zeynep:{id:"zeynep",name:"Zeynep",skin:"#C9956C",hair:"#1A1510",shirt:C.purple,age:"young",face:"oval",cloth:"sweater",
     hairPath:"M20 50 Q14 14 50 6 Q86 14 80 50 Q74 28 50 22 Q26 28 20 50",
-    extras:`<circle cx="28" cy="56" r="2.3" fill="${C.mustard}"/><circle cx="72" cy="56" r="2.3" fill="${C.mustard}"/>`},
-  hasan:{id:"hasan",name:"Hasan Amca",skin:"#D4A574",hair:"#C8C0B0",shirt:C.sage,
+    extras:`<circle cx="28" cy="56" r="2.3" fill="${C.mustard}"/><circle cx="72" cy="56" r="2.3" fill="${C.mustard}"/><path d="M66 78 Q76 70 80 84 Q72 90 64 84Z" fill="${C.blush}"/>`},
+  hasan:{id:"hasan",name:"Hasan Amca",skin:"#D4A574",hair:"#C8C0B0",shirt:C.sage,age:"elder",face:"square",cloth:"shirt",mustache:"#C8C0B0",beard:"#C8C0B0",
     hairPath:"M24 42 Q24 16 50 10 Q76 16 76 42 Q68 28 50 26 Q32 28 24 42",
-    extras:`<path d="M38 58 Q50 64 62 58" fill="none" stroke="${C.ink}" stroke-width="1.3" opacity=".55"/>`},
-  merve:{id:"merve",name:"Merve",skin:"#E8C4A8",hair:"#8B4513",shirt:C.pink,
+    extras:`<circle cx="72" cy="78" r="5" fill="${C.wood}"/>`},
+  merve:{id:"merve",name:"Merve",skin:"#E8C4A8",hair:"#8B4513",shirt:C.pink,age:"young",face:"heart",cloth:"sweater",
     hairPath:"M22 44 Q20 10 50 6 Q80 10 78 44 Q70 24 50 22 Q30 24 22 44",
-    extras:`<circle cx="72" cy="78" r="5" fill="${C.mustard}"/><path d="M70 76 L74 80 M74 76 L70 80" stroke="${C.brick}" stroke-width="1"/>`},
-  can:{id:"can",name:"Can",skin:"#F0D0B0",hair:"#2A2218",shirt:C.blue,
-    hairPath:"M28 36 Q30 10 50 6 Q70 10 72 36 Q62 18 50 18 Q38 18 28 36",
-    extras:`<rect x="66" y="72" width="16" height="12" rx="2" fill="${C.navy}"/><circle cx="74" cy="78" r="2" fill="${C.mustard}" stroke="none"/>`},
-  cem:{id:"cem",name:"Cem",skin:"#E8C4A8",hair:"#2A2218",shirt:C.teal,
+    extras:`<circle cx="72" cy="78" r="5" fill="${C.mustard}"/><path d="M70 76 L74 80 M74 76 L70 80" stroke="${C.brick}" stroke-width="1"/><path d="M24 18 Q32 8 40 18" fill="${C.pink}" opacity=".8"/>`},
+  can:{id:"can",name:"Can",skin:"#F5D4A8",hair:"#2A2218",shirt:C.blue,age:"child",face:"round",cloth:"sweater",
+    hairPath:"M30 34 Q28 8 50 4 Q72 8 70 34 Q64 16 50 14 Q36 16 30 34",
+    extras:`<rect x="64" y="70" width="18" height="14" rx="2" fill="${C.navy}"/><circle cx="73" cy="77" r="2.2" fill="${C.mustard}" stroke="none"/><path d="M34 18 L38 10 L42 18 M58 18 L62 10 L66 18" fill="none" stroke="${C.ink}" stroke-width="1.3"/>`},
+  cem:{id:"cem",name:"Cem",skin:"#E8C4A8",hair:"#2A2218",shirt:C.teal,age:"young",face:"oval",cloth:"uniform",
     hairPath:"M28 38 Q26 12 50 8 Q74 12 72 38 Q64 22 50 20 Q36 22 28 38",
     extras:`<rect x="62" y="70" width="14" height="18" rx="1.5" fill="${C.navy}"/><path d="M64 74 H74 M64 78 H72" stroke="${C.cream}" stroke-width="1"/>`},
-  selim:{id:"selim",name:"Selim Amca",skin:"#D4A574",hair:"#C8C0B0",shirt:C.wood,
+  selim:{id:"selim",name:"Selim Amca",skin:"#D4A574",hair:"#C8C0B0",shirt:C.wood,age:"elder",face:"square",cloth:"coat",mustache:"#C8C0B0",
     hairPath:"M26 40 Q28 16 50 12 Q72 16 74 40 Q66 28 50 26 Q34 28 26 40",
     extras:`<path d="M36 58 Q50 66 64 58" fill="none" stroke="${C.ink}" stroke-width="1.4" opacity=".5"/><ellipse cx="50" cy="100" rx="18" ry="4" fill="${C.mustard}" opacity=".7"/>`},
-  fulya:{id:"fulya",name:"Fulya Hanım",skin:"#F0D0B0",hair:"#5A3020",shirt:C.pink,
+  fulya:{id:"fulya",name:"Fulya Hanım",skin:"#F0D0B0",hair:"#5A3020",shirt:C.pink,age:"adult",face:"heart",cloth:"coat",
     hairPath:"M22 46 Q16 14 50 6 Q84 14 78 46 Q70 26 50 22 Q30 26 22 46",
     extras:`<circle cx="30" cy="54" r="2" fill="${C.mustard}"/><circle cx="70" cy="54" r="2" fill="${C.mustard}"/><path d="M68 72 Q78 66 82 78 Q74 86 66 78Z" fill="${C.blush}"/>`},
-  hatice:{id:"hatice",name:"Hatice Teyze",skin:"#E0B890",hair:"#6B5A4A",shirt:C.sage,
+  hatice:{id:"hatice",name:"Hatice Teyze",skin:"#E0B890",hair:"#6B5A4A",shirt:C.sage,age:"elder",face:"oval",cloth:"coat",
     hairPath:"M24 42 Q22 14 50 8 Q78 14 76 42 Q68 28 50 26 Q32 28 24 42",
     behind:`<ellipse cx="50" cy="36" rx="32" ry="34" fill="${C.sage}"/><path d="M22 48 Q14 68 24 84 Q34 78 30 58Z" fill="${C.sage}"/><path d="M78 48 Q86 68 76 84 Q66 78 70 58Z" fill="${C.sage}"/>`,
     extras:`<circle cx="50" cy="70" r="3" fill="${C.mustard}"/>`},
-  oguz:{id:"oguz",name:"Oğuz",skin:"#D8B090",hair:"#3A3028",shirt:C.gray,
+  oguz:{id:"oguz",name:"Oğuz",skin:"#D8B090",hair:"#3A3028",shirt:C.gray,age:"adult",face:"square",cloth:"shirt",beard:"#3A3028",
     hairPath:"M28 36 Q30 12 50 8 Q70 12 72 36 Q62 20 50 20 Q38 20 28 36",
     extras:`<path d="M34 58 L38 66 L42 58" fill="none" stroke="${C.ink}" stroke-width="1.2" opacity=".5"/><rect x="70" y="68" width="12" height="16" rx="1" fill="${C.cream}"/>`},
-  melis:{id:"melis",name:"Melis",skin:"#F0D0B0",hair:"#8B4513",shirt:C.purple,
-    hairPath:"M24 44 Q18 12 50 6 Q82 12 76 44 Q68 24 50 20 Q32 24 24 44",
-    extras:`<path d="M44 16 Q50 8 56 16" fill="none" stroke="${C.ink}" stroke-width="1.2"/><circle cx="72" cy="76" r="4.5" fill="${C.mustard}"/>`},
-  riza:{id:"riza",name:"Rıza Usta",skin:"#C9956C",hair:"#2A2218",shirt:C.brick,
+  melis:{id:"melis",name:"Melis",skin:"#F2C9A0",hair:"#A0522D",shirt:C.purple,age:"young",face:"heart",cloth:"sweater",
+    hairPath:"M22 48 Q14 10 50 4 Q86 10 78 48 Q72 22 50 18 Q28 22 22 48",
+    extras:`<path d="M42 14 Q50 4 58 14 Q50 18 42 14" fill="${C.pink}" stroke="${C.ink}" stroke-width="1.1"/><circle cx="28" cy="54" r="2.4" fill="${C.mustard}"/><circle cx="72" cy="54" r="2.4" fill="${C.mustard}"/><circle cx="74" cy="78" r="5" fill="${C.sky}"/>`},
+  riza:{id:"riza",name:"Rıza Usta",skin:"#C9956C",hair:"#2A2218",shirt:C.brick,age:"adult",face:"square",cloth:"uniform",mustache:"#2A2218",
     hairPath:"M26 38 Q28 14 50 10 Q72 14 74 38 Q64 24 50 22 Q36 24 26 38",
     extras:`<rect x="66" y="74" width="18" height="8" rx="1" fill="${C.wood}"/><circle cx="75" cy="78" r="2" fill="${C.mustard}" stroke="none"/>`},
-  deniz:{id:"deniz",name:"Deniz",skin:"#E8C4A8",hair:"#3D2B1F",shirt:C.sky,
+  deniz:{id:"deniz",name:"Deniz",skin:"#E8C4A8",hair:"#3D2B1F",shirt:C.sky,age:"young",face:"oval",cloth:"sweater",
     hairPath:"M26 40 Q24 12 50 8 Q76 12 74 40 Q66 24 50 22 Q34 24 26 40",
     extras:`<ellipse cx="78" cy="88" rx="11" ry="7" fill="${C.mustard}"/><path d="M72 84 Q78 80 84 84" fill="none" stroke="${C.ink}" stroke-width="1.1"/>`},
-  yalanci:{id:"yalanci",name:"Şüpheli Adam",skin:"#D8B090",hair:"#3A3028",shirt:C.gray,
+  yalanci:{id:"yalanci",name:"Şüpheli Adam",skin:"#D8B090",hair:"#3A3028",shirt:C.gray,age:"adult",face:"square",cloth:"coat",
     hairPath:"M26 38 Q28 12 50 8 Q72 12 74 38 Q64 22 50 20 Q36 22 26 38",
     extras:`<path d="M60 46 Q66 50 60 54" fill="none" stroke="${C.ink}" stroke-width="1.2"/><rect x="68" y="70" width="14" height="18" rx="1" fill="${C.cream}"/>`},
-  ayse:{id:"ayse",name:"Ayşe Hanım",skin:"#E8C4A8",hair:"#4A3020",shirt:C.teal,
+  ayse:{id:"ayse",name:"Ayşe Hanım",skin:"#E0B890",hair:"#4A3020",shirt:C.teal,age:"adult",face:"oval",cloth:"coat",
     hairPath:"M26 36 Q22 14 50 8 Q78 14 74 36 Q68 24 50 22 Q32 24 26 36",
-    behind:`<ellipse cx="50" cy="38" rx="33" ry="36" fill="${C.teal}"/><path d="M20 50 Q12 70 22 86 Q32 80 28 60Z" fill="${C.teal}"/><path d="M80 50 Q88 70 78 86 Q68 80 72 60Z" fill="${C.teal}"/>`,
-    extras:`<circle cx="50" cy="70" r="2.8" fill="${C.mustard}"/>`}
+    behind:`<ellipse cx="50" cy="36" rx="34" ry="38" fill="${C.teal}"/><path d="M18 48 Q10 72 22 90 Q34 82 28 58Z" fill="${C.teal}"/><path d="M82 48 Q90 72 78 90 Q66 82 72 58Z" fill="${C.teal}"/><path d="M30 18 Q50 8 70 18" fill="none" stroke="${C.mustard}" stroke-width="2"/>`,
+    extras:`<circle cx="50" cy="70" r="3.2" fill="${C.mustard}"/><circle cx="30" cy="54" r="2" fill="${C.mustard}"/><circle cx="70" cy="54" r="2" fill="${C.mustard}"/>`}
 };
 
 
@@ -3426,8 +3511,8 @@ function loadVisitor(){
   $("visitor-name").textContent=v.name;
   updatePatience();
   const speechTxt=cv.trick?(cv.claim||""):(cv.clue||"");
-  if(cv.trick){$("btn-reject").classList.add("show");$("stamp-text").textContent="REDDEDİLDİ"}
-  else{$("btn-reject").classList.remove("show");$("stamp-text").textContent="TESLİM EDİLDİ"}
+  $("btn-reject").classList.add("show");
+  $("stamp-text").textContent=cv.trick?"REDDEDİLDİ":"TESLİM EDİLDİ";
   if(window.Motion){Motion.enterVisitor($("visitor-body"));Motion.typewrite($("speech"),speechTxt);}
   else{$("speech").textContent=speechTxt;}
   $("btn-ask").disabled=false;
@@ -3617,13 +3702,29 @@ function askQuestion(){
   if(state.patience<=0){state.failed=true;setTimeout(()=>endDay(false),700)}
 }
 function rejectTrick(){
-  const cv=currentVisitor();if(!cv||!cv.trick||state.failed)return;
-  AudioSys.ok();setExpr("annoyed");state.correct++;
-  const coins=8;state.dayCoins+=coins;save.coins+=coins;writeSave(save);$("hud-coin-text").textContent=String(save.coins);
-  $("stamp-text").textContent="REDDEDİLDİ";$("stamp-overlay").classList.add("show");AudioSys.stamp();
-  const payoff=$("payoff");payoff.innerHTML=`<div>${cv.payoffReject||"İyi iş."}</div><div class="payoff-coins">+${coins} jeton</div>`;payoff.classList.add("show");
-  document.querySelectorAll(".shelf-item").forEach(s=>s.classList.add("dimmed"));
-  setTimeout(()=>{$("stamp-overlay").classList.remove("show");payoff.classList.remove("show");nextVisitorOrEnd()},1600);
+  const cv=currentVisitor();if(!cv||state.failed)return;
+  // Trick visitor: correct to reject
+  if(cv.trick){
+    AudioSys.ok();setExpr("annoyed");state.correct++;
+    const coins=8;state.dayCoins+=coins;save.coins+=coins;writeSave(save);$("hud-coin-text").textContent=String(save.coins);
+    $("stamp-text").textContent="REDDEDİLDİ";$("stamp-overlay").classList.add("show");AudioSys.stamp();
+    const payoff=$("payoff");payoff.innerHTML=`<div>${cv.payoffReject||"İyi iş."}</div><div class="payoff-coins">+${coins} jeton</div>`;payoff.classList.add("show");
+    document.querySelectorAll(".shelf-item").forEach(s=>s.classList.add("dimmed"));
+    setTimeout(()=>{$("stamp-overlay").classList.remove("show");payoff.classList.remove("show");nextVisitorOrEnd()},1600);
+    return;
+  }
+  // Honest visitor: "Burada yok" is correct only if target is NOT on the shelf
+  const onShelf=!!(cv.target&&(cv.shelf||[]).some(it=>itemId(it)===itemId(cv.target)));
+  if(!onShelf){
+    AudioSys.ok();setExpr("happy");state.correct++;
+    const coins=6;state.dayCoins+=coins;save.coins+=coins;writeSave(save);$("hud-coin-text").textContent=String(save.coins);
+    $("stamp-text").textContent="KAYIT YOK";$("stamp-overlay").classList.add("show");AudioSys.stamp();
+    const payoff=$("payoff");payoff.innerHTML=`<div>Doğru — rafta yoktu.</div><div class="payoff-coins">+${coins} jeton</div>`;payoff.classList.add("show");
+    document.querySelectorAll(".shelf-item").forEach(s=>s.classList.add("dimmed"));
+    setTimeout(()=>{$("stamp-overlay").classList.remove("show");payoff.classList.remove("show");nextVisitorOrEnd()},1600);
+  } else {
+    onWrong(null, "Rafta var gibi… bir daha bak.");
+  }
 }
 function nextVisitorOrEnd(){
   if(typeof Queue!=="undefined"&&Queue.active){
