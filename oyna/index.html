@@ -289,6 +289,14 @@ body{display:flex;justify-content:center;align-items:stretch;padding:var(--safe-
 .festival-mode .office-bg{filter:saturate(1.2)}
 .festival-bunting{position:absolute;top:2px;left:0;right:0;text-align:center;color:#C45A4A;font-size:14px;letter-spacing:6px;z-index:3;pointer-events:none;text-shadow:1px 1px 0 #F0C050}
 
+.album-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px;overflow:auto}
+.album-card{display:flex;gap:8px;background:#FFF8EC;border:2px solid var(--ink);border-radius:12px;padding:8px;font-size:12px}
+.album-card .art{width:56px;height:56px;flex-shrink:0}
+.album-card.locked{opacity:.72;filter:grayscale(.3)}
+.album-card .silhouette{opacity:.85}
+.challenge-card{border-color:var(--mustard)!important;box-shadow:0 2px 0 rgba(0,0,0,.08)}
+.arc-intro h3{margin:0 0 8px}
+
 /* 2.0.0 motion — respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
@@ -480,7 +488,7 @@ try{const v2=JSON.parse(localStorage.getItem("kayip_esya_v2")||"null");if(v2){re
   // migrate v1 coins if present
   let coins=0,muted=false;
   try{const v1=JSON.parse(localStorage.getItem("kayip_esya_v1")||"null");if(v1){coins=v1.coins||0;muted=!!v1.muted}}catch(_){}
-  return{dayStars:{},unlockedDay:1,coins,muted,endlessUnlocked:false,decor:[]};
+  return{dayStars:{},unlockedDay:1,coins,muted,endlessUnlocked:false,decor:[],album:[],endlessPB:0,challengesDone:{},reputation:0,chapterUnlocked:1};
 }
 function writeSave(s){try{localStorage.setItem(SAVE_KEY,JSON.stringify(s))}catch(_){}}
 let save=loadSave();AudioSys.muted=!!save.muted;
@@ -1031,7 +1039,21 @@ const DECORS=[
   {id:"kedi",name:"Kedi Yatağı",price:70,desc:"Kedi (bazen) uyur"},
   {id:"poster",name:"Kasaba Posteri",price:40,desc:"Duvara asılı poster"},
   {id:"lamba",name:"Masa Lambası",price:55,desc:"Sıcak bir ışık"},
-  {id:"saatduvar",name:"Duvar Saati Süsü",price:45,desc:"Ek sarkaç süsü"}
+  {id:"saatduvar",name:"Duvar Saati Süsü",price:45,desc:"Ek sarkaç süsü"},
+  {id:"cicek",name:"Vazo Çiçek",price:35,desc:"Tezgâhta taze çiçek"},
+  {id:"kitap",name:"Eski Defterler",price:40,desc:"Raf kenarı kitap yığını"},
+  {id:"fincan",name:"Çay Fincanı",price:25,desc:"Buharı tüten fincan"},
+  {id:"pencere",name:"Perde",price:60,desc:"Pencerede dantel perde"},
+  {id:"halı",name:"Küçük Halı",price:80,desc:"Tezgâh önü kilim"},
+  {id:"ayna",name:"Duvar Aynası",price:65,desc:"Yuvarlak ayna"},
+  {id:"bayrak",name:"Kasaba Bayrağı",price:55,desc:"Direkte küçük bayrak"},
+  {id:"kutu",name:"Karton Kutu",price:20,desc:"Depo köşesi"},
+  {id:"mumluk",name:"Mumluk",price:45,desc:"Akşam ışığı"},
+  {id:"tablo",name:"Yağlıboya",price:90,desc:"Kasaba manzarası"},
+  {id:"sef",name:"Şef Rozeti",price:100,desc:"Duvara asılı rozet"},
+  {id:"zil",name:"Tezgâh Zili",price:50,desc:"Ding!"},
+  {id:"askilik",name:"Askılık",price:70,desc:"Kapı yanı"},
+  {id:"terlik",name:"Misafir Terliği",price:30,desc:"Kapı eşiği"}
 ];
 function decorSvg(id,x,y,s){
   s=s||1;const t=`translate(${x},${y}) scale(${s})`;
@@ -1041,6 +1063,7 @@ function decorSvg(id,x,y,s){
   if(id==="poster")return`<g transform="${t}" stroke="${C.ink}" stroke-width="1.4"><rect x="0" y="0" width="18" height="24" fill="${C.mustard}"/><rect x="2" y="2" width="14" height="14" fill="${C.sky}"/><text x="9" y="22" text-anchor="middle" font-size="4" fill="${C.ink}" stroke="none" font-weight="700">KASABA</text></g>`;
   if(id==="lamba")return`<g transform="${t}" stroke="${C.ink}" stroke-width="1.4"><rect x="6" y="20" width="8" height="4" fill="${C.wood}"/><line x1="10" y1="8" x2="10" y2="20" stroke="${C.ink}" stroke-width="2"/><path d="M2 10 Q10 0 18 10Z" fill="${C.mustard}"/></g>`;
   if(id==="saatduvar")return`<g transform="${t}" stroke="${C.ink}" stroke-width="1.3"><circle cx="10" cy="10" r="9" fill="${C.cream}"/><line x1="10" y1="10" x2="10" y2="5" stroke="${C.ink}"/><line x1="10" y1="10" x2="14" y2="12" stroke="${C.ink}"/><circle cx="10" cy="10" r="1" fill="${C.brick}"/></g>`;
+  if(typeof Meta!=="undefined"){const extra=Meta.decorSvgExtra(id,x,y,s); if(extra) return extra;}
   return"";
 }
 
@@ -2651,6 +2674,227 @@ const FestivalSys = {
 };
 const Festival = FestivalSys;
 
+/** Handcrafted chapter intros, character arcs payoff, festival boss. */
+const ArcsSys = {
+  INTROS: {
+    1: { title: "İlk Gün", body: "Kasaba bürosuna hoş geldin. Etiketi oku, doğru eşyayı ver. Sabır tükenmesin." },
+    2: { title: "Depo Düzeni", body: "Kasa dolu. Eşyaları bölgelerine yerleştir; sonra ziyaretçileri karşıla." },
+    3: { title: "Defter Tutmak", body: "Fiş ve kimlik yalan söyleyebilir. Deftere bakmadan teslim etme." },
+    4: { title: "Çocuk Saati", body: "Küçükler belirsiz konuşur. Sabırlı ol, soru sor." },
+    5: { title: "Gece Nöbeti", body: "Lamba kapalıyken detay kaybolur. Önce ışığı aç." },
+    6: { title: "Güvenilir mi?", body: "Bir ipucu yanlış olabilir. Soru sorunca netleşir — ama sabır gider." },
+    7: { title: "Telefon", body: "Biri arayıp eşya ayırtır. Etiketi yaz, sonra sahibi gelir." },
+    8: { title: "Tamir Tezgâhı", body: "Hasarlı eşyayı hızlıca onar; bonus jeton kazan." },
+    9: { title: "Kayıp Dostlar", body: "Kedi gözlere oturur. Kov. Bazen sahibi de gelir." },
+    10: { title: "Turist Dalgası", body: "Basit İngilizce + küçük resim ipucu. Yardım et." },
+    11: { title: "Yoğun Vardiya", body: "Kuyruk uzuyor, süre azalıyor. Hızlı ve doğru ol." },
+    12: { title: "Festival Finali", body: "Panayır! Temalı eşyalar, süsler… ve sonunda bir boss dolandırıcı." },
+  },
+  STORIES: {
+    nermin1: "Nermin’in ilk şemsiyesi — yağmurda unuttuğu.",
+    nermin2: "Nermin ikinci kez: torunu için oyuncak.",
+    nermin3: "Nermin artık büroyu ezbere biliyor.",
+    nermin4: "Nermin festival bileti kaybetmişti…",
+    nermin5: "Nermin’in veda hediyesi: teşekkür mektubu.",
+    ahmet1: "Ahmet’in cüzdanı — kimlik fotoğrafı soluk.",
+    ahmet2: "Ahmet iş için acele ediyor.",
+    ahmet3: "Ahmet’in yedek anahtarı.",
+    ahmet4: "Ahmet gece otobüsüne yetişecek.",
+    ahmet5: "Ahmet büroya çiçek bıraktı.",
+    kemal1: "Kemal’in atkısı — annesi ördü.",
+    kemal2: "Kemal yine yanlış eşya iddiasında…",
+    kemal3: "Kemal özür diliyor, bu sefer dürüst.",
+    kemal4: "Kemal festivalde kayıp bildirimi yaptı.",
+    kemal5: "Kemal gönüllü oldu — kuyruk düzeni.",
+  },
+  showIntro(chId) {
+    const info = this.INTROS[chId];
+    if (!info) return Promise.resolve();
+    return new Promise(r => {
+      const ov = document.createElement("div");
+      ov.className = "mechanic-overlay";
+      ov.innerHTML = `<div class="mechanic-panel arc-intro"><h3>${info.title}</h3><p>${info.body}</p>
+        <button class="btn primary" id="arc-intro-ok" type="button">Başla</button></div>`;
+      document.body.appendChild(ov);
+      ov.querySelector("#arc-intro-ok").onclick = () => { ov.remove(); r(); };
+    });
+  },
+  storyFor(arc) {
+    return this.STORIES[arc] || null;
+  },
+  /** Festival boss: last visitor is a slick trickster with forged tag. */
+  injectBoss(visitors, diff) {
+    try {
+      const boss = (typeof generateVisitor === "function") ? generateVisitor(diff + 4) : null;
+      if (!boss) return visitors;
+      boss.trick = true;
+      boss.target = null;
+      boss.claimItem = (boss.shelf && boss.shelf[0]) || null;
+      boss.visitorName = "Panayır Dolandırıcısı";
+      boss._boss = true;
+      boss.claim = "Festival biletim var — o eşya benim! Bak, etiket aynı…";
+      boss.extraClue = "Fiş numarası: SAHTE-999";
+      boss.payoffReject = "Yakalandım… festival güvenlik çağırır!";
+      boss.wrongGive = "Ah, sahtekâr yine kazandı.";
+      visitors.push(boss);
+    } catch (_e) {}
+    return visitors;
+  },
+  dismissPending() {
+    document.getElementById("arc-intro-ok")?.click();
+  }
+};
+const Arcs = ArcsSys;
+
+/** Album silhouettes, daily/weekly challenges, endless personal best, shop upgrades. */
+const MetaSys = {
+  EXTRA_DECORS: [
+    {id:"cicek",name:"Vazo Çiçek",price:35,desc:"Tezgâhta taze çiçek"},
+    {id:"kitap",name:"Eski Defterler",price:40,desc:"Raf kenarı kitap yığını"},
+    {id:"fincan",name:"Çay Fincanı",price:25,desc:"Buharı tüten fincan"},
+    {id:"pencere",name:"Perde",price:60,desc:"Pencerede dantel perde"},
+    {id:"halı",name:"Küçük Halı",price:80,desc:"Tezgâh önü kilim"},
+    {id:"ayna",name:"Duvar Aynası",price:65,desc:"Yuvarlak ayna"},
+    {id:"bayrak",name:"Kasaba Bayrağı",price:55,desc:"Direkte küçük bayrak"},
+    {id:"kutu",name:"Karton Kutu",price:20,desc:"Depo köşesi"},
+    {id:"mumluk",name:"Mumluk",price:45,desc:"Akşam ışığı"},
+    {id:"tablo",name:"Yağlıboya",price:90,desc:"Kasaba manzarası"},
+    {id:"sef",name:"Şef Rozeti",price:100,desc:"Duvara asılı rozet"},
+    {id:"zil",name:"Tezgâh Zili",price:50,desc:"Ding!"},
+    {id:"askilik",name:"Askılık",price:70,desc:"Kapı yanı"},
+    {id:"terlik",name:"Misafir Terliği",price:30,desc:"Kapı eşiği"},
+  ],
+  ensureDecors() {
+    if (typeof DECORS === "undefined") return;
+    const have = new Set(DECORS.map(d => d.id));
+    this.EXTRA_DECORS.forEach(d => { if (!have.has(d.id)) DECORS.push(d); });
+  },
+  decorSvgExtra(id, x, y, s) {
+    s = s || 1; const t = `translate(${x},${y}) scale(${s})`;
+    const ink = (typeof C !== "undefined" && C.ink) || "#3D2B1F";
+    const map = {
+      cicek: `<g transform="${t}" stroke="${ink}" stroke-width="1.3"><rect x="4" y="14" width="10" height="10" fill="#C45A4A"/><circle cx="9" cy="8" r="5" fill="#E8A0B0"/><circle cx="9" cy="8" r="2" fill="#F0C050"/></g>`,
+      kitap: `<g transform="${t}" stroke="${ink}" stroke-width="1.2"><rect x="0" y="8" width="16" height="12" fill="#5A7A9A"/><rect x="2" y="4" width="14" height="10" fill="#8B5A3C"/></g>`,
+      fincan: `<g transform="${t}" stroke="${ink}" stroke-width="1.3"><path d="M2 10 h14 v8 a4 4 0 0 1-4 4 h-6 a4 4 0 0 1-4-4z" fill="#FFF8EC"/><path d="M16 12 h4 a3 3 0 0 1 0 6 h-4" fill="none"/></g>`,
+      pencere: `<g transform="${t}" stroke="${ink}" stroke-width="1.2"><rect x="0" y="0" width="18" height="22" fill="#A8C8D8"/><line x1="9" y1="0" x2="9" y2="22"/><line x1="0" y1="11" x2="18" y2="11"/></g>`,
+      "halı": `<g transform="${t}" stroke="${ink}" stroke-width="1.2"><ellipse cx="12" cy="14" rx="12" ry="6" fill="#C45A4A"/><ellipse cx="12" cy="14" rx="7" ry="3" fill="#F0C050"/></g>`,
+      ayna: `<g transform="${t}" stroke="${ink}" stroke-width="1.4"><circle cx="10" cy="10" r="9" fill="#D0E8F0"/><circle cx="10" cy="10" r="7" fill="#E8F4F8"/></g>`,
+      bayrak: `<g transform="${t}" stroke="${ink}" stroke-width="1.3"><line x1="2" y1="0" x2="2" y2="24"/><path d="M2 2 h14 l-3 5 l3 5 h-14z" fill="#C45A4A"/></g>`,
+      kutu: `<g transform="${t}" stroke="${ink}" stroke-width="1.2"><path d="M0 8 l10-4 l10 4 v12 l-10 4 l-10-4z" fill="#D2B48C"/><path d="M10 4 v12" fill="none"/></g>`,
+      mumluk: `<g transform="${t}" stroke="${ink}" stroke-width="1.2"><rect x="6" y="10" width="8" height="12" fill="#FFF8EC"/><path d="M10 4 l2 6 h-4z" fill="#F0C050"/></g>`,
+      tablo: `<g transform="${t}" stroke="${ink}" stroke-width="1.2"><rect x="0" y="0" width="20" height="16" fill="#8B5A3C"/><rect x="2" y="2" width="16" height="12" fill="#A8C8D8"/></g>`,
+      sef: `<g transform="${t}" stroke="${ink}" stroke-width="1.3"><circle cx="10" cy="10" r="9" fill="#F0C050"/><text x="10" y="13" text-anchor="middle" font-size="8" fill="${ink}" stroke="none">★</text></g>`,
+      zil: `<g transform="${t}" stroke="${ink}" stroke-width="1.3"><path d="M2 14 h16 l-2-8 a6 6 0 0 0-12 0z" fill="#C0C0C0"/><circle cx="10" cy="16" r="2" fill="#3D2B1F"/></g>`,
+      askilik: `<g transform="${t}" stroke="${ink}" stroke-width="1.3"><line x1="0" y1="4" x2="20" y2="4"/><circle cx="4" cy="8" r="2"/><circle cx="10" cy="8" r="2"/><circle cx="16" cy="8" r="2"/></g>`,
+      terlik: `<g transform="${t}" stroke="${ink}" stroke-width="1.2"><ellipse cx="10" cy="14" rx="10" ry="5" fill="#8B5A3C"/><path d="M4 12 q6-8 12 0" fill="#C4A882"/></g>`,
+    };
+    return map[id] || "";
+  },
+  dailyKey() {
+    const d = new Date();
+    return `d${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+  },
+  weeklyKey() {
+    const d = new Date();
+    const onejan = new Date(d.getFullYear(), 0, 1);
+    const week = Math.ceil((((d - onejan) / 86400000) + onejan.getDay() + 1) / 7);
+    return `w${d.getFullYear()}-${week}`;
+  },
+  seedFrom(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+    return h;
+  },
+  challengeFor(kind) {
+    const key = kind === "weekly" ? this.weeklyKey() : this.dailyKey();
+    const seed = this.seedFrom(key);
+    const chId = 1 + (seed % 12);
+    const goal = kind === "weekly" ? (8 + (seed % 5)) : (3 + (seed % 3));
+    return { key, chId, goal, kind, title: kind === "weekly" ? "Haftalık Meydan" : "Günün Görevi" };
+  },
+  startChallenge(kind) {
+    const c = this.challengeFor(kind);
+    state.challenge = c;
+    if (typeof startChapter === "function") startChapter(c.chId);
+  },
+  recordEndlessPB(round) {
+    save.endlessPB = Math.max(save.endlessPB || 0, round || 0);
+    writeSave(save);
+  },
+  albumTypes() {
+    return (typeof TYPE_KEYS !== "undefined" ? TYPE_KEYS : []).slice();
+  },
+  renderAlbumFull() {
+    ensureAlbumUI();
+    const g = $("album-grid"); if (!g) return;
+    g.innerHTML = "";
+    const owned = new Map((save.album || []).map(e => [e.item?.type || e.type, e]));
+    const types = this.albumTypes();
+    if (!types.length) {
+      g.innerHTML = "<p class='day-meta' style='padding:16px'>Tür listesi yok.</p>";
+      return;
+    }
+    types.forEach(type => {
+      const entry = owned.get(type);
+      const card = document.createElement("div");
+      card.className = "album-card" + (entry ? "" : " locked");
+      if (entry) {
+        const story = entry.story || (typeof Arcs !== "undefined" && entry.arc ? Arcs.storyFor(entry.arc) : null) || "Bir kasaba hikâyesi.";
+        card.innerHTML = `<div class="art">${drawItem(entry.item)}</div><div><b>${TYPE_TR[type]||type}</b><p>${story}</p></div>`;
+      } else {
+        card.innerHTML = `<div class="art silhouette"><svg viewBox="0 0 64 64"><rect width="64" height="64" fill="#D8C8B0" rx="8"/><text x="32" y="38" text-anchor="middle" font-size="22" fill="#8A7060">?</text></svg></div><div><b>??? </b><p>Henüz bulunmadı</p></div>`;
+      }
+      g.appendChild(card);
+    });
+  },
+  polishDaySelectExtras(listEl) {
+    if (!listEl) return;
+    // Daily / weekly cards at top
+    ["daily", "weekly"].forEach(kind => {
+      const c = this.challengeFor(kind);
+      const done = (save.challengesDone || {})[c.key];
+      const card = document.createElement("div");
+      card.className = "day-card challenge-card" + (done ? " owned" : "");
+      card.innerHTML = `<div class="day-num" style="background:var(--mustard)">${kind === "daily" ? "G" : "H"}</div>
+        <div class="day-info"><div class="day-name">${c.title}</div>
+        <div class="day-meta">Bölüm ${c.chId} · hedef ${c.goal} doğru${done ? " · tamam" : ""}</div></div>
+        <div class="day-stars">${done ? "✓" : "🎯"}</div>`;
+      if (!done) card.addEventListener("click", () => { AudioSys.click(); this.startChallenge(kind); });
+      listEl.insertBefore(card, listEl.firstChild);
+    });
+    // Endless PB line
+    const pb = document.createElement("div");
+    pb.className = "day-meta";
+    pb.style.cssText = "margin:6px 4px;font-weight:600";
+    pb.textContent = "Sonsuz rekor: " + (save.endlessPB || 0);
+    listEl.appendChild(pb);
+  },
+  polishSummary() {
+    const stats = $("summary-stats");
+    if (!stats) return;
+    let extra = "";
+    if (state.challenge) {
+      const ok = state.correct >= state.challenge.goal && !state.failed;
+      if (ok) {
+        save.challengesDone = save.challengesDone || {};
+        save.challengesDone[state.challenge.key] = true;
+        save.coins += state.challenge.kind === "weekly" ? 40 : 15;
+        writeSave(save);
+        extra += `<div style="margin-top:8px;color:var(--teal)">Görev tamam · bonus jeton!</div>`;
+      } else {
+        extra += `<div style="margin-top:8px">Görev: ${state.correct}/${state.challenge.goal}</div>`;
+      }
+      state.challenge = null;
+    }
+    if (state.dayData?.endless) {
+      this.recordEndlessPB(state.dayData.round || state.endlessRound || 0);
+      extra += `<div>Sonsuz rekor: <strong>${save.endlessPB || 0}</strong></div>`;
+    }
+    if (extra) stats.insertAdjacentHTML("beforeend", extra);
+  }
+};
+const Meta = MetaSys;
+
 function rand(a){return a[Math.floor(Math.random()*a.length)]}
 function shuffle(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
 function similarItem(base,hard){const v=Object.assign({},base);const which=rand(hard?["color","pattern","detail","type","tag"]:["color","pattern","detail","tag"]);
@@ -2773,8 +3017,9 @@ function renderDaySelect(){
     list.appendChild(card);
   });
   const card=document.createElement("div");card.className="day-card";
-  card.innerHTML=`<div class="day-num" style="background:var(--teal);color:#fff">∞</div><div class="day-info"><div class="day-name">Sonsuz Mesai</div><div class="day-meta">Prosedürel zorluk</div></div><div class="day-stars">🎲</div>`;
+  card.innerHTML=`<div class="day-num" style="background:var(--teal);color:#fff">∞</div><div class="day-info"><div class="day-name">Sonsuz Mesai</div><div class="day-meta">Rekor: ${(save.endlessPB||0)}</div></div><div class="day-stars">🎲</div>`;
   card.addEventListener("click",()=>{AudioSys.click();startEndless()});list.appendChild(card);
+  if(typeof Meta!=="undefined") Meta.polishDaySelectExtras(list);
   refreshTitleCoins();
 }
 
@@ -2798,6 +3043,7 @@ function ensureAlbumUI(){
   $("album-back").onclick=()=>showScreen("screen-title");
 }
 function renderAlbum(){
+  if(typeof Meta!=="undefined"){ Meta.renderAlbumFull(); return; }
   ensureAlbumUI();
   const g=$("album-grid"); if(!g)return;
   const album=save.album||[];
@@ -2829,6 +3075,7 @@ function startChapter(chId){
   state.mode="day"; state.dayIndex=chId-1; state.visitorIndex=0; state.patience=Math.max(3,5-Math.floor(chId/4)); state.maxPatience=state.patience;
   state.asked=false; state.correct=0; state.wrong=0; state.dayCoins=0; state.failed=false; state.expr="neutral";
   showScreen("screen-game"); $("hud-day-text").textContent=ch.name; $("hud-coin-text").textContent=String(save.coins); refreshOffice();
+  const _afterIntro=()=>{
   if(ch.mechanic==="ledger"){
     state.ledgerGate=true;
     if(!visitors.some(v=>v.trick)){
@@ -2894,6 +3141,7 @@ function startChapter(chId){
     Tourist.showTutorial().then(()=>loadVisitor());
   } else if(ch.mechanic==="festival"&&typeof Festival!=="undefined"){
     visitors.forEach(v=>Festival.biasVisitor(v));
+    if(typeof Arcs!=="undefined") Arcs.injectBoss(visitors, diff);
     state.queueMode=true; state.shiftTimer=state.shiftTimer||100;
     Festival.showTutorial().then(()=>{ Festival.decorate(); loadVisitor(); if(typeof Queue!=="undefined"){ Queue.begin(visitors, state.shiftTimer); }});
   } else if(ch.mechanic==="phonecall"&&typeof Phone!=="undefined"){
@@ -2917,6 +3165,8 @@ function startChapter(chId){
       Queue.renderRail();
     }
   }
+  };
+  if(typeof Arcs!=="undefined") Arcs.showIntro(chId).then(_afterIntro); else _afterIntro();
 }
 function renderShop(){
   refreshTitleCoins();
@@ -3108,7 +3358,16 @@ function tryGive(item,el){
 function onCorrect(item,el,cv,bonus){
   bonus=bonus||0;
   AudioSys.ok();setExpr("happy");if(el)el.classList.add("correct-flash");
-  state.correct++;const coins=5+Math.max(1,state.patience)*2+bonus;state.dayCoins+=coins;save.coins+=coins;writeSave(save);$("hud-coin-text").textContent=String(save.coins);flyCoin();
+  state.correct++;const coins=5+Math.max(1,state.patience)*2+bonus;state.dayCoins+=coins;save.coins+=coins;
+  // Album: unlock type with story
+  try{
+    save.album=save.album||[];
+    if(item&&item.type&&!save.album.some(e=>e.item&&e.item.type===item.type)){
+      const story=(typeof Arcs!=="undefined"&&cv&&cv.arc)?(Arcs.storyFor(cv.arc)||null):null;
+      save.album.push({item:Object.assign({},item),story:story||((TYPE_TR[item.type]||item.type)+" kasabaya geri döndü."),arc:cv&&cv.arc});
+    }
+  }catch(_e){}
+  writeSave(save);$("hud-coin-text").textContent=String(save.coins);flyCoin();
   $("stamp-text").textContent="TESLİM EDİLDİ";$("stamp-overlay").classList.add("show"); if(window.Motion) Motion.shakeScreen();AudioSys.stamp();
   const payoff=$("payoff");payoff.innerHTML=`<div>${cv.payoff}</div><div class="payoff-coins">+${coins} jeton</div>`;payoff.classList.add("show");
   document.querySelectorAll(".shelf-item").forEach(s=>s.classList.add("dimmed"));
@@ -3162,6 +3421,7 @@ function endDay(won){ if(typeof Queue!=="undefined"){ Queue.stopTimer(); Queue.a
   const title=state.dayData.endless?(won?"Tur Tamam!":"Mesai Bitti"):(won?"Gün Bitti!":"Sabır Tükendi");
   $("summary-title").textContent=title;$("summary-stars").innerHTML=starsHtml(Math.max(stars,won?1:stars));
   $("summary-stats").innerHTML=`<div>Doğru / red: <strong>${state.correct}</strong></div><div>Yanlış: <strong>${state.wrong}</strong></div><div>Jeton: <strong>${state.dayCoins}</strong></div><div>Toplam: <strong>${save.coins}</strong></div>${!won?"<div style='margin-top:8px'>Sabır tükendi.</div>":""}`;
+  if(typeof Meta!=="undefined") Meta.polishSummary();
   const nextBtn=$("btn-next-day");
   if(state.dayData.endless){nextBtn.style.display=won?"block":"none";nextBtn.textContent="Devam Et"}
   else if(won&&state.dayIndex<DAYS.length-1){nextBtn.style.display="block";nextBtn.textContent="Sonraki Gün"}
@@ -3222,6 +3482,15 @@ function updateMuteBtn(){$("btn-mute").textContent=AudioSys.muted?"Ses: Kapalı"
 $("btn-play").addEventListener("click",()=>{AudioSys.unlock();AudioSys.click();renderDaySelect();showScreen("screen-days")});
 $("btn-endless").addEventListener("click",()=>{AudioSys.unlock();AudioSys.click();save.endlessUnlocked=true;writeSave(save);state.endlessRound=1;startEndless()});
 $("btn-shop").addEventListener("click",()=>{AudioSys.unlock();AudioSys.click();renderShop();showScreen("screen-shop")});
+(function(){
+  const row=document.querySelector(".title-actions")||$("btn-shop")?.parentElement;
+  if(row && !$("btn-album")){
+    const a=document.createElement("button"); a.className="btn btn-ghost"; a.id="btn-album"; a.type="button"; a.textContent="Koleksiyon";
+    row.insertBefore(a, $("btn-mute")||null);
+    a.addEventListener("click",()=>{AudioSys.unlock();AudioSys.click();renderAlbum();showScreen("screen-album")});
+  }
+  if(typeof Meta!=="undefined") Meta.ensureDecors();
+})();
 $("btn-mute").addEventListener("click",()=>{AudioSys.unlock();AudioSys.muted=!AudioSys.muted;save.muted=AudioSys.muted;writeSave(save);updateMuteBtn();AudioSys.click()});
 $("btn-days-back").addEventListener("click",()=>{AudioSys.click();refreshTitleCoins();showScreen("screen-title")});
 $("btn-shop-back").addEventListener("click",()=>{AudioSys.click();refreshTitleCoins();showScreen("screen-title")});
@@ -3251,7 +3520,7 @@ document.querySelectorAll("button.btn, button.btn-back").forEach(b=>{
 renderTitle();AudioSys.init();
 window.__KEB_READY__=true;document.documentElement.dataset.kebReady="1";
 
-window.Motion=Motion;window.CHAPTERS=CHAPTERS;window.generateVisitor=generateVisitor;window.buildClue=typeof buildClue!=="undefined"?buildClue:null;try{window.renderAlbum=renderAlbum;window.ensureAlbumUI=ensureAlbumUI;}catch(_e){}window.Storage=Storage;window.Ledger=Ledger;window.Queue=Queue;window.Memory=Memory;window.Phone=Phone;window.Repair=Repair;window.Pets=Pets;window.Tourist=Tourist;window.Festival=Festival;window.__KEB_READY__=true;document.documentElement.dataset.kebReady="1";window.__KEB__={getSave:()=>save,setSave:(s)=>{save=s;writeSave(save)},state,DAYS,VISITORS,TYPE_KEYS,DECORS,CHAPTERS,Motion,generateVisitor,buildClue,renderAlbum,ensureAlbumUI,Storage,Ledger,Queue,Memory,Phone,Repair,Pets,Tourist,Festival,startDay,startChapter,startEndless,showScreen,itemId,currentVisitor,tryGive,askQuestion,rejectTrick,endDay,calcStars,generateEndlessDay,renderDaySelect,renderShop,openInspect,closeInspect,startTutorial,endTutorial,refreshOffice,writeSave,loadSave,SAVE_KEY,drawVisitor,drawTitleFacade,drawItem,itemLabel,generateVisitor,buildClue,EXTRA_NAMES,TYPE_TR,DETAIL_TR,PROC_DETAILS,PROC_COLORS,PROC_PATTERNS,COLOR_TR,PATTERN_TR};
+window.Motion=Motion;window.CHAPTERS=CHAPTERS;window.generateVisitor=generateVisitor;window.buildClue=typeof buildClue!=="undefined"?buildClue:null;try{window.renderAlbum=renderAlbum;window.ensureAlbumUI=ensureAlbumUI;}catch(_e){}window.Storage=Storage;window.Ledger=Ledger;window.Queue=Queue;window.Memory=Memory;window.Phone=Phone;window.Repair=Repair;window.Pets=Pets;window.Tourist=Tourist;window.Festival=Festival;window.Arcs=Arcs;window.Meta=Meta;window.__KEB_READY__=true;document.documentElement.dataset.kebReady="1";window.__KEB__={getSave:()=>save,setSave:(s)=>{save=s;writeSave(save)},state,DAYS,VISITORS,TYPE_KEYS,DECORS,CHAPTERS,Motion,generateVisitor,buildClue,renderAlbum,ensureAlbumUI,Storage,Ledger,Queue,Memory,Phone,Repair,Pets,Tourist,Festival,Arcs,Meta,startDay,startChapter,startEndless,showScreen,itemId,currentVisitor,tryGive,askQuestion,rejectTrick,endDay,calcStars,generateEndlessDay,renderDaySelect,renderShop,renderAlbum,openInspect,closeInspect,startTutorial,endTutorial,refreshOffice,writeSave,loadSave,SAVE_KEY,drawVisitor,drawTitleFacade,drawItem,itemLabel,generateVisitor,buildClue,EXTRA_NAMES,TYPE_TR,DETAIL_TR,PROC_DETAILS,PROC_COLORS,PROC_PATTERNS,COLOR_TR,PATTERN_TR};
 })();
 
 </script>
