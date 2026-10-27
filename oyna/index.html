@@ -237,6 +237,21 @@ body{display:flex;justify-content:center;align-items:stretch;padding:var(--safe-
 .shelf-item.zone-misfiled{filter:saturate(.7)}
 .mechanic-overlay{position:fixed;inset:0;background:rgba(30,20,10,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:18px}
 
+/* —— Ledger (ch3) —— */
+.ledger-root{display:none;position:absolute;inset:0;z-index:45;background:rgba(30,22,12,.5);align-items:center;justify-content:center;padding:10px}
+.ledger-root.show{display:flex}
+.ledger-panel{background:var(--cream,#F5EBD8);border:3px solid var(--ink);border-radius:16px;padding:14px;max-width:400px;width:100%;max-height:100%;overflow:auto;box-shadow:4px 6px 0 rgba(0,0,0,.2)}
+.ledger-panel h3{margin:0 0 10px}
+.ledger-cols{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ledger-card{border:2.5px solid var(--ink);border-radius:12px;padding:8px;font-size:.78rem;line-height:1.45;background:#FFF8EC}
+.ledger-card.receipt{background:#F8F0D8}
+.ledger-card.defter{background:#E8F0E8}
+.ledger-card-title{font-weight:700;margin-bottom:6px;font-size:.85rem;border-bottom:1.5px solid var(--ink);padding-bottom:4px}
+.ledger-hint{font-size:.85rem;margin:10px 0 8px}
+.ledger-actions{display:flex;gap:8px}
+.ledger-actions .btn{flex:1}
+#btn-ledger{background:#5C6B4A;color:#fff}
+
 /* 2.0.0 motion — respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
@@ -1916,6 +1931,169 @@ const Storage = StorageSys();
 Storage.ZONES = STORAGE_ZONES;
 Storage.zoneForTag = storageZoneForTag;
 
+/** Chapter 3 — Ledger / receipt check. Mismatch ⇒ trick visitor. */
+const LedgerSys = {
+  open: false,
+  pending: null, // { visitor, receipt, entry, isMatch }
+
+  /** Build a receipt + ledger entry for a visitor. Tricks get mismatches. */
+  makeForVisitor(cv, seq) {
+    const target = cv.target || (cv.shelf && cv.shelf[0]);
+    const tag = (target && target.tag) || "Kasaba, Bugün";
+    const [place, when] = tag.split(",").map(s => (s || "").trim());
+    const entryNo = "K-" + String(1000 + (seq || 1) * 7 + (place || "").length);
+    const receipt = {
+      no: entryNo,
+      place: place || "Kasaba",
+      when: when || "Bugün",
+      type: target ? (TYPE_TR[target.type] || target.type) : "eşya",
+      color: target ? (COLOR_TR[target.color] || target.color) : "?",
+      holder: cv.visitorName || (VISITORS[cv.visitor] || {}).name || "Ziyaretçi"
+    };
+    let entry = Object.assign({}, receipt);
+    let isMatch = true;
+    if (cv.trick) {
+      isMatch = false;
+      // Mismatch one field so player can catch the lie
+      const which = ["no", "place", "when"][Math.floor(Math.random() * 3)];
+      if (which === "no") entry.no = "K-" + String(1000 + Math.floor(Math.random() * 800));
+      else if (which === "place") entry.place = entry.place === "Park" ? "Kafe" : "Park";
+      else entry.when = entry.when === "Sabah" ? "Akşam" : "Sabah";
+      cv.ledgerMismatch = which;
+    } else {
+      // Honest: ledger matches receipt exactly
+      cv.ledgerMismatch = null;
+    }
+    cv.receipt = receipt;
+    cv.ledgerEntry = entry;
+    cv.ledgerMatch = isMatch;
+    return { receipt, entry, isMatch };
+  },
+
+  showTutorial() {
+    return new Promise(resolve => {
+      let ov = document.getElementById("ledger-tut");
+      if (!ov) {
+        ov = document.createElement("div");
+        ov.className = "mechanic-overlay";
+        ov.id = "ledger-tut";
+        document.body.appendChild(ov);
+      }
+      ov.style.display = "flex";
+      ov.innerHTML = '<div class="mechanic-panel">'
+        + "<h3>Defter Kontrolu</h3>"
+        + "<p>Ziyaretci fis / kimlik gosterir. Defteri acip kayit no, yer ve zamani karsilastir.</p>"
+        + "<p>Uyusmuyorsa bu kisi yalan soyluyor — <b>Burada yok</b> de.</p>"
+        + '<button class="btn primary" id="ledger-tut-ok" type="button">Anladim</button>'
+        + "</div>";
+      ov.querySelector("#ledger-tut-ok").onclick = () => { ov.remove(); resolve(); };
+    });
+  },
+
+  /** Open dual panel: receipt vs ledger */
+  openCheck(cv) {
+    if (!cv || !cv.receipt) return Promise.resolve({ verified: false });
+    this.open = true;
+    this.pending = cv;
+    return new Promise(resolve => {
+      let root = document.getElementById("ledger-root");
+      if (!root) {
+        root = document.createElement("div");
+        root.id = "ledger-root";
+        document.getElementById("screen-game")?.appendChild(root) || document.body.appendChild(root);
+      }
+      const r = cv.receipt, e = cv.ledgerEntry;
+      root.className = "ledger-root show";
+      root.innerHTML = `
+        <div class="ledger-panel">
+          <h3>Karşılaştır</h3>
+          <div class="ledger-cols">
+            <div class="ledger-card receipt">
+              <div class="ledger-card-title">Fiş / Kimlik</div>
+              <div><b>No:</b> ${r.no}</div>
+              <div><b>Ad:</b> ${r.holder}</div>
+              <div><b>Eşya:</b> ${r.color} ${r.type}</div>
+              <div><b>Yer:</b> ${r.place}</div>
+              <div><b>Zaman:</b> ${r.when}</div>
+            </div>
+            <div class="ledger-card defter">
+              <div class="ledger-card-title">Bürodaki Defter</div>
+              <div><b>No:</b> ${e.no}</div>
+              <div><b>Ad:</b> ${e.holder}</div>
+              <div><b>Eşya:</b> ${e.color} ${e.type}</div>
+              <div><b>Yer:</b> ${e.place}</div>
+              <div><b>Zaman:</b> ${e.when}</div>
+            </div>
+          </div>
+          <p class="ledger-hint">Kayıtlar uyuyor mu?</p>
+          <div class="ledger-actions">
+            <button type="button" class="btn primary" id="ledger-match">Uyuyor</button>
+            <button type="button" class="btn btn-reject show" id="ledger-mismatch">Uyuşmuyor</button>
+          </div>
+          <button type="button" class="btn" id="ledger-close" style="margin-top:8px">Kapat (henüz karar yok)</button>
+        </div>`;
+      const done = (verdict) => {
+        root.classList.remove("show");
+        this.open = false;
+        resolve({ verified: true, saysMatch: verdict === "match", actualMatch: !!cv.ledgerMatch });
+      };
+      root.querySelector("#ledger-match").onclick = () => done("match");
+      root.querySelector("#ledger-mismatch").onclick = () => done("mismatch");
+      root.querySelector("#ledger-close").onclick = () => {
+        root.classList.remove("show");
+        this.open = false;
+        resolve({ verified: false });
+      };
+    });
+  },
+
+  ensureButton() {
+    if (document.getElementById("btn-ledger")) return;
+    const row = document.querySelector(".action-row");
+    if (!row) return;
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn btn-ask";
+    b.id = "btn-ledger";
+    b.textContent = "Defter";
+    b.style.display = "none";
+    row.appendChild(b);
+    b.addEventListener("click", async () => {
+      const cv = currentVisitor();
+      if (!cv || state.failed) return;
+      AudioSys.click && AudioSys.click();
+      const res = await Ledger.openCheck(cv);
+      if (!res.verified) return;
+      // Player verdict
+      if (res.saysMatch === res.actualMatch) {
+        // Correct assessment
+        if (!res.actualMatch && cv.trick) {
+          // correctly identified trick via ledger → reject
+          rejectTrick();
+        } else if (res.actualMatch && !cv.trick) {
+          $("speech").textContent = "Defter uyuyor. Eşyayı rafa göre seçebilirsin.";
+        }
+      } else {
+        // Wrong assessment — patience hit
+        state.patience = Math.max(0, state.patience - 1);
+        updatePatience();
+        $("speech").textContent = res.saysMatch
+          ? "Deftere tekrar bak… bir yerler uyuşmuyor gibi."
+          : "Aslında kayıtlar tutuyor. Yanlış alarm!";
+        if (state.patience <= 0) { state.failed = true; setTimeout(() => endDay(false), 700); }
+      }
+    });
+  },
+
+  setVisible(on) {
+    this.ensureButton();
+    const b = document.getElementById("btn-ledger");
+    if (b) b.style.display = on ? "" : "none";
+  }
+};
+
+const Ledger = LedgerSys;
+
 function rand(a){return a[Math.floor(Math.random()*a.length)]}
 function shuffle(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
 function similarItem(base,hard){const v=Object.assign({},base);const which=rand(hard?["color","pattern","detail","type","tag"]:["color","pattern","detail","tag"]);
@@ -1944,7 +2122,7 @@ function generateVisitor(diff){
   if(trick){
     const cast=typeof EXTRA_NAMES!=="undefined"?rand(EXTRA_NAMES):{name:"Oğuz",tone:"şüpheli"};
     const claim=typeof buildClue==="function"?buildClue(target,diff):((COLOR_TR[color]||color)+" "+(TYPE_TR[type]||type)+"…");
-    return{visitor:"yalanci",visitorName:cast.name,visitorTone:cast.tone,trick:true,target:null,claim,extraClue:"Biraz aceleye getiriyor…",shelf:shuffle(shelf),payoffReject:cast.name+" kapıdan çıktı.",wrongGive:"Bu eşya başka birine ait!"};
+    return{visitor:"yalanci",visitorName:cast.name,visitorTone:cast.tone,trick:true,target:null,claimItem:target,claim,extraClue:"Biraz aceleye getiriyor…",shelf:shuffle(shelf),payoffReject:cast.name+" kapıdan çıktı.",wrongGive:"Bu eşya başka birine ait!"};
   }
   const vk=rand(Object.keys(VISITORS).filter(k=>k!=="yalanci"));
   const clue=typeof buildClue==="function"?buildClue(target,diff):((COLOR_TR[color]||color)+" "+(TYPE_TR[type]||type));
@@ -2091,7 +2269,20 @@ function startChapter(chId){
   state.mode="day"; state.dayIndex=chId-1; state.visitorIndex=0; state.patience=Math.max(3,5-Math.floor(chId/4)); state.maxPatience=state.patience;
   state.asked=false; state.correct=0; state.wrong=0; state.dayCoins=0; state.failed=false; state.expr="neutral";
   showScreen("screen-game"); $("hud-day-text").textContent=ch.name; $("hud-coin-text").textContent=String(save.coins); refreshOffice();
-  if(ch.mechanic==="ledger"){ state.ledgerGate=true; }
+  if(ch.mechanic==="ledger"){
+    state.ledgerGate=true;
+    if(!visitors.some(v=>v.trick)){
+      try{
+        const t=generateVisitor(diff+3);
+        t.trick=true; t.target=null; t.claimItem=(t.shelf&&t.shelf[0])||null;
+        t.visitorName=(typeof EXTRA_NAMES!=="undefined"?EXTRA_NAMES[0].name:"Oguz");
+        t.claim=(typeof buildClue==="function"&&t.claimItem)?buildClue(t.claimItem,diff):"Bu benim!";
+        t.payoffReject="Yakalandim…";
+        t.wrongGive="Bu esya baskasinin!";
+        visitors[visitors.length-1]=t;
+      }catch(_e){}
+    }
+  }
   if(ch.mechanic==="queue"||ch.mechanic==="timer"){ state.shiftTimer=60+chId*8; state.queueLen=visitors.length; }
   if(ch.mechanic==="storage" && typeof Storage!=="undefined"){
     // Build delivery crate from all visitor shelves (unique by id), then sort before serving
@@ -2119,7 +2310,11 @@ function startChapter(chId){
     });
     return;
   }
-  loadVisitor();
+  if(ch.mechanic==="ledger"&&typeof Ledger!=="undefined"){
+    Ledger.showTutorial().then(()=>loadVisitor());
+  } else {
+    loadVisitor();
+  }
 }
 function renderShop(){
   refreshTitleCoins();
@@ -2170,6 +2365,22 @@ function loadVisitor(){
   renderShelf(cv.shelf||[]);
   applyNightLamp();
   if(typeof Storage!=="undefined"&&state.storageMap) Storage.applyShelfHints($("shelf"));
+  if(state.ledgerGate&&typeof Ledger!=="undefined"){
+    try{
+      const seq=state.visitorIndex+1;
+      if(!cv.receipt){
+        if(cv.trick){
+          if(!cv.claimItem) cv.claimItem=(cv.shelf&&cv.shelf[0])||null;
+          const tmp={trick:true,visitor:cv.visitor,visitorName:cv.visitorName,target:cv.claimItem,shelf:cv.shelf};
+          Ledger.makeForVisitor(tmp, seq);
+          cv.receipt=tmp.receipt; cv.ledgerEntry=tmp.ledgerEntry; cv.ledgerMatch=tmp.ledgerMatch; cv.ledgerMismatch=tmp.ledgerMismatch;
+        } else {
+          Ledger.makeForVisitor(cv, seq);
+        }
+      }
+      Ledger.setVisible(true);
+    }catch(err){ console.warn("ledger", err); Ledger.setVisible(true); }
+  } else if(typeof Ledger!=="undefined"){ Ledger.setVisible(false); }
 }
 function applyNightLamp(){
   const night=!!(state.dayData&&state.dayData.night);
@@ -2418,7 +2629,7 @@ document.querySelectorAll("button.btn, button.btn-back").forEach(b=>{
 
 renderTitle();AudioSys.init();
 
-window.Motion=Motion;window.CHAPTERS=CHAPTERS;window.generateVisitor=generateVisitor;window.buildClue=typeof buildClue!=="undefined"?buildClue:null;try{window.renderAlbum=renderAlbum;window.ensureAlbumUI=ensureAlbumUI;}catch(_e){}window.Storage=Storage;window.__KEB__={getSave:()=>save,setSave:(s)=>{save=s;writeSave(save)},state,DAYS,VISITORS,TYPE_KEYS,DECORS,CHAPTERS,Motion,generateVisitor,buildClue,renderAlbum,ensureAlbumUI,Storage,startDay,startChapter,startEndless,showScreen,itemId,currentVisitor,tryGive,askQuestion,rejectTrick,endDay,calcStars,generateEndlessDay,renderDaySelect,renderShop,openInspect,closeInspect,startTutorial,endTutorial,refreshOffice,writeSave,loadSave,SAVE_KEY,drawVisitor,drawTitleFacade,drawItem,itemLabel,generateVisitor,buildClue,EXTRA_NAMES,TYPE_TR,DETAIL_TR,PROC_DETAILS,PROC_COLORS,PROC_PATTERNS,COLOR_TR,PATTERN_TR};
+window.Motion=Motion;window.CHAPTERS=CHAPTERS;window.generateVisitor=generateVisitor;window.buildClue=typeof buildClue!=="undefined"?buildClue:null;try{window.renderAlbum=renderAlbum;window.ensureAlbumUI=ensureAlbumUI;}catch(_e){}window.Storage=Storage;window.Ledger=Ledger;window.__KEB__={getSave:()=>save,setSave:(s)=>{save=s;writeSave(save)},state,DAYS,VISITORS,TYPE_KEYS,DECORS,CHAPTERS,Motion,generateVisitor,buildClue,renderAlbum,ensureAlbumUI,Storage,Ledger,startDay,startChapter,startEndless,showScreen,itemId,currentVisitor,tryGive,askQuestion,rejectTrick,endDay,calcStars,generateEndlessDay,renderDaySelect,renderShop,openInspect,closeInspect,startTutorial,endTutorial,refreshOffice,writeSave,loadSave,SAVE_KEY,drawVisitor,drawTitleFacade,drawItem,itemLabel,generateVisitor,buildClue,EXTRA_NAMES,TYPE_TR,DETAIL_TR,PROC_DETAILS,PROC_COLORS,PROC_PATTERNS,COLOR_TR,PATTERN_TR};
 })();
 
 </script>
