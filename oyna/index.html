@@ -1115,20 +1115,21 @@ function drawVisitor(v,expr){
   }
   const eyeR=age==="child"?2.0:2.35;
 
-  const yOff = age==="child" ? 10 : 0;
+  const yOff = age==="child" ? 8 : (age==="elder" ? -1 : 0);
   return `<svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" overflow="visible">
     <style>
       @keyframes ${bid}{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.08)}}
-      @keyframes ${breath}{0%,100%{transform:translateY(0)}50%{transform:translateY(1.15px)}}
+      @keyframes ${breath}{0%,100%{transform:translateY(0)}50%{transform:translateY(1.1px)}}
       .e${bid}{transform-origin:center;transform-box:fill-box;animation:${bid} 3.8s ease-in-out infinite}
-      .idle${breath}{transform-origin:50px 110px;animation:${breath} 3.1s ease-in-out infinite}
+      .idle${breath}{animation:${breath} 3.1s ease-in-out infinite}
     </style>
-    <g class="idle${breath}" transform="translate(0 ${yOff}) scale(${scale})" style="transform-origin:50px 110px" stroke="${C.ink}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <g transform="translate(0 ${yOff}) scale(${scale})" transform-origin="50 110" stroke="${C.ink}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <g class="idle${breath}">
       ${v.behind||""}
       ${torso}
-      <path d="M30 80 Q14 86 16 98 Q20 102 34 96" fill="${shirt}"/>
-      <path d="M70 80 Q86 86 84 98 Q80 102 66 96" fill="${shirt}"/>
-      <ellipse cx="18" cy="100" rx="8" ry="5.5" fill="${skin}"/><ellipse cx="82" cy="100" rx="8" ry="5.5" fill="${skin}"/>
+      <path d="M32 78 Q22 84 20 96 Q24 100 34 94" fill="${shirt}" stroke="${C.ink}" stroke-width="1.4"/>
+      <path d="M68 78 Q78 84 80 96 Q76 100 66 94" fill="${shirt}" stroke="${C.ink}" stroke-width="1.4"/>
+      <ellipse cx="22" cy="98" rx="7" ry="5" fill="${skin}"/><ellipse cx="78" cy="98" rx="7" ry="5" fill="${skin}"/>
       <path d="${v.hairPath||"M26 40 Q24 14 50 10 Q76 14 74 40 Q68 26 50 24 Q32 26 26 40"}" fill="${hair}"/>
       ${headShape}
       <ellipse cx="42" cy="38" rx="7" ry="5" fill="${skinHi}" opacity=".28" stroke="none"/>
@@ -1142,7 +1143,7 @@ function drawVisitor(v,expr){
       ${facial}
       <path d="${mouthPath(expr)}" fill="none" stroke="${C.ink}" stroke-width="1.5"/>
       ${v.extras||""}
-    </g></svg>`;
+    </g></g></svg>`;
 }
 
 const VISITORS={
@@ -1169,14 +1170,14 @@ const VISITORS={
     hairPath:"M22 44 Q20 10 50 6 Q80 10 78 44 Q70 24 50 22 Q30 24 22 44",
     extras:`<circle cx="72" cy="78" r="5" fill="${C.mustard}"/><path d="M70 76 L74 80 M74 76 L70 80" stroke="${C.brick}" stroke-width="1"/><path d="M24 18 Q32 8 40 18" fill="${C.pink}" opacity=".8"/>`},
   can:{id:"can",name:"Can",skin:"#F5D4A8",hair:"#2A2218",shirt:C.blue,age:"child",face:"round",cloth:"sweater",
-    hairPath:"M30 34 Q28 8 50 4 Q72 8 70 34 Q64 16 50 14 Q36 16 30 34",
-    extras:`<rect x="64" y="70" width="18" height="14" rx="2" fill="${C.navy}"/><circle cx="73" cy="77" r="2.2" fill="${C.mustard}" stroke="none"/><path d="M34 18 L38 10 L42 18 M58 18 L62 10 L66 18" fill="none" stroke="${C.ink}" stroke-width="1.3"/>`},
+    hairPath:"M28 38 Q26 16 36 10 L40 16 Q45 6 50 8 Q55 6 60 16 L64 10 Q74 16 72 38 Q64 20 50 18 Q36 20 28 38",
+    extras:`<g transform="translate(70,88)"><rect x="-6" y="-5" width="14" height="10" rx="1.5" fill="${C.navy}" stroke="${C.ink}" stroke-width="1.2"/><circle cx="1" cy="0" r="2" fill="${C.mustard}" stroke="none"/></g>`},
   cem:{id:"cem",name:"Cem",skin:"#E8C4A8",hair:"#2A2218",shirt:C.teal,age:"young",face:"oval",cloth:"uniform",
     hairPath:"M28 38 Q26 12 50 8 Q74 12 72 38 Q64 22 50 20 Q36 22 28 38",
     extras:`<rect x="62" y="70" width="14" height="18" rx="1.5" fill="${C.navy}"/><path d="M64 74 H74 M64 78 H72" stroke="${C.cream}" stroke-width="1"/>`},
   selim:{id:"selim",name:"Selim Amca",skin:"#D4A574",hair:"#C8C0B0",shirt:C.wood,age:"elder",face:"square",cloth:"coat",mustache:"#C8C0B0",
-    hairPath:"M26 40 Q28 16 50 12 Q72 16 74 40 Q66 28 50 26 Q34 28 26 40",
-    extras:`<path d="M36 58 Q50 66 64 58" fill="none" stroke="${C.ink}" stroke-width="1.4" opacity=".5"/><ellipse cx="50" cy="100" rx="18" ry="4" fill="${C.mustard}" opacity=".7"/>`},
+    hairPath:"M24 42 Q26 14 50 10 Q74 14 76 42 Q68 26 50 24 Q32 26 24 42",
+    extras:`<rect x="34" y="40" width="11" height="6" rx="1" fill="none" stroke="${C.ink}" stroke-width="1.2"/><rect x="55" y="40" width="11" height="6" rx="1" fill="none" stroke="${C.ink}" stroke-width="1.2"/><line x1="45" y1="43" x2="55" y2="43" stroke="${C.ink}" stroke-width="1.1"/><ellipse cx="50" cy="102" rx="16" ry="3.5" fill="${C.mustard}" opacity=".65"/>`},
   fulya:{id:"fulya",name:"Fulya Hanım",skin:"#F0D0B0",hair:"#5A3020",shirt:C.pink,age:"adult",face:"heart",cloth:"coat",
     hairPath:"M22 46 Q16 14 50 6 Q84 14 78 46 Q70 26 50 22 Q30 26 22 46",
     extras:`<circle cx="30" cy="54" r="2" fill="${C.mustard}"/><circle cx="70" cy="54" r="2" fill="${C.mustard}"/><path d="M68 72 Q78 66 82 78 Q74 86 66 78Z" fill="${C.blush}"/>`},
@@ -1186,7 +1187,7 @@ const VISITORS={
     extras:`<circle cx="50" cy="70" r="3" fill="${C.mustard}"/>`},
   oguz:{id:"oguz",name:"Oğuz",skin:"#D8B090",hair:"#3A3028",shirt:C.gray,age:"adult",face:"square",cloth:"shirt",beard:"#3A3028",
     hairPath:"M28 36 Q30 12 50 8 Q70 12 72 36 Q62 20 50 20 Q38 20 28 36",
-    extras:`<path d="M34 58 L38 66 L42 58" fill="none" stroke="${C.ink}" stroke-width="1.2" opacity=".5"/><rect x="70" y="68" width="12" height="16" rx="1" fill="${C.cream}"/>`},
+    extras:`<g transform="translate(68,76)"><rect width="14" height="18" rx="1.2" fill="${C.cream}" stroke="${C.ink}" stroke-width="1.3"/><line x1="2.5" y1="5" x2="11.5" y2="5" stroke="${C.ink}" stroke-width=".9"/><line x1="2.5" y1="9" x2="10" y2="9" stroke="${C.ink}" stroke-width=".9"/></g>`},
   melis:{id:"melis",name:"Melis",skin:"#F2C9A0",hair:"#A0522D",shirt:C.purple,age:"young",face:"heart",cloth:"sweater",
     hairPath:"M22 48 Q14 10 50 4 Q86 10 78 48 Q72 22 50 18 Q28 22 22 48",
     extras:`<path d="M42 14 Q50 4 58 14 Q50 18 42 14" fill="${C.pink}" stroke="${C.ink}" stroke-width="1.1"/><circle cx="28" cy="54" r="2.4" fill="${C.mustard}"/><circle cx="72" cy="54" r="2.4" fill="${C.mustard}"/><circle cx="74" cy="78" r="5" fill="${C.sky}"/>`},
@@ -1198,7 +1199,7 @@ const VISITORS={
     extras:`<ellipse cx="78" cy="88" rx="11" ry="7" fill="${C.mustard}"/><path d="M72 84 Q78 80 84 84" fill="none" stroke="${C.ink}" stroke-width="1.1"/>`},
   yalanci:{id:"yalanci",name:"Şüpheli Adam",skin:"#D8B090",hair:"#3A3028",shirt:C.gray,age:"adult",face:"square",cloth:"coat",
     hairPath:"M26 38 Q28 12 50 8 Q72 12 74 38 Q64 22 50 20 Q36 22 26 38",
-    extras:`<path d="M60 46 Q66 50 60 54" fill="none" stroke="${C.ink}" stroke-width="1.2"/><rect x="68" y="70" width="14" height="18" rx="1" fill="${C.cream}"/>`},
+    extras:`<path d="M61 46 L63 52" fill="none" stroke="${C.brick}" stroke-width="1.35" stroke-linecap="round" opacity=".85"/><g transform="translate(64,82)"><rect x="0" y="0" width="15" height="18" rx="1.2" fill="${C.cream}" stroke="${C.ink}" stroke-width="1.3"/><line x1="2.5" y1="4.5" x2="12.5" y2="4.5" stroke="${C.ink}" stroke-width=".85"/><line x1="2.5" y1="8.5" x2="11.5" y2="8.5" stroke="${C.ink}" stroke-width=".85"/><line x1="2.5" y1="12.5" x2="10.5" y2="12.5" stroke="${C.ink}" stroke-width=".85"/></g>`},
   ayse:{id:"ayse",name:"Ayşe Hanım",skin:"#E0B890",hair:"#4A3020",shirt:C.teal,age:"adult",face:"oval",cloth:"coat",
     hairPath:"M26 36 Q22 14 50 8 Q78 14 74 36 Q68 24 50 22 Q32 24 26 36",
     behind:`<ellipse cx="50" cy="36" rx="34" ry="38" fill="${C.teal}"/><path d="M18 48 Q10 72 22 90 Q34 82 28 58Z" fill="${C.teal}"/><path d="M82 48 Q90 72 78 90 Q66 82 72 58Z" fill="${C.teal}"/><path d="M30 18 Q50 8 70 18" fill="none" stroke="${C.mustard}" stroke-width="2"/>`,
@@ -2940,8 +2941,9 @@ const ArcsSys = {
       if (!boss) return visitors;
       boss.trick = true;
       boss.target = null;
+      boss.visitor = "yalanci";
       boss.claimItem = (boss.shelf && boss.shelf[0]) || null;
-      boss.visitorName = "Panayır Dolandırıcısı";
+      boss.visitorName = "Panayır Dolandırıcısı"; // alias of yalanci only — not a cast member name
       boss._boss = true;
       boss.claim = "Festival biletim var — o eşya benim! Bak, etiket aynı…";
       boss.extraClue = "Fiş numarası: SAHTE-999";
@@ -3199,23 +3201,66 @@ function generateVisitor(diff){
   const target=makeItem(type,color,pattern,detail,tag);
   const size=Math.min(5+Math.floor(diff/2)+(diff>6?2:0),9);const shelf=[target];const seen=new Set([itemId(target)]);
   let g=0;while(shelf.length<size&&g++<100){const d=similarItem(target,diff>2);const id=itemId(d);if(!seen.has(id)){seen.add(id);shelf.push(d)}}
-  if(diff>3){for(let k=0;k<2;k++){const near=Object.assign({},target);const which=rand(["color","pattern","detail","tag"]);
+  // Prefer close decoys: force 1-2 same-type near-misses on hard
+  // Soft types (bere/eldiven/…) MUST differ in a clue-visible attr (color/pattern/detail) — never tag-only.
+  if(diff>2){for(let k=0;k<Math.max(2,Math.min(3,size-1));k++){const near=Object.assign({},target);
+    const shapeTypes=["oyuncak","anahtarlik","anahtar","atki","sal","sapka","gozluk","semsiye","bere","eldiven","telefon","cuzdan","kalemlik"];
+    const soft=["bere","eldiven","telefon","atki","sal","sapka","kalemlik"];
+    let which;
+    if(soft.includes(type)){
+      // Cycle: pattern → color → detail so each decoy reads different at card size
+      const cycle=["pattern","color","detail"];
+      which=cycle[k%cycle.length];
+      if(which==="pattern"&&(!target.pattern||target.pattern==="duz")&&k===0) which="color";
+    } else if(shapeTypes.includes(type)) which=(k===0?"detail":rand(["color","detail","pattern"]));
+    else which=rand(["color","pattern","detail","tag"]);
     if(which==="color"){let c;do{c=rand(PROC_COLORS)}while(c===target.color);near.color=c;}
-    else if(which==="pattern"){let p;do{p=rand(PROC_PATTERNS)}while(p===target.pattern);near.pattern=p;}
-    else if(which==="detail"){const opts=(PROC_DETAILS[type]||[null]).filter(d=>d!==target.detail);near.detail=opts.length?rand(opts):null;}
+    else if(which==="pattern"){let p;do{p=rand(PROC_PATTERNS)}while(p===(target.pattern||"duz"));near.pattern=p;}
+    else if(which==="detail"){const opts=(PROC_DETAILS[type]||[null]).filter(d=>d!==target.detail);near.detail=opts.length?rand(opts):(target.detail?null:"yama");}
     else{let tg;do{tg=rand(PROC_TAGS)}while(tg===target.tag);near.tag=tg;}
+    // Soft: always differ in color OR pattern OR detail (never tag-only lookalikes)
+    if(soft.includes(type)&&near.color===target.color&&(near.pattern||"duz")===(target.pattern||"duz")&&near.detail===target.detail){
+      let c;do{c=rand(PROC_COLORS)}while(c===target.color);near.color=c;
+    }
+    if(near.color===target.color&&near.pattern===target.pattern&&near.detail===target.detail){
+      let c;do{c=rand(PROC_COLORS)}while(c===target.color);near.color=c;
+    }
     const id=itemId(near);if(!seen.has(id)){seen.add(id);if(shelf.length>=size)shelf[shelf.length-1]=near;else shelf.push(near);}
   }}
+  // Cull soft lookalikes that only differ by tag (same type+color+pattern+detail)
+  if(["bere","eldiven","telefon","atki","sal","sapka","kalemlik"].includes(type)){
+    const vis=new Set();
+    const kept=[];
+    for(const it of shelf){
+      const vid=[it.type,it.color,it.pattern||"duz",it.detail||"yok"].join("|");
+      if(vis.has(vid)&&itemId(it)!==itemId(target)) continue;
+      vis.add(vid);kept.push(it);
+    }
+    while(kept.length<size){
+      const near=Object.assign({},target);
+      let c;do{c=rand(PROC_COLORS)}while(c===target.color||kept.some(it=>it.color===c&&(it.pattern||"duz")===(target.pattern||"duz")));
+      near.color=c;
+      const id=itemId(near);
+      if(!kept.some(it=>itemId(it)===id)) kept.push(near);
+      else break;
+    }
+    shelf.length=0;shelf.push(...kept.slice(0,size));
+  }
   const trick=diff>2&&Math.random()<(0.2+Math.min(diff,10)*0.03);
   if(trick){
-    const cast=typeof EXTRA_NAMES!=="undefined"?rand(EXTRA_NAMES):{name:"Oğuz",tone:"şüpheli"};
-    const claim=typeof buildClue==="function"?buildClue(target,diff):((COLOR_TR[color]||color)+" "+(TYPE_TR[type]||type)+"…");
-    return{visitor:"yalanci",visitorName:cast.name,visitorTone:cast.tone,trick:true,target:null,claimItem:target,claim,extraClue:"Biraz aceleye getiriyor…",shelf:shuffle(shelf),payoffReject:cast.name+" kapıdan çıktı.",wrongGive:"Bu eşya başka birine ait!"};
+    const claim=(typeof buildClue==="function")?buildClue(target,diff):((COLOR_TR[color]||color)+" "+(TYPE_TR[type]||type)+" benim!");
+    return{visitor:"yalanci",visitorName:null,trick:true,target:null,claimItem:target,claim,extraClue:"Biraz aceleye getiriyor…",shelf:shuffle(shelf),payoffReject:"Başka kapıya…",wrongGive:"Bu başkasının eşyası!"};
   }
-  const vk=rand(Object.keys(VISITORS).filter(k=>k!=="yalanci"));
-  const clue=typeof buildClue==="function"?buildClue(target,diff):((COLOR_TR[color]||color)+" "+(TYPE_TR[type]||type));
-  let extra=detail?"Özellikle "+(DETAIL_TR[detail]||detail)+".":"";
-  return{visitor:vk,target,shelf:shuffle(shelf),clue,extraClue:extra,payoff:rand(["Ah, işte bu!","Mucize, sağ ol!","Kasabanın en iyisisin.","İçim rahatladı.","İyi ki buradasın."])};
+  const cast=Object.keys(VISITORS).filter(k=>k!=="yalanci");
+  const vk=rand(cast);
+  const visitorName=null; // name comes from VISITORS[vk] — full portrait, never rename onto wrong body
+  let clue=(typeof buildClue==="function")?buildClue(target,diff):((COLOR_TR[color]||color)+" "+(TYPE_TR[type]||type));
+  let extra=detail?"Özellikle "+(DETAIL_TR[detail]||detail)+" olanı. Etiket: "+tag+".":"Etiket: "+tag+".";
+  if(typeof buildClue==="function"){
+    // Ask-tip: slightly richer second line
+    extra=(DETAIL_TR[detail]||detail||"İnce detayı")+" — etiket tam: "+tag+".";
+  }
+  return{visitor:vk,visitorName,target,shelf:shuffle(shelf),clue,extraClue:extra,payoff:rand(["Ah, işte bu!","Mucize, sağ ol!","Kasabanın en iyisisin.","İçim rahatladı.","İyi ki buradasın."])};
 }
 function generateEndlessDay(round){const count=Math.min(3+Math.floor(round/2),5);const visitors=[];for(let i=0;i<count;i++)visitors.push(generateVisitor(1+round));return{id:"endless",name:"Sonsuz #"+round,weather:rand(["acik","yagmurlu","gunesli","bulutlu"]),hour:9+round%8,visitors,endless:true,round}}
 
@@ -3265,7 +3310,7 @@ function refreshOffice(){
   const cp=$("counter-props"); if(cp) cp.innerHTML=drawCounterProps();
   const lg=$("lamp-glow"); if(lg){ const night=!!(state.dayData&&state.dayData.night); lg.classList.toggle("on", night?!!state.lampLit:true); }
 }
-function setExpr(e){state.expr=e;const cv=currentVisitor();if(!cv)return;const v=VISITORS[cv.visitor];const vb=$("visitor-body");vb.innerHTML=drawVisitor(v,e);
+function setExpr(e){state.expr=e;const cv=currentVisitor();if(!cv)return;const v=resolveVisitorPortrait(cv);mountVisitorPortrait(v,e);
   vb.classList.remove("react-happy","react-annoyed");
   if(e==="happy"){vb.classList.add("react-happy");setTimeout(()=>vb.classList.remove("react-happy"),560)}
   if(e==="annoyed"){vb.classList.add("react-annoyed");setTimeout(()=>vb.classList.remove("react-annoyed"),460)}
@@ -3378,11 +3423,11 @@ function startChapter(chId){
     if(!visitors.some(v=>v.trick)){
       try{
         const t=generateVisitor(diff+3);
-        t.trick=true; t.target=null; t.claimItem=(t.shelf&&t.shelf[0])||null;
-        t.visitorName=(typeof EXTRA_NAMES!=="undefined"?EXTRA_NAMES[0].name:"Oguz");
+        t.trick=true; t.target=null; t.visitor="yalanci"; t.visitorName=null;
+        t.claimItem=(t.shelf&&t.shelf[0])||null;
         t.claim=(typeof buildClue==="function"&&t.claimItem)?buildClue(t.claimItem,diff):"Bu benim!";
-        t.payoffReject="Yakalandim…";
-        t.wrongGive="Bu esya baskasinin!";
+        t.payoffReject="Yakalandım…";
+        t.wrongGive="Bu eşya başkasının!";
         visitors[visitors.length-1]=t;
       }catch(_e){}
     }
@@ -3501,13 +3546,45 @@ function restoreGameChrome(){
   });
   document.getElementById("storage-root")?.classList.remove("show");
 }
+function resolveVisitorPortrait(cv){
+  /* Name and body must always match a single VISITORS entry.
+     visitorName may alias yalanci (boss title) but must NEVER steal another cast member's name onto the wrong body. */
+  const key=cv.visitor||"yalanci";
+  let v=Object.assign({}, VISITORS[key]||VISITORS.yalanci||{});
+  if(cv.visitorName){
+    const castHit=Object.values(VISITORS).find(x=>x && x.name===cv.visitorName);
+    if(castHit && castHit.id!==v.id){
+      // Stolen cast name — prefer real portrait for that name (or drop alias for tricks)
+      if(cv.trick || key==="yalanci"){ /* keep suspicious body, drop fake name */ }
+      else { v=Object.assign({}, castHit); }
+    } else if(!castHit){
+      v.name=cv.visitorName; // unique alias e.g. Panayır Dolandırıcısı
+    }
+  }
+  return v;
+}
+function mountVisitorPortrait(v, expr){
+  const vb=$("visitor-body");
+  if(!vb) return v;
+  vb.classList.remove("enter","exit","react-happy","react-annoyed");
+  // Hard reset: one layer only — wipe any leftover SVG/nodes from prior visitor
+  while(vb.firstChild) vb.removeChild(vb.firstChild);
+  vb.innerHTML=drawVisitor(v, expr||"neutral");
+  const svg=vb.querySelector("svg");
+  if(svg){
+    svg.setAttribute("data-name", v.name||"");
+    svg.setAttribute("data-visitor-id", v.id||"");
+  }
+  vb.setAttribute("data-name", v.name||"");
+  vb.setAttribute("data-visitor-id", v.id||"");
+  return v;
+}
 function loadVisitor(){
   restoreGameChrome();
   const cv=currentVisitor();if(!cv)return;
-  const v=Object.assign({},VISITORS[cv.visitor]||VISITORS.yalanci||{});
-  if(cv.visitorName) v.name=cv.visitorName;
+  const v=resolveVisitorPortrait(cv);
   state.patience=state.maxPatience;state.asked=false;state.expr="neutral";
-  $("visitor-body").innerHTML=drawVisitor(v,"neutral");
+  mountVisitorPortrait(v,"neutral");
   $("visitor-name").textContent=v.name;
   updatePatience();
   const speechTxt=cv.trick?(cv.claim||""):(cv.clue||"");
@@ -3734,7 +3811,14 @@ function nextVisitorOrEnd(){
   }
   if(state.visitorIndex>=state.dayData.visitors.length-1){endDay(true);return}
   state.visitorIndex++;$("between-text").textContent="Sıradaki ziyaretçi geliyor…";$("between-msg").classList.add("show");
-  setTimeout(()=>{$("between-msg").classList.remove("show");loadVisitor()},850);
+  const vb=$("visitor-body");
+  const go=()=>{$("between-msg").classList.remove("show");loadVisitor()};
+  if(window.Motion&&Motion.exitVisitor&&vb){
+    Motion.exitVisitor(vb).then(()=>{ while(vb.firstChild) vb.removeChild(vb.firstChild); setTimeout(go,200); });
+  } else {
+    if(vb) while(vb.firstChild) vb.removeChild(vb.firstChild);
+    setTimeout(go,850);
+  }
 }
 function calcStars(){if(state.failed)return state.correct>=1?1:0;const total=state.dayData.visitors.length;if(state.wrong===0&&state.correct===total)return 3;if(state.wrong<=2)return 2;return 1}
 function endDay(won){ if(typeof Queue!=="undefined"){ Queue.stopTimer(); Queue.active=false; const c=$("shift-clock"); if(c) c.style.display="none"; const r=$("queue-rail"); if(r) r.classList.remove("show"); } if(typeof Pets!=="undefined") Pets.stop(); if(typeof Festival!=="undefined") Festival.undecorate();
@@ -3844,7 +3928,7 @@ document.querySelectorAll("button.btn, button.btn-back").forEach(b=>{
 renderTitle();AudioSys.init();
 window.__KEB_READY__=true;document.documentElement.dataset.kebReady="1";
 
-window.Motion=Motion;window.CHAPTERS=CHAPTERS;window.generateVisitor=generateVisitor;window.buildClue=typeof buildClue!=="undefined"?buildClue:null;try{window.renderAlbum=renderAlbum;window.ensureAlbumUI=ensureAlbumUI;}catch(_e){}window.Storage=Storage;window.Ledger=Ledger;window.Queue=Queue;window.Memory=Memory;window.Phone=Phone;window.Repair=Repair;window.Pets=Pets;window.Tourist=Tourist;window.Festival=Festival;window.Arcs=Arcs;window.Meta=Meta;window.__KEB_READY__=true;document.documentElement.dataset.kebReady="1";window.__KEB__={getSave:()=>save,setSave:(s)=>{save=s;writeSave(save)},state,DAYS,VISITORS,TYPE_KEYS,DECORS,CHAPTERS,Motion,generateVisitor,buildClue,renderAlbum,ensureAlbumUI,Storage,Ledger,Queue,Memory,Phone,Repair,Pets,Tourist,Festival,Arcs,Meta,startDay,startChapter,startEndless,showScreen,itemId,currentVisitor,tryGive,askQuestion,rejectTrick,endDay,calcStars,generateEndlessDay,renderDaySelect,renderShop,renderAlbum,openInspect,closeInspect,startTutorial,endTutorial,refreshOffice,applyNightLamp,restoreGameChrome,writeSave,loadSave,SAVE_KEY,drawVisitor,drawTitleFacade,drawItem,itemLabel,generateVisitor,buildClue,EXTRA_NAMES,TYPE_TR,DETAIL_TR,PROC_DETAILS,PROC_COLORS,PROC_PATTERNS,COLOR_TR,PATTERN_TR};
+window.Motion=Motion;window.CHAPTERS=CHAPTERS;window.generateVisitor=generateVisitor;window.buildClue=typeof buildClue!=="undefined"?buildClue:null;try{window.renderAlbum=renderAlbum;window.ensureAlbumUI=ensureAlbumUI;}catch(_e){}window.Storage=Storage;window.Ledger=Ledger;window.Queue=Queue;window.Memory=Memory;window.Phone=Phone;window.Repair=Repair;window.Pets=Pets;window.Tourist=Tourist;window.Festival=Festival;window.Arcs=Arcs;window.Meta=Meta;window.__KEB_READY__=true;document.documentElement.dataset.kebReady="1";window.__KEB__={getSave:()=>save,setSave:(s)=>{save=s;writeSave(save)},state,DAYS,VISITORS,TYPE_KEYS,DECORS,CHAPTERS,Motion,generateVisitor,buildClue,renderAlbum,ensureAlbumUI,Storage,Ledger,Queue,Memory,Phone,Repair,Pets,Tourist,Festival,Arcs,Meta,startDay,startChapter,startEndless,showScreen,itemId,currentVisitor,tryGive,askQuestion,rejectTrick,endDay,calcStars,generateEndlessDay,renderDaySelect,renderShop,renderAlbum,openInspect,closeInspect,startTutorial,endTutorial,refreshOffice,applyNightLamp,restoreGameChrome,writeSave,loadSave,SAVE_KEY,drawVisitor,drawTitleFacade,drawItem,itemLabel,generateVisitor,buildClue,EXTRA_NAMES,TYPE_TR,DETAIL_TR,PROC_DETAILS,PROC_COLORS,PROC_PATTERNS,COLOR_TR,PATTERN_TR,loadVisitor,resolveVisitorPortrait,mountVisitorPortrait,nextVisitorOrEnd};
 })();
 
 </script>
