@@ -264,6 +264,17 @@ body{display:flex;justify-content:center;align-items:stretch;padding:var(--safe-
 .shift-clock{font-weight:700;font-size:.85rem;padding:4px 8px;border:2px solid var(--ink);border-radius:8px;background:#FFF8EC;margin-left:6px}
 .shift-clock.urgent{background:#F5D0C8;animation:lampFlicker 1s ease-in-out infinite}
 
+/* —— Phone hold —— */
+.phone-root{display:none;position:absolute;inset:0;z-index:46;background:rgba(20,30,40,.55);align-items:center;justify-content:center;padding:12px}
+.phone-root.show{display:flex}
+.phone-panel{background:var(--cream);border:3px solid var(--ink);border-radius:16px;padding:14px;max-width:360px;width:100%;box-shadow:4px 6px 0 rgba(0,0,0,.25)}
+.phone-bell{font-weight:700;font-size:1.05rem;margin-bottom:8px;animation:lampFlicker .8s ease-in-out infinite}
+.phone-clue{font-size:.9rem;line-height:1.4;background:#FFF8EC;border:2px solid var(--ink);border-radius:10px;padding:8px}
+.phone-actions{display:flex;gap:8px;margin-top:10px}
+.phone-actions .btn{flex:1}
+.shelf.phone-pick-mode{outline:3px dashed var(--mustard);outline-offset:2px}
+.shelf-item.phone-held{box-shadow:0 0 0 3px #3D6B6B;background:#E0F0F0}
+
 /* 2.0.0 motion — respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
@@ -2317,6 +2328,109 @@ const MemorySys = {
 
 const Memory = MemorySys;
 
+/** Chapter 7 — Phone hold: ring → describe item → tag on shelf → caller arrives later. */
+const PhoneSys = {
+  active: false,
+  holdItemId: null,
+  holdItem: null,
+  pendingCaller: null,
+  ringing: false,
+
+  showTutorial() {
+    return new Promise(resolve => {
+      const ov = document.createElement("div");
+      ov.className = "mechanic-overlay";
+      ov.id = "phone-tut";
+      ov.innerHTML = `<div class="mechanic-panel">
+        <h3>Telefon Nöbeti</h3>
+        <p>Telefon çalar. Arayan bir eşya tarif eder — raftan seçip <b>Ayır</b>.</p>
+        <p>Sonra o kişi sıraya gelir; ayırdığın eşyayı ver.</p>
+        <button class="btn primary" id="phone-tut-ok" type="button">Anladım</button>
+      </div>`;
+      document.body.appendChild(ov);
+      ov.querySelector("#phone-tut-ok").onclick = () => { ov.remove(); resolve(); };
+    });
+  },
+
+  /** Start a ring mid-shift with an item from the upcoming caller's target. */
+  ring(item, callerVisitor) {
+    this.active = true;
+    this.ringing = true;
+    this.holdItem = null;
+    this.holdItemId = null;
+    this.pendingCaller = callerVisitor;
+    this._wanted = item;
+    this.renderRing(item);
+  },
+
+  renderRing(item) {
+    let root = document.getElementById("phone-root");
+    if (!root) {
+      root = document.createElement("div");
+      root.id = "phone-root";
+      document.getElementById("screen-game")?.appendChild(root) || document.body.appendChild(root);
+    }
+    const clue = typeof buildClue === "function" ? buildClue(item, 3) : (COLOR_TR[item.color] + " " + TYPE_TR[item.type]);
+    root.className = "phone-root show";
+    root.innerHTML = `<div class="phone-panel">
+      <div class="phone-bell">Telefon çalıyor…</div>
+      <p class="phone-clue">"${clue}"</p>
+      <p class="day-meta">Raftan doğru eşyayı seç, sonra Ayır.</p>
+      <div class="phone-actions">
+        <button type="button" class="btn primary" id="phone-pick">Raftan seçiyorum</button>
+        <button type="button" class="btn" id="phone-ignore">Sonra</button>
+      </div>
+    </div>`;
+    root.querySelector("#phone-ignore").onclick = () => {
+      root.classList.remove("show");
+      this.ringing = false;
+    };
+    root.querySelector("#phone-pick").onclick = () => {
+      root.classList.remove("show");
+      this.ringing = false;
+      this._picking = true;
+      $("speech").textContent = "Ayırmak için raftaki eşyaya dokun…";
+      document.getElementById("shelf")?.classList.add("phone-pick-mode");
+    };
+  },
+
+  /** Called from tryGive / bind when picking for hold */
+  tryTag(item, el) {
+    if (!this._picking) return false;
+    this._picking = false;
+    document.getElementById("shelf")?.classList.remove("phone-pick-mode");
+    const want = this._wanted;
+    if (want && itemId(item) === itemId(want)) {
+      this.holdItem = item;
+      this.holdItemId = itemId(item);
+      if (el) el.classList.add("phone-held");
+      AudioSys.ok && AudioSys.ok();
+      $("speech").textContent = "Ayırıldı. Arayan sonra uğrayacak.";
+      return true;
+    }
+    AudioSys.bad && AudioSys.bad();
+    $("speech").textContent = "Bu değil — tarifteki eşyayı ayır.";
+    this._picking = true;
+    document.getElementById("shelf")?.classList.add("phone-pick-mode");
+    return true; // consumed the tap
+  },
+
+  /** When a visitor arrives who was the caller, only the held item is correct. */
+  isCaller(cv) {
+    return !!(this.pendingCaller && cv && (cv === this.pendingCaller || cv._phoneCaller));
+  },
+
+  clearHold() {
+    this.holdItem = null;
+    this.holdItemId = null;
+    this.pendingCaller = null;
+    this.active = false;
+    document.querySelectorAll(".phone-held").forEach(el => el.classList.remove("phone-held"));
+  }
+};
+
+const Phone = PhoneSys;
+
 function rand(a){return a[Math.floor(Math.random()*a.length)]}
 function shuffle(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
 function similarItem(base,hard){const v=Object.assign({},base);const which=rand(hard?["color","pattern","detail","type","tag"]:["color","pattern","detail","tag"]);
@@ -2546,6 +2660,17 @@ function startChapter(chId){
       loadVisitor();
       if(state.queueMode&&typeof Queue!=="undefined"){ Queue.begin(visitors, state.shiftTimer||90); state.patience=Queue.patienceMap[0]||state.patience; updatePatience(); Queue.renderRail(); }
     });
+  } else if(ch.mechanic==="phonecall"&&typeof Phone!=="undefined"){
+    // Designate last honest visitor as phone caller; ring after first visitor loads
+    const honest=visitors.filter(v=>!v.trick&&v.target);
+    const caller=honest[honest.length-1];
+    if(caller){ caller._phoneCaller=true; state.phoneCaller=caller; }
+    Phone.showTutorial().then(()=>{
+      loadVisitor();
+      setTimeout(()=>{
+        if(caller&&caller.target) Phone.ring(caller.target, caller);
+      }, 1200);
+    });
   } else {
     loadVisitor();
     if(state.queueMode&&typeof Queue!=="undefined"){
@@ -2727,8 +2852,13 @@ function closeInspect(){$("inspect-modal").classList.remove("show")}
 
 function tryGive(item,el){
   if(el){el._kebGave=true;setTimeout(()=>{try{el._kebGave=false}catch(_){}},400)}
+  if(typeof Phone!=="undefined"&&Phone._picking){ Phone.tryTag(item,el); return; }
   const cv=currentVisitor();if(!cv)return;
   if(cv.trick){onWrong(el,cv.wrongGive||"Bu senin değil!");return}
+  if(cv._phoneCaller&&typeof Phone!=="undefined"){
+    if(Phone.holdItemId&&itemId(item)===Phone.holdItemId){ onCorrect(item,el,cv); Phone.clearHold(); return; }
+    onWrong(el,"Ayırdığın eşya bu değil…"); return;
+  }
   if(itemId(item)===itemId(cv.target))onCorrect(item,el,cv);else onWrong(el);
 }
 function onCorrect(item,el,cv){
@@ -2876,7 +3006,7 @@ document.querySelectorAll("button.btn, button.btn-back").forEach(b=>{
 renderTitle();AudioSys.init();
 window.__KEB_READY__=true;document.documentElement.dataset.kebReady="1";
 
-window.Motion=Motion;window.CHAPTERS=CHAPTERS;window.generateVisitor=generateVisitor;window.buildClue=typeof buildClue!=="undefined"?buildClue:null;try{window.renderAlbum=renderAlbum;window.ensureAlbumUI=ensureAlbumUI;}catch(_e){}window.Storage=Storage;window.Ledger=Ledger;window.Queue=Queue;window.Memory=Memory;window.__KEB_READY__=true;document.documentElement.dataset.kebReady="1";window.__KEB__={getSave:()=>save,setSave:(s)=>{save=s;writeSave(save)},state,DAYS,VISITORS,TYPE_KEYS,DECORS,CHAPTERS,Motion,generateVisitor,buildClue,renderAlbum,ensureAlbumUI,Storage,Ledger,Queue,Memory,startDay,startChapter,startEndless,showScreen,itemId,currentVisitor,tryGive,askQuestion,rejectTrick,endDay,calcStars,generateEndlessDay,renderDaySelect,renderShop,openInspect,closeInspect,startTutorial,endTutorial,refreshOffice,writeSave,loadSave,SAVE_KEY,drawVisitor,drawTitleFacade,drawItem,itemLabel,generateVisitor,buildClue,EXTRA_NAMES,TYPE_TR,DETAIL_TR,PROC_DETAILS,PROC_COLORS,PROC_PATTERNS,COLOR_TR,PATTERN_TR};
+window.Motion=Motion;window.CHAPTERS=CHAPTERS;window.generateVisitor=generateVisitor;window.buildClue=typeof buildClue!=="undefined"?buildClue:null;try{window.renderAlbum=renderAlbum;window.ensureAlbumUI=ensureAlbumUI;}catch(_e){}window.Storage=Storage;window.Ledger=Ledger;window.Queue=Queue;window.Memory=Memory;window.Phone=Phone;window.__KEB_READY__=true;document.documentElement.dataset.kebReady="1";window.__KEB__={getSave:()=>save,setSave:(s)=>{save=s;writeSave(save)},state,DAYS,VISITORS,TYPE_KEYS,DECORS,CHAPTERS,Motion,generateVisitor,buildClue,renderAlbum,ensureAlbumUI,Storage,Ledger,Queue,Memory,Phone,startDay,startChapter,startEndless,showScreen,itemId,currentVisitor,tryGive,askQuestion,rejectTrick,endDay,calcStars,generateEndlessDay,renderDaySelect,renderShop,openInspect,closeInspect,startTutorial,endTutorial,refreshOffice,writeSave,loadSave,SAVE_KEY,drawVisitor,drawTitleFacade,drawItem,itemLabel,generateVisitor,buildClue,EXTRA_NAMES,TYPE_TR,DETAIL_TR,PROC_DETAILS,PROC_COLORS,PROC_PATTERNS,COLOR_TR,PATTERN_TR};
 })();
 
 </script>
