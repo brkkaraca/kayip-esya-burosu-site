@@ -560,11 +560,12 @@ function svgWrap(inner, vb){
   return `<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><g stroke="${C.ink}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none" vector-effect="non-scaling-stroke">${inner}</g></svg>`;
 }
 function patternFill(pattern, base, pid){
-  /* Fabric: soft tone-on-tone bands/dots (no ink wire-grid). Callers inset-clip. */
+  /* Fabric: tone-on-tone ONLY. Never C.ink. Explicit stroke=none so parent outline does not cage tiles. */
   const d = lo(base), h = hi(base);
-  if (pattern === "cizgili") return `<defs><pattern id="${pid}" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(16)"><rect width="7" height="7" fill="${base}"/><rect x="0" y="0" width="2.4" height="7" fill="${d}" opacity=".26"/><rect x="4.2" y="0" width=".9" height="7" fill="${h}" opacity=".2"/></pattern></defs>`;
-  if (pattern === "benekli") return `<defs><pattern id="${pid}" width="11" height="11" patternUnits="userSpaceOnUse"><rect width="11" height="11" fill="${base}"/><circle cx="3.2" cy="3.2" r="1.85" fill="${d}" opacity=".32"/><circle cx="8.2" cy="7.6" r="1.45" fill="${h}" opacity=".34"/><circle cx="7.5" cy="2.4" r="1.1" fill="${d}" opacity=".2"/></pattern></defs>`;
-  if (pattern === "kareli") return `<defs><pattern id="${pid}" width="11" height="11" patternUnits="userSpaceOnUse"><rect width="11" height="11" fill="${base}"/><rect width="5.5" height="5.5" fill="${d}" opacity=".22"/><rect x="5.5" y="5.5" width="5.5" height="5.5" fill="${d}" opacity=".22"/><rect x="5.5" y="0" width="5.5" height="5.5" fill="${h}" opacity=".14"/><rect x="0" y="5.5" width="5.5" height="5.5" fill="${h}" opacity=".14"/></pattern></defs>`;
+  const sn = 'stroke="none"';
+  if (pattern === "cizgili") return `<defs><pattern id="${pid}" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(18)"><rect width="8" height="8" fill="${base}" ${sn}/><rect x="0" y="0" width="2.2" height="8" fill="${d}" opacity=".28" ${sn}/><rect x="4.5" y="0" width="0.85" height="8" fill="${h}" opacity=".22" ${sn}/></pattern></defs>`;
+  if (pattern === "benekli") return `<defs><pattern id="${pid}" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="${base}" ${sn}/><circle cx="3.5" cy="3.5" r="1.9" fill="${d}" opacity=".3" ${sn}/><circle cx="8.8" cy="8" r="1.5" fill="${h}" opacity=".32" ${sn}/><circle cx="8.2" cy="2.8" r="1.15" fill="${d}" opacity=".18" ${sn}/></pattern></defs>`;
+  if (pattern === "kareli") return `<defs><pattern id="${pid}" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="${base}" ${sn}/><rect width="6" height="6" fill="${d}" opacity=".2" ${sn}/><rect x="6" y="6" width="6" height="6" fill="${d}" opacity=".2" ${sn}/><rect x="6" y="0" width="6" height="6" fill="${h}" opacity=".12" ${sn}/><rect x="0" y="6" width="6" height="6" fill="${h}" opacity=".12" ${sn}/></pattern></defs>`;
   return "";
 }
 function pf(pattern, pid){ return (pattern === "cizgili" || pattern === "benekli" || pattern === "kareli") ? "url(#" + pid + ")" : null; }
@@ -587,23 +588,34 @@ function fabricEllipse(cx,cy,rx,ry,fill,col,pid,sw){
   }
   return `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${fill||col}" stroke="${C.ink}" stroke-width="${sw}"/>`;
 }
+function fabricRect(x,y,w,h,rx,fill,col,pid,sw){
+  sw = sw || 1.5; rx = rx || 0;
+  if (fill && String(fill).indexOf("url(") === 0) {
+    const inset = 0.16;
+    const ix = x + w*inset/2, iy = y + h*inset/2, iw = w*(1-inset), ih = h*(1-inset);
+    return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${col}" stroke="${C.ink}" stroke-width="${sw}"/>
+      <defs><clipPath id="inr${pid}"><rect x="${ix}" y="${iy}" width="${iw}" height="${ih}" rx="${Math.max(0,rx-1)}"/></clipPath></defs>
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${fill}" stroke="none" clip-path="url(#inr${pid})"/>`;
+  }
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${fill||col}" stroke="${C.ink}" stroke-width="${sw}"/>`;
+}
 
 const ItemDraw = {
   semsiye(item){
     const col = COLOR_HEX[item.color] || C.red, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
     const canopy = "M8 30 Q16 14 24 26 Q32 8 40 26 Q48 14 56 30 Q46 40 32 38 Q18 40 8 30Z";
-    const ribs = `<path d="M24 26 Q32 20 32 36" fill="none" stroke="${C.ink}" stroke-width="1.1" opacity=".4"/><path d="M40 26 Q32 20 32 36" fill="none" stroke="${C.ink}" stroke-width="1.1" opacity=".4"/><path d="M32 12 Q32 24 32 36" fill="none" stroke="${C.ink}" stroke-width="1.1" opacity=".35"/>`;
+    const ribs = `<path d="M24 26 Q32 20 32 36" fill="none" stroke="${lo(col)}" stroke-width="1" opacity=".45"/><path d="M40 26 Q32 20 32 36" fill="none" stroke="${lo(col)}" stroke-width="1" opacity=".45"/><path d="M32 12 Q32 24 32 36" fill="none" stroke="${lo(col)}" stroke-width="1" opacity=".4"/>`;
     let handle = "";
     if (item.detail === "ordek") {
       handle = `<path d="M31 40 L31 48 Q31 56 24 57 Q18 57 17 51 Q17 46 23 46 Q29 46 31 50" fill="${C.yellow}"/><circle cx="20" cy="50" r="1.2" fill="${C.ink}" stroke="none"/><path d="M17 52 L12 54 L17 55Z" fill="${C.orange}" stroke="${C.ink}" stroke-width="1"/>`;
     } else if (item.detail === "j_sap") {
-      handle = `<path d="M31 40 L31 50 Q31 58 23 58" fill="none" stroke="${C.wood}" stroke-width="3"/><path d="M31 40 L31 50 Q31 58 23 58" fill="none" stroke="${C.ink}" stroke-width="1.6"/>`;
+      handle = `<path d="M31 40 L31 50 Q31 58 23 58" fill="none" stroke="${C.wood}" stroke-width="3.4"/><path d="M31 40 L31 50 Q31 58 23 58" fill="none" stroke="${C.ink}" stroke-width="1.6"/>`;
     } else {
-      handle = `<line x1="31" y1="40" x2="31" y2="56" stroke="${C.wood}" stroke-width="3"/><line x1="31" y1="40" x2="31" y2="56" stroke="${C.ink}" stroke-width="1.6"/><circle cx="31" cy="57.5" r="2.4" fill="${C.wood}"/>`;
+      /* düz_sap — straight shaft + ferrule + knob (reads as "düz sap" vs curved j) */
+      handle = `<line x1="31" y1="40" x2="31" y2="56" stroke="${C.wood}" stroke-width="3.4"/><line x1="31" y1="40" x2="31" y2="56" stroke="${C.ink}" stroke-width="1.6"/><rect x="28" y="48" width="6" height="3" rx="0.5" fill="${C.mustard}" stroke="${C.ink}" stroke-width="1"/><circle cx="31" cy="57.5" r="2.8" fill="${C.wood}" stroke="${C.ink}" stroke-width="1.2"/>`;
     }
-    return svgWrap(`${pat}<defs><clipPath id="uc${_pid}"><path d="${canopy}"/></clipPath></defs>
-      <path d="${canopy}" fill="${fill}"/>
-      <path d="M14 24 Q32 12 50 24" fill="${hi(col)}" opacity=".28" stroke="none"/>
+    return svgWrap(`${pat}${fabricPath(canopy, fill, col, _pid, 1.6)}
+      <defs><clipPath id="uc${_pid}"><path d="${canopy}" transform="translate(32 32) scale(0.84) translate(-32 -32)"/></clipPath></defs>
       <g clip-path="url(#uc${_pid})">${ribs}</g>
       <circle cx="32" cy="12" r="2.6" fill="${lo(col)}"/>
       <line x1="31" y1="36" x2="31" y2="40" stroke="${C.ink}" stroke-width="2.2"/>
@@ -612,10 +624,11 @@ const ItemDraw = {
   cuzdan(item){
     const col = COLOR_HEX[item.color] || C.brown, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
     let e = "";
-    if (item.detail === "metal") e = `<rect x="38" y="28" width="8" height="6" rx="1" fill="${C.mustard}"/>`;
-    if (item.detail === "kalpli") e = `<path d="M30 30 Q28 26 24 28 Q22 32 30 38 Q38 32 36 28 Q32 26 30 30" fill="${C.brick}"/>`;
-    if (item.detail === "fermuar") e = `<line x1="18" y1="32" x2="46" y2="32" stroke="${C.mustard}" stroke-width="1.6"/><circle cx="46" cy="32" r="1.8" fill="${C.mustard}"/>`;
-    return svgWrap(`${pat}<rect x="14" y="22" width="36" height="24" rx="4" fill="${fill}"/><path d="M16 24 H48 V30 H14 V26 Q14 24 16 24Z" fill="${hi(col)}" opacity=".28" stroke="none"/><line x1="14" y1="32" x2="50" y2="32" stroke="${C.ink}" stroke-width="1.4"/>${e}`);
+    if (item.detail === "metal") e = `<rect x="36" y="26" width="10" height="8" rx="1.5" fill="${C.mustard}" stroke="${C.ink}" stroke-width="1.1"/><rect x="38" y="28" width="6" height="2" fill="${hi(C.mustard)}" stroke="none"/>`;
+    if (item.detail === "kalpli") e = `<path d="M30 30 Q28 26 24 28 Q22 32 30 38 Q38 32 36 28 Q32 26 30 30" fill="${C.brick}" stroke="${C.ink}" stroke-width="1"/>`;
+    if (item.detail === "fermuar") e = `<line x1="18" y1="32" x2="46" y2="32" stroke="${C.mustard}" stroke-width="2"/><circle cx="46" cy="32" r="2.4" fill="${C.mustard}" stroke="${C.ink}" stroke-width="1"/><circle cx="46" cy="32" r="0.8" fill="${C.ink}" stroke="none"/>`;
+    return svgWrap(`${pat}${fabricRect(14,22,36,24,4,fill,col,_pid)}
+      <line x1="14" y1="32" x2="50" y2="32" stroke="${C.ink}" stroke-width="1.4"/>${e}`);
   },
   anahtarlik(item){
     /* Ring + keys + charm — colour AND charm shape always visible; key count varies */
@@ -682,30 +695,56 @@ const ItemDraw = {
     return svgWrap(`<circle cx="20" cy="20" r="6" fill="${col}"/><circle cx="44" cy="20" r="6" fill="${col}"/><ellipse cx="32" cy="34" rx="14" ry="12" fill="${col}"/><ellipse cx="26" cy="30" rx="3" ry="2.2" fill="${hi(col)}" opacity=".3" stroke="none"/><ellipse cx="32" cy="48" rx="10" ry="8" fill="${col}"/><circle cx="26" cy="32" r="1.6" fill="${C.ink}"/><circle cx="38" cy="32" r="1.6" fill="${C.ink}"/><ellipse cx="32" cy="38" rx="2.5" ry="1.6" fill="${C.blush}"/>${b}`);
   },
   gozluk(item){
-    /* Chunky glasses — fill square card */
+    /* Chunky glasses — shape + wear marks must differ by detail */
     const col = COLOR_HEX[item.color] || C.black;
-    const round = item.detail === "yuvarlak" || item.detail === "eski";
-    const lenses = round
-      ? `<circle cx="20" cy="30" r="12" fill="${C.cream}" stroke="${col}" stroke-width="2.6"/><circle cx="44" cy="30" r="12" fill="${C.cream}" stroke="${col}" stroke-width="2.6"/><path d="M12 24 Q20 20 28 24" fill="none" stroke="${hi(C.cream)}" stroke-width="1.3" opacity=".7"/>`
-      : `<rect x="8" y="20" width="20" height="18" rx="3" fill="${C.cream}" stroke="${col}" stroke-width="2.6"/><rect x="36" y="20" width="20" height="18" rx="3" fill="${C.cream}" stroke="${col}" stroke-width="2.6"/>`;
+    let lenses;
+    if (item.detail === "yuvarlak") {
+      lenses = `<circle cx="20" cy="30" r="12" fill="${C.cream}" stroke="${col}" stroke-width="2.6"/><circle cx="44" cy="30" r="12" fill="${C.cream}" stroke="${col}" stroke-width="2.6"/><path d="M12 24 Q20 20 28 24" fill="none" stroke="${hi(C.cream)}" stroke-width="1.3" opacity=".7"/>`;
+    } else if (item.detail === "eski") {
+      /* Round but scratched / taped — visibly worn */
+      lenses = `<circle cx="20" cy="30" r="12" fill="${C.cream}" stroke="${col}" stroke-width="2.4"/><circle cx="44" cy="30" r="12" fill="${C.cream}" stroke="${col}" stroke-width="2.4"/>
+        <path d="M14 26 L26 34 M16 34 L24 26" stroke="${C.ink}" stroke-width="1.1" opacity=".55"/>
+        <path d="M38 26 L50 34" stroke="${C.ink}" stroke-width="1.1" opacity=".5"/>
+        <rect x="16" y="18" width="8" height="3" rx="0.5" fill="${C.mustard}" stroke="${C.ink}" stroke-width=".8"/>`;
+    } else {
+      /* kare_cam — square lenses with corner rivets */
+      lenses = `<rect x="8" y="20" width="20" height="18" rx="2" fill="${C.cream}" stroke="${col}" stroke-width="2.8"/><rect x="36" y="20" width="20" height="18" rx="2" fill="${C.cream}" stroke="${col}" stroke-width="2.8"/>
+        <circle cx="10" cy="22" r="1.2" fill="${col}" stroke="none"/><circle cx="26" cy="22" r="1.2" fill="${col}" stroke="none"/>
+        <circle cx="10" cy="36" r="1.2" fill="${col}" stroke="none"/><circle cx="26" cy="36" r="1.2" fill="${col}" stroke="none"/>
+        <circle cx="38" cy="22" r="1.2" fill="${col}" stroke="none"/><circle cx="54" cy="22" r="1.2" fill="${col}" stroke="none"/>
+        <circle cx="38" cy="36" r="1.2" fill="${col}" stroke="none"/><circle cx="54" cy="36" r="1.2" fill="${col}" stroke="none"/>`;
+    }
     return svgWrap(`${lenses}<path d="M28 30 H36" stroke="${col}" stroke-width="2.4"/><path d="M8 28 Q2 22 4 14" fill="none" stroke="${col}" stroke-width="2.2"/><path d="M56 28 Q62 22 60 14" fill="none" stroke="${col}" stroke-width="2.2"/><path d="M4 14 L4 48 M60 14 L60 48" stroke="${col}" stroke-width="2"/>`);
   },
   atki(item){
-    /* Long draped scarf: clear loop + two tapered ends + fringe */
+    /* Long draped scarf: clear loop + two tapered ends; fringe varies by detail */
     const col = COLOR_HEX[item.color] || C.brick, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
     const loop = "M14 16 C14 4 50 4 50 16 C50 24 42 30 32 30 C22 30 14 24 14 16Z";
     const left = "M18 28 C16 40 12 50 14 58 L24 58 C26 48 24 38 26 28Z";
     const right = "M38 28 C40 40 44 50 42 58 L52 58 C54 48 50 38 48 28Z";
     const knot = "M24 26 C30 34 36 34 40 26 C36 36 32 38 28 36Z";
+    let fringe = `<g stroke="${lo(col)}" stroke-width="1.4" stroke-linecap="round">
+        <line x1="15" y1="58" x2="14" y2="62"/><line x1="19" y1="58" x2="19" y2="62"/><line x1="23" y1="58" x2="23" y2="62"/>
+        <line x1="43" y1="58" x2="43" y2="62"/><line x1="47" y1="58" x2="47" y2="62"/><line x1="51" y1="58" x2="52" y2="62"/>
+      </g>`;
+    if (item.detail === "püskül") {
+      fringe = `<g stroke="${col}" stroke-width="1.8" stroke-linecap="round">
+        <line x1="14" y1="58" x2="11" y2="68"/><line x1="17" y1="58" x2="15" y2="70"/><line x1="20" y1="58" x2="20" y2="69"/><line x1="23" y1="58" x2="25" y2="68"/>
+        <line x1="41" y1="58" x2="39" y2="68"/><line x1="44" y1="58" x2="44" y2="70"/><line x1="47" y1="58" x2="49" y2="69"/><line x1="50" y1="58" x2="53" y2="68"/>
+      </g>
+      <circle cx="18" cy="58" r="2.2" fill="${lo(col)}" stroke="${C.ink}" stroke-width="1"/><circle cx="46" cy="58" r="2.2" fill="${lo(col)}" stroke="${C.ink}" stroke-width="1"/>`;
+    } else if (item.detail === "tüylü") {
+      fringe = `<ellipse cx="18" cy="60" rx="7" ry="5" fill="${hi(col)}" stroke="${C.ink}" stroke-width="1.1" opacity=".9"/>
+        <ellipse cx="46" cy="60" rx="7" ry="5" fill="${hi(col)}" stroke="${C.ink}" stroke-width="1.1" opacity=".9"/>
+        <circle cx="15" cy="58" r="1.6" fill="${col}" stroke="none"/><circle cx="21" cy="62" r="1.4" fill="${col}" stroke="none"/>
+        <circle cx="43" cy="58" r="1.6" fill="${col}" stroke="none"/><circle cx="49" cy="62" r="1.4" fill="${col}" stroke="none"/>`;
+    }
     return svgWrap(`${pat}
       ${fabricPath(loop, fill, col, _pid+"o", 1.6)}
       ${fabricPath(left, fill, col, _pid+"l", 1.5)}
       ${fabricPath(right, fill, col, _pid+"r", 1.5)}
       <path d="${knot}" fill="${lo(col)}" stroke="${C.ink}" stroke-width="1.2"/>
-      <g stroke="${lo(col)}" stroke-width="1.7" stroke-linecap="round">
-        <line x1="15" y1="58" x2="13" y2="65"/><line x1="19" y1="58" x2="18" y2="66"/><line x1="23" y1="58" x2="23" y2="65"/>
-        <line x1="43" y1="58" x2="42" y2="65"/><line x1="47" y1="58" x2="47" y2="66"/><line x1="51" y1="58" x2="53" y2="65"/>
-      </g>`);
+      ${fringe}`);
   },
   telefon(item){
     const col = COLOR_HEX[item.color] || C.teal, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
@@ -743,9 +782,16 @@ const ItemDraw = {
   },
   termos(item){
     const col = COLOR_HEX[item.color] || C.teal, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
-    let top = `<ellipse cx="32" cy="12" rx="14" ry="5" fill="${lo(col)}"/><rect x="26" y="6" width="12" height="8" rx="2" fill="${C.gray}"/>`;
-    if (item.detail === "kulplu") top += `<path d="M46 28 Q56 32 46 44" fill="none" stroke="${C.ink}" stroke-width="2.2"/>`;
-    return svgWrap(`${pat}<rect x="16" y="14" width="32" height="42" rx="6" fill="${fill}"/><rect x="18" y="16" width="10" height="38" rx="3" fill="${hi(col)}" opacity=".28" stroke="none"/><ellipse cx="32" cy="14" rx="16" ry="6" fill="${fill}"/><line x1="18" y1="36" x2="46" y2="36" stroke="${C.ink}" stroke-width="1.2" opacity=".35"/>${top}`);
+    let extra = `<ellipse cx="32" cy="12" rx="14" ry="5" fill="${lo(col)}"/><rect x="26" y="6" width="12" height="8" rx="2" fill="${C.gray}" stroke="${C.ink}" stroke-width="1"/>`;
+    if (item.detail === "kulp" || item.detail === "kulplu") {
+      extra += `<path d="M48 26 Q58 34 48 46" fill="none" stroke="${C.ink}" stroke-width="2.6"/><path d="M48 26 Q58 34 48 46" fill="none" stroke="${lo(col)}" stroke-width="1.4"/>`;
+    }
+    if (item.detail === "kayis") {
+      extra += `<path d="M18 18 Q8 32 18 50" fill="none" stroke="${C.mustard}" stroke-width="2.8"/><path d="M18 18 Q8 32 18 50" fill="none" stroke="${C.ink}" stroke-width="1.3"/><rect x="15" y="16" width="6" height="4" rx="1" fill="${C.mustard}" stroke="${C.ink}" stroke-width="1"/>`;
+    }
+    return svgWrap(`${pat}${fabricRect(16,14,32,42,6,fill,col,_pid)}
+      <ellipse cx="32" cy="14" rx="16" ry="6" fill="${col}" stroke="${C.ink}" stroke-width="1.4"/>
+      <line x1="18" y1="36" x2="46" y2="36" stroke="${lo(col)}" stroke-width="1.2" opacity=".5"/>${extra}`);
   },
   cayseti(item){
     const col = COLOR_HEX[item.color] || C.cream;
@@ -758,7 +804,16 @@ const ItemDraw = {
     const col = COLOR_HEX[item.color] || C.brown;
     let face = `<circle cx="32" cy="32" r="9" fill="${C.cream}"/><circle cx="32" cy="32" r="1.4" fill="${C.ink}"/><line x1="32" y1="32" x2="32" y2="25" stroke="${C.ink}" stroke-width="1.5"/><line x1="32" y1="32" x2="37" y2="34" stroke="${C.ink}" stroke-width="1.3"/>`;
     if (item.detail === "dijital") face = `<rect x="23" y="26" width="18" height="12" rx="2" fill="${C.black}"/><rect x="25" y="28" width="14" height="8" rx="1" fill="${C.sage}" stroke="none"/>`;
-    return svgWrap(`<rect x="28" y="10" width="8" height="12" rx="2" fill="${col}"/><rect x="28" y="42" width="8" height="12" rx="2" fill="${col}"/><circle cx="32" cy="32" r="11" fill="${lo(col)}"/>${face}`);
+    let strap = `<rect x="28" y="10" width="8" height="12" rx="2" fill="${col}"/><rect x="28" y="42" width="8" height="12" rx="2" fill="${col}"/>`;
+    if (item.detail === "deri") {
+      strap = `<rect x="26" y="8" width="12" height="14" rx="2" fill="${col}" stroke="${C.ink}" stroke-width="1.2"/>
+        <rect x="26" y="42" width="12" height="14" rx="2" fill="${col}" stroke="${C.ink}" stroke-width="1.2"/>
+        <line x1="28" y1="12" x2="36" y2="12" stroke="${lo(col)}" stroke-width="1.2"/>
+        <line x1="28" y1="16" x2="36" y2="16" stroke="${lo(col)}" stroke-width="1.2"/>
+        <line x1="28" y1="48" x2="36" y2="48" stroke="${lo(col)}" stroke-width="1.2"/>
+        <rect x="30" y="52" width="4" height="3" fill="${C.mustard}" stroke="${C.ink}" stroke-width=".8"/>`;
+    }
+    return svgWrap(`${strap}<circle cx="32" cy="32" r="11" fill="${lo(col)}" stroke="${C.ink}" stroke-width="1.4"/>${face}`);
   },
   bere(item){
     const col = COLOR_HEX[item.color] || C.brick, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
@@ -772,11 +827,14 @@ const ItemDraw = {
   },
   cantasirt(item){
     const col = COLOR_HEX[item.color] || C.navy, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
+    const body = "M18 22 Q18 16 24 16 L40 16 Q46 16 46 22 L48 50 Q48 54 32 54 Q16 54 16 50Z";
     let e = "";
-    if (item.detail === "yama") e = `<rect x="34" y="30" width="10" height="10" rx="1" fill="${C.mustard}"/>`;
-    if (item.detail === "fermuar") e = `<line x1="32" y1="22" x2="32" y2="48" stroke="${C.mustard}" stroke-width="1.5"/>`;
-    if (item.detail === "kırık_askı") e = `<path d="M22 18 L18 12 M42 18 L46 12" stroke="${C.ink}" stroke-width="1.3"/>`;
-    return svgWrap(`${pat}<path d="M18 22 Q18 16 24 16 L40 16 Q46 16 46 22 L48 50 Q48 54 32 54 Q16 54 16 50Z" fill="${fill}"/><path d="M22 16 Q22 10 32 10 Q42 10 42 16" fill="none" stroke="${C.ink}" stroke-width="1.8"/><rect x="22" y="28" width="20" height="14" rx="2" fill="${lo(col)}" opacity=".35" stroke="none"/>${e}`);
+    if (item.detail === "yama") e = `<rect x="34" y="30" width="10" height="10" rx="1" fill="${C.mustard}" stroke="${C.ink}" stroke-width="1"/>`;
+    if (item.detail === "fermuar") e = `<line x1="32" y1="22" x2="32" y2="48" stroke="${C.mustard}" stroke-width="2"/><circle cx="32" cy="24" r="1.6" fill="${C.mustard}" stroke="${C.ink}" stroke-width=".8"/>`;
+    if (item.detail === "kırık_askı") e = `<path d="M22 16 L16 8 M42 16 L48 8" stroke="${C.ink}" stroke-width="1.8"/><circle cx="16" cy="8" r="1.5" fill="${C.ink}" stroke="none"/><circle cx="48" cy="8" r="1.5" fill="${C.ink}" stroke="none"/>`;
+    return svgWrap(`${pat}${fabricPath(body, fill, col, _pid)}
+      <path d="M22 16 Q22 10 32 10 Q42 10 42 16" fill="none" stroke="${C.ink}" stroke-width="1.8"/>
+      <rect x="22" y="28" width="20" height="14" rx="2" fill="${lo(col)}" opacity=".3" stroke="none"/>${e}`);
   },
   ayakkabi(item){
     const col = COLOR_HEX[item.color] || C.red;
@@ -795,15 +853,13 @@ const ItemDraw = {
   },
   kalemlik(item){
     const col = COLOR_HEX[item.color] || C.wood, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
-    let pens = `<rect x="22" y="10" width="5" height="24" rx="1.5" fill="${C.brick}"/><rect x="30" y="6" width="5" height="28" rx="1.5" fill="${C.teal}"/><rect x="38" y="12" width="5" height="22" rx="1.5" fill="${C.mustard}"/>`;
+    let pens = `<rect x="22" y="10" width="5" height="24" rx="1.5" fill="${C.brick}" stroke="${C.ink}" stroke-width="1"/><rect x="30" y="6" width="5" height="28" rx="1.5" fill="${C.teal}" stroke="${C.ink}" stroke-width="1"/><rect x="38" y="12" width="5" height="22" rx="1.5" fill="${C.mustard}" stroke="${C.ink}" stroke-width="1"/>`;
     if (item.detail === "boş") pens = "";
-    if (item.detail === "cetvel") pens += `<rect x="42" y="12" width="2.2" height="18" rx="0.6" fill="${C.cream}"/>`;
-    const body = "M14 28 h36 a4 4 0 0 1 0 0 v24 a4 4 0 0 1-4 4 h-28 a4 4 0 0 1-4-4 z";
+    if (item.detail === "cetvel") pens += `<rect x="44" y="10" width="2.4" height="20" rx="0.6" fill="${C.cream}" stroke="${C.ink}" stroke-width=".9"/>`;
     return svgWrap(`${pat}
-      <rect x="14" y="28" width="36" height="28" rx="4" fill="${fill}"/>
-      <rect x="16" y="30" width="10" height="24" rx="2" fill="${hi(col)}" opacity=".25" stroke="none"/>
+      ${fabricRect(14,28,36,28,4,fill,col,_pid)}
       ${pens}
-      <ellipse cx="32" cy="28" rx="18" ry="5" fill="${fill}"/>`);
+      <ellipse cx="32" cy="28" rx="18" ry="5" fill="${col}" stroke="${C.ink}" stroke-width="1.4"/>`);
   },
   foto(item){
     const col = COLOR_HEX[item.color] || C.black;
@@ -825,14 +881,15 @@ const ItemDraw = {
     let ribs = "";
     for (let i = 0; i < 6; i++) {
       const a = -1.0 + i * 0.4;
-      ribs += `<line x1="32" y1="46" x2="${(32+Math.cos(a)*20).toFixed(1)}" y2="${(46+Math.sin(a)*20-12).toFixed(1)}" stroke="${C.ink}" stroke-width="1" opacity=".4"/>`;
+      ribs += `<line x1="32" y1="46" x2="${(32+Math.cos(a)*20).toFixed(1)}" y2="${(46+Math.sin(a)*20-12).toFixed(1)}" stroke="${lo(col)}" stroke-width="1" opacity=".45"/>`;
     }
     let decor = "";
-    if (item.detail === "desenli") decor = `<path d="M20 28 Q32 22 44 28" fill="none" stroke="${C.brick}" stroke-width="1.3"/>`;
-    if (item.detail === "altın") decor = `<circle cx="32" cy="26" r="3.5" fill="${C.mustard}"/>`;
-    return svgWrap(`${pat}<defs><clipPath id="yf${_pid}"><path d="${fan}"/></clipPath></defs>
-      <path d="${fan}" fill="${fill}"/><g clip-path="url(#yf${_pid})">${ribs}${decor}</g>
-      <rect x="29" y="44" width="6" height="12" rx="1" fill="${C.wood}"/>`);
+    if (item.detail === "desenli") decor = `<path d="M20 28 Q32 20 44 28" fill="none" stroke="${C.brick}" stroke-width="1.6"/><circle cx="32" cy="24" r="2" fill="${C.brick}" stroke="none"/>`;
+    if (item.detail === "altın") decor = `<circle cx="32" cy="26" r="4.2" fill="${C.mustard}" stroke="${C.ink}" stroke-width="1"/><circle cx="32" cy="26" r="2" fill="${hi(C.mustard)}" stroke="none"/>`;
+    return svgWrap(`${pat}${fabricPath(fan, fill, col, _pid)}
+      <defs><clipPath id="yf${_pid}"><path d="${fan}" transform="translate(32 32) scale(0.84) translate(-32 -32)"/></clipPath></defs>
+      <g clip-path="url(#yf${_pid})">${ribs}${decor}</g>
+      <rect x="29" y="44" width="6" height="12" rx="1" fill="${C.wood}" stroke="${C.ink}" stroke-width="1"/>`);
   },
   emzik(item){
     /* Clear pacifier: ring + shield + nipple */
@@ -863,11 +920,10 @@ const ItemDraw = {
       s = `<circle cx="28" cy="28" r="1.3" fill="${C.cream}" stroke="none"/><circle cx="36" cy="30" r="1.1" fill="${C.cream}" stroke="none"/><circle cx="32" cy="38" r="1.2" fill="${C.cream}" stroke="none"/><circle cx="24" cy="34" r="1" fill="${C.cream}" stroke="none"/><circle cx="40" cy="34" r="1" fill="${C.cream}" stroke="none"/>`;
     }
     if (item.detail === "peyirli") s += `<path d="M26 32 Q32 28 38 32" fill="none" stroke="${C.cream}" stroke-width="2.2"/>`;
-    return svgWrap(`${pat}<defs><clipPath id="sm${_pid}"><circle cx="32" cy="32" r="16"/><circle cx="32" cy="32" r="7"/></clipPath></defs>
-      <circle cx="32" cy="32" r="16" fill="${fill}" stroke="${C.ink}" stroke-width="1.6"/>
-      <circle cx="32" cy="32" r="7" fill="${C.cream}" stroke="${C.ink}" stroke-width="1.4"/>
-      <g clip-path="url(#sm${_pid})">${item.pattern && item.pattern!=="duz" ? `<circle cx="32" cy="32" r="16" fill="${fill}" stroke="none"/>` : `<path d="M22 26 Q32 18 42 26" fill="${hi(col)}" opacity=".3" stroke="none"/>`}</g>
-      ${s}`);
+    const outer = item.pattern && item.pattern !== "duz"
+      ? `${fabricEllipse(32,32,16,16,fill,col,_pid+"o",1.6)}<circle cx="32" cy="32" r="7" fill="${C.cream}" stroke="${C.ink}" stroke-width="1.4"/>`
+      : `<circle cx="32" cy="32" r="16" fill="${col}" stroke="${C.ink}" stroke-width="1.6"/><circle cx="32" cy="32" r="7" fill="${C.cream}" stroke="${C.ink}" stroke-width="1.4"/><path d="M22 26 Q32 18 42 26" fill="${hi(col)}" opacity=".3" stroke="none"/>`;
+    return svgWrap(`${pat}${outer}${s}`);
   },
   caybardagi(item){
     const col = COLOR_HEX[item.color] || C.cream;
@@ -879,18 +935,42 @@ const ItemDraw = {
   mendil(item){
     const col = COLOR_HEX[item.color] || C.white, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
     let e = "";
-    if (item.detail === "nakışlı") e = `<path d="M32 26 Q36 30 32 34 Q28 30 32 26" fill="${C.brick}"/><circle cx="32" cy="30" r="1.4" fill="${C.mustard}" stroke="none"/>`;
-    if (item.detail === "katlı") e = `<path d="M18 32 L46 30" stroke="${C.ink}" stroke-width="1.2" opacity=".45"/>`;
-    return svgWrap(`${pat}<rect x="14" y="16" width="36" height="36" rx="2" fill="${fill}" transform="rotate(-8 32 34)"/>
-      <rect x="16" y="18" width="32" height="10" fill="${hi(col)}" opacity=".3" stroke="none" transform="rotate(-8 32 34)"/>
-      ${e}`);
+    if (item.detail === "nakışlı") e = `<g transform="rotate(-8 32 34)"><path d="M32 26 Q38 32 32 38 Q26 32 32 26" fill="${C.brick}" stroke="${C.ink}" stroke-width="1"/><circle cx="32" cy="32" r="2" fill="${C.mustard}" stroke="none"/></g>`;
+    if (item.detail === "katlı") e = `<path d="M16 34 L48 30" stroke="${C.ink}" stroke-width="1.6" opacity=".55" transform="rotate(-8 32 34)"/><path d="M18 40 L46 36" stroke="${lo(col)}" stroke-width="1.2" opacity=".5" transform="rotate(-8 32 34)"/>`;
+    return svgWrap(`${pat}<g transform="rotate(-8 32 34)">${fabricRect(14,16,36,36,2,fill,col,_pid)}</g>${e}`);
   },
   canta(item){
     const col = COLOR_HEX[item.color] || C.brown, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
+    /* Default leather strap handle */
+    let handle = `<path d="M22 24 Q22 14 32 14 Q42 14 42 24" fill="none" stroke="${C.ink}" stroke-width="2"/>`;
     let e = "";
-    if (item.detail === "zincir") e = `<path d="M24 22 Q32 14 40 22" fill="none" stroke="${C.mustard}" stroke-width="2"/>`;
-    if (item.detail === "püskül") e = `<path d="M44 40 L48 48 M46 40 L50 46" stroke="${col}" stroke-width="1.4"/>`;
-    return svgWrap(`${pat}<rect x="16" y="24" width="32" height="26" rx="3" fill="${fill}"/><path d="M22 24 Q22 16 32 16 Q42 16 42 24" fill="none" stroke="${C.ink}" stroke-width="1.8"/><rect x="18" y="26" width="10" height="22" fill="${hi(col)}" opacity=".22" stroke="none"/>${e}`);
+    if (item.detail === "zincir") {
+      /* Unmistakable metal chain: overlapping oval links — NOT a thin strap */
+      handle = `<g fill="none" stroke="${C.mustard}" stroke-width="2.2">
+        <ellipse cx="22" cy="18" rx="3.2" ry="4.2"/><ellipse cx="27" cy="14" rx="3.2" ry="4.2"/>
+        <ellipse cx="32" cy="12" rx="3.2" ry="4.2"/><ellipse cx="37" cy="14" rx="3.2" ry="4.2"/>
+        <ellipse cx="42" cy="18" rx="3.2" ry="4.2"/>
+      </g>
+      <g fill="none" stroke="${C.ink}" stroke-width="1.1">
+        <ellipse cx="22" cy="18" rx="3.2" ry="4.2"/><ellipse cx="27" cy="14" rx="3.2" ry="4.2"/>
+        <ellipse cx="32" cy="12" rx="3.2" ry="4.2"/><ellipse cx="37" cy="14" rx="3.2" ry="4.2"/>
+        <ellipse cx="42" cy="18" rx="3.2" ry="4.2"/>
+      </g>
+      <circle cx="22" cy="24" r="1.6" fill="${C.mustard}" stroke="${C.ink}" stroke-width=".9"/>
+      <circle cx="42" cy="24" r="1.6" fill="${C.mustard}" stroke="${C.ink}" stroke-width=".9"/>`;
+    }
+    if (item.detail === "püskül") {
+      e = `<g>
+        <circle cx="46" cy="40" r="2.4" fill="${lo(col)}" stroke="${C.ink}" stroke-width="1"/>
+        <line x1="46" y1="42" x2="44" y2="54" stroke="${col}" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="46" y1="42" x2="46" y2="55" stroke="${col}" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="46" y1="42" x2="48" y2="54" stroke="${col}" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="46" y1="42" x2="50" y2="52" stroke="${lo(col)}" stroke-width="1.4" stroke-linecap="round"/>
+        <line x1="46" y1="42" x2="42" y2="52" stroke="${lo(col)}" stroke-width="1.4" stroke-linecap="round"/>
+      </g>`;
+    }
+    return svgWrap(`${pat}${fabricRect(16,24,32,26,3,fill,col,_pid)}
+      ${handle}${e}`);
   },
   oyuncak(item){
     /* Toy car — details change silhouette clearly (van / wood block / racer) */
@@ -974,7 +1054,16 @@ const ItemDraw = {
   },
   gozluk_gunes(item){
     const col = COLOR_HEX[item.color] || C.black;
-    return svgWrap(`<path d="M14 30 Q8 28 6 26" fill="none" stroke="${col}" stroke-width="1.8"/><path d="M50 30 Q56 28 58 26" fill="none" stroke="${col}" stroke-width="1.8"/><path d="M30 32 H34" stroke="${col}" stroke-width="2"/><ellipse cx="22" cy="32" rx="10" ry="8" fill="${lo(col)}"/><ellipse cx="42" cy="32" rx="10" ry="8" fill="${lo(col)}"/><path d="M16 28 Q22 26 28 28" fill="none" stroke="${hi(col)}" stroke-width="1" opacity=".5"/>`);
+    let lenses = `<ellipse cx="22" cy="32" rx="10" ry="8" fill="${lo(col)}"/><ellipse cx="42" cy="32" rx="10" ry="8" fill="${lo(col)}"/>`;
+    if (item.detail === "kare_cam") {
+      lenses = `<rect x="12" y="24" width="20" height="16" rx="2" fill="${lo(col)}"/><rect x="32" y="24" width="20" height="16" rx="2" fill="${lo(col)}"/>`;
+    }
+    let wear = `<path d="M16 28 Q22 26 28 28" fill="none" stroke="${hi(col)}" stroke-width="1" opacity=".5"/>`;
+    if (item.detail === "eski") {
+      wear = `<path d="M16 28 L28 36 M18 36 L26 28" stroke="${C.cream}" stroke-width="1.2" opacity=".6"/>
+        <rect x="18" y="22" width="7" height="2.5" rx="0.4" fill="${C.mustard}" stroke="${C.ink}" stroke-width=".7"/>`;
+    }
+    return svgWrap(`<path d="M14 30 Q8 28 6 26" fill="none" stroke="${col}" stroke-width="1.8"/><path d="M50 30 Q56 28 58 26" fill="none" stroke="${col}" stroke-width="1.8"/><path d="M30 32 H34" stroke="${col}" stroke-width="2"/>${lenses}${wear}`);
   },
   fener(item){
     const col = COLOR_HEX[item.color] || C.yellow;
@@ -984,26 +1073,54 @@ const ItemDraw = {
     return svgWrap(`<rect x="24" y="22" width="16" height="10" rx="2" fill="${col}"/><rect x="26" y="32" width="12" height="18" rx="2" fill="${lo(col)}"/><circle cx="32" cy="28" r="3" fill="${C.cream}" stroke="none"/>${e}`);
   },
   bisiklettok(item){
-    /* Bike lock — U shape + bar */
+    /* Bike lock — U shape + bar; dial / keyhole must read at card size */
     const col = COLOR_HEX[item.color] || C.black;
     let e = "";
-    if (item.detail === "şifreli") e = `<circle cx="32" cy="44" r="3" fill="${C.mustard}"/>`;
-    if (item.detail === "anahtarlı") e = `<circle cx="40" cy="44" r="2.5" fill="${C.mustard}"/>`;
-    return svgWrap(`<path d="M20 36 Q20 16 32 14 Q44 16 44 36" fill="none" stroke="${col}" stroke-width="3.5"/><rect x="18" y="36" width="28" height="12" rx="2" fill="${col}"/>${e}`);
+    if (item.detail === "şifreli") {
+      e = `<rect x="24" y="38" width="16" height="10" rx="2" fill="${C.mustard}" stroke="${C.ink}" stroke-width="1.1"/>
+        <circle cx="28" cy="43" r="2.6" fill="${C.cream}" stroke="${C.ink}" stroke-width=".9"/>
+        <circle cx="36" cy="43" r="2.6" fill="${C.cream}" stroke="${C.ink}" stroke-width=".9"/>
+        <line x1="28" y1="43" x2="28" y2="41" stroke="${C.ink}" stroke-width="1"/>
+        <line x1="36" y1="43" x2="37.2" y2="41.5" stroke="${C.ink}" stroke-width="1"/>
+        <text x="28" y="44.5" text-anchor="middle" font-size="3.2" fill="${C.ink}" stroke="none">3</text>
+        <text x="36" y="44.5" text-anchor="middle" font-size="3.2" fill="${C.ink}" stroke="none">7</text>`;
+    }
+    if (item.detail === "anahtarlı") {
+      e = `<circle cx="40" cy="42" r="3.4" fill="${C.mustard}" stroke="${C.ink}" stroke-width="1.1"/>
+        <circle cx="40" cy="42" r="1.4" fill="${C.ink}" stroke="none"/>
+        <rect x="39" y="43.5" width="2" height="4" fill="${C.ink}" stroke="none"/>`;
+    }
+    return svgWrap(`<path d="M20 36 Q20 16 32 14 Q44 16 44 36" fill="none" stroke="${col}" stroke-width="3.5"/><rect x="18" y="36" width="28" height="12" rx="2" fill="${col}" stroke="${C.ink}" stroke-width="1.3"/>${e}`);
   },
   sal(item){
-    /* Folded triangle shawl with fringe — pattern clipped to cloth only */
+    /* Folded triangle shawl — fringe / embroidery vary by detail */
     const col = COLOR_HEX[item.color] || C.purple, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
     const shape = "M8 24 L32 10 L56 24 L50 46 L32 40 L14 46Z";
     const fold = "M14 24 L32 16 L50 24 L32 28Z";
-    const fringe = `<g stroke="${col}" stroke-width="1.5" stroke-linecap="round">
-      <line x1="14" y1="46" x2="12" y2="56"/><line x1="20" y1="44" x2="18" y2="55"/><line x1="26" y1="42" x2="26" y2="54"/>
-      <line x1="32" y1="40" x2="32" y2="54"/><line x1="38" y1="42" x2="38" y2="54"/>
-      <line x1="44" y1="44" x2="46" y2="55"/><line x1="50" y1="46" x2="52" y2="56"/>
+    let fringe = `<g stroke="${lo(col)}" stroke-width="1.3" stroke-linecap="round">
+      <line x1="14" y1="46" x2="13" y2="52"/><line x1="26" y1="42" x2="26" y2="50"/>
+      <line x1="32" y1="40" x2="32" y2="50"/><line x1="38" y1="42" x2="38" y2="50"/>
+      <line x1="50" y1="46" x2="51" y2="52"/>
     </g>`;
+    let decor = "";
+    if (item.detail === "püskül") {
+      fringe = `<g stroke="${col}" stroke-width="1.8" stroke-linecap="round">
+        <line x1="14" y1="46" x2="10" y2="58"/><line x1="18" y1="45" x2="15" y2="58"/><line x1="22" y1="43" x2="20" y2="57"/>
+        <line x1="26" y1="42" x2="26" y2="56"/><line x1="32" y1="40" x2="32" y2="56"/>
+        <line x1="38" y1="42" x2="38" y2="56"/><line x1="42" y1="43" x2="44" y2="57"/>
+        <line x1="46" y1="45" x2="49" y2="58"/><line x1="50" y1="46" x2="54" y2="58"/>
+      </g>
+      <circle cx="20" cy="45" r="1.8" fill="${lo(col)}" stroke="${C.ink}" stroke-width=".8"/>
+      <circle cx="44" cy="45" r="1.8" fill="${lo(col)}" stroke="${C.ink}" stroke-width=".8"/>`;
+    }
+    if (item.detail === "desenli") {
+      decor = `<path d="M20 28 Q32 22 44 28" fill="none" stroke="${C.mustard}" stroke-width="1.5"/>
+        <path d="M22 34 Q32 40 42 34" fill="none" stroke="${C.mustard}" stroke-width="1.3"/>
+        <circle cx="32" cy="30" r="2.5" fill="${C.mustard}" stroke="${C.ink}" stroke-width=".9"/>`;
+    }
     return svgWrap(`${pat}${fabricPath(shape, fill, col, _pid, 1.5)}
       <path d="${fold}" fill="${hi(col)}" opacity=".35" stroke="${C.ink}" stroke-width="1"/>
-      ${fringe}`);
+      ${decor}${fringe}`);
   },
   ceptelefonu(item){
     /* Distinct from kılıf — bare phone thinner */
@@ -3662,6 +3779,14 @@ function startChapter(chId){
     visitors.push(petV);
     Pets.showTutorial().then(()=>{ loadVisitor(); Pets.start(); });
   } else if(ch.mechanic==="english"&&typeof Tourist!=="undefined"){
+    /* Tourists with English + picture must appear early — keep first two honest */
+    for(let i=0;i<Math.min(2,visitors.length);i++){
+      if(visitors[i].trick||!visitors[i].target){
+        const hi=visitors.findIndex((v,j)=>j>=i&&!v.trick&&v.target);
+        if(hi>i){ const tmp=visitors[i]; visitors[i]=visitors[hi]; visitors[hi]=tmp; }
+        else { visitors[i]=makeHonestVisitor(diff+i); }
+      }
+    }
     visitors.forEach(v=>Tourist.apply(v));
     Tourist.showTutorial().then(()=>loadVisitor());
   } else if(ch.mechanic==="festival"&&typeof Festival!=="undefined"){
