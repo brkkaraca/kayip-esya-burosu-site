@@ -1948,6 +1948,15 @@ function StorageSys() {
       this.render();
     },
 
+    abort() {
+      this.active = false;
+      this.crate = [];
+      this._sel = null;
+      this.onDone = null;
+      const root = document.getElementById("storage-root");
+      if (root) { root.classList.remove("show"); root.innerHTML = ""; }
+      document.getElementById("storage-tut")?.remove();
+    },
     finish() {
       this.active = false;
       const root = document.getElementById("storage-root");
@@ -2463,6 +2472,16 @@ const PhoneSys = {
     this.pendingCaller = null;
     this.active = false;
     document.querySelectorAll(".phone-held").forEach(el => el.classList.remove("phone-held"));
+  },
+  reset() {
+    this.clearHold();
+    this.ringing = false;
+    this._picking = false;
+    this._wanted = null;
+    const root = document.getElementById("phone-root");
+    if (root) { root.classList.remove("show"); root.innerHTML = ""; }
+    document.getElementById("phone-tut")?.remove();
+    document.getElementById("shelf")?.classList.remove("phone-pick-mode");
   }
 };
 
@@ -3057,6 +3076,14 @@ function renderAlbum(){
 }
 
 function startChapter(chId){
+  document.querySelectorAll('.mechanic-overlay,#memory-tut,#phone-tut,#pet-blocker,#festival-bunting,#tourist-hint,#repair-root').forEach(el=>{ if(el.id==='tourist-hint'){el.style.display='none';} else el.remove(); });
+  if(typeof Storage!=='undefined'&&Storage.abort) Storage.abort();
+  if(typeof Phone!=='undefined'&&Phone.reset) Phone.reset();
+  if(typeof Queue!=='undefined'){ try{ Queue.stopTimer(); Queue.active=false; }catch(_e){} const c=$('shift-clock'); if(c) c.style.display='none'; const r=$('queue-rail'); if(r) r.classList.remove('show'); }
+  if(typeof Pets!=='undefined') Pets.stop();
+  if(typeof Festival!=='undefined') Festival.undecorate();
+  if(typeof Repair!=='undefined'&&Repair.close) try{ Repair.close(); }catch(_e){}
+  state.mode='day'; state.queueMode=false; state.unreliableMode=false; state.ledgerGate=false;
   const ch=(CHAPTERS||[]).find(c=>c.id===chId)||CHAPTERS[0];
   state.chapterId=chId; state.mechanic=ch.mechanic;
   const label=$("hud-chapter-label"); if(label) label.textContent="B"+chId;
