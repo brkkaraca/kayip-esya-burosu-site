@@ -2,7 +2,6 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -108,7 +107,7 @@ body{display:flex;justify-content:center;align-items:stretch;padding:var(--safe-
 .shelf{flex:1;min-height:0;height:100%;overflow:hidden;overscroll-behavior:none;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;align-content:stretch;align-items:stretch;padding:0}
 .cubby{min-height:0;height:100%;aspect-ratio:auto;background:linear-gradient(180deg,#6B4A18 0%,#5A3C10 40%,#4A3208 100%);border:2.5px solid var(--ink);border-radius:12px;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:inset 0 2px 4px rgba(0,0,0,.25);touch-action:manipulation;pointer-events:none}
 .cubby .shelf-item{width:94%;height:94%;background:var(--white);border:2px solid var(--ink);border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:2px 2px 0 rgba(0,0,0,.2);transition:transform .12s,box-shadow .12s;touch-action:manipulation;-webkit-user-select:none;user-select:none;overflow:hidden;pointer-events:auto;position:relative;z-index:2}
-.cubby .shelf-item svg{width:78%;height:78%;min-width:78%;min-height:78%;pointer-events:none;display:block}
+.cubby .shelf-item svg{width:88%;height:88%;min-width:88%;min-height:88%;pointer-events:none;display:block}
 .cubby .shelf-item.dragging{transform:scale(1.12) rotate(-3deg);z-index:10;box-shadow:4px 8px 0 rgba(0,0,0,.28)}.cubby .shelf-item:active{transform:scale(1.06)}
 .cubby .shelf-item.bounce{animation:bouncePick .28s ease}
 @keyframes bouncePick{0%{transform:scale(1)}40%{transform:scale(1.14) rotate(-3deg)}100%{transform:scale(1.08)}}
@@ -135,8 +134,8 @@ body{display:flex;justify-content:center;align-items:stretch;padding:var(--safe-
 .inspect-modal{position:absolute;inset:0;z-index:45;background:rgba(61,43,31,.45);display:none;align-items:center;justify-content:center;padding:20px}
 .inspect-modal.show{display:flex}
 .inspect-card{background:var(--cream);border:2.5px solid var(--ink);border-radius:16px;padding:16px;width:100%;max-width:280px;text-align:center;box-shadow:4px 5px 0 var(--shadow)}
-.inspect-card .inspect-art{width:88px;height:88px;margin:0 auto 10px;background:var(--white);border:2px solid var(--ink);border-radius:12px;display:flex;align-items:center;justify-content:center}
-.inspect-card .inspect-art svg{width:78%;height:78%}
+.inspect-card .inspect-art{width:120px;height:120px;margin:0 auto 10px;background:var(--white);border:2px solid var(--ink);border-radius:12px;display:flex;align-items:center;justify-content:center}
+.inspect-card .inspect-art svg{width:90%;height:90%}
 .inspect-card .inspect-name{font-size:.88rem;font-weight:700;margin:2px 0 6px}
 .inspect-card h3{font-size:1rem;margin-bottom:6px}
 .inspect-tag{display:inline-block;background:var(--mustard);border:2px solid var(--ink);border-radius:8px;padding:6px 12px;font-weight:700;font-size:.88rem;margin:8px 0;transform:rotate(-2deg)}
@@ -196,6 +195,26 @@ body{display:flex;justify-content:center;align-items:stretch;padding:var(--safe-
 .noscript-banner{padding:24px 18px;font-family:system-ui,sans-serif;background:#F5EBD8;color:#3D2B1F;max-width:420px;margin:40px auto;border:2.5px solid #3D2B1F;border-radius:14px;line-height:1.45}
 
 
+/* Night + lamp readability */
+.night-mode .office-bg{background:linear-gradient(180deg,#121820 0%,#1c2430 40%,#2a241c 100%)!important}
+.night-mode .visitor-area{filter:brightness(.78)}
+.night-mode .shelf{background:#1a1814}
+.night-mode .cubby{background:#2a261e}
+.night-mode .cubby.lit{box-shadow:inset 0 0 18px rgba(255,200,100,.35)}
+.cubby.dimmed .shelf-item{filter:brightness(.22) saturate(.45);transition:filter .28s ease}
+.cubby.lit .shelf-item,.cubby:not(.dimmed) .shelf-item{filter:none}
+.speech-bubble,#speech{max-height:none;overflow:visible;white-space:pre-wrap;word-break:break-word;min-height:3.2em;line-height:1.35}
+.night-mode .lamp-glow.on{opacity:1;background:radial-gradient(ellipse at 25% 20%,rgba(255,200,100,.4),transparent 70%)}
+
+#mechanic-overlay{position:fixed;inset:0;background:rgba(30,20,10,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:18px}
+.mechanic-panel{background:var(--cream,#FFF8EC);border:3px solid var(--ink,#3D2B1F);border-radius:16px;padding:18px;max-width:340px;box-shadow:4px 4px 0 rgba(0,0,0,.2)}
+.mechanic-panel h3{margin:0 0 8px;font-size:1.15rem}
+.mechanic-panel p{margin:0 0 12px;line-height:1.4}
+.album-grid{display:grid;grid-template-columns:1fr;gap:10px;padding:12px;overflow:auto}
+.album-card{display:flex;gap:12px;align-items:center;background:#FFF8EC;border:2px solid #3D2B1F;border-radius:12px;padding:10px}
+.album-card .art{width:72px;height:72px;flex-shrink:0}
+.album-card .art svg{width:100%;height:100%}
+
 /* 2.0.0 motion — respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
@@ -233,6 +252,26 @@ body{display:flex;justify-content:center;align-items:stretch;padding:var(--safe-
 .clock-hand { transform-origin: 32px 32px; transition: transform .6s ease; }
 .inspect-name { font-size:.85rem; font-weight:700; margin-top:4px; color:var(--ink); }
 .chapter-banner { font-size:.72rem; font-weight:700; color:var(--teal); letter-spacing:.04em; text-transform:uppercase; }
+.clock-live { animation: clockPulse 4s ease-in-out infinite; }
+@keyframes clockPulse { 0%,100%{opacity:1} 50%{opacity:.92} }
+.wx-rain .office-bg .rain-line { animation-duration: .55s; }
+.wx-snow .office-bg .snow-flake { animation: snowFall 2.4s linear infinite; }
+.wx-night .lamp-glow.on { animation: lampFlicker 2.8s ease-in-out infinite; }
+@keyframes lampFlicker { 0%,100%{opacity:1} 40%{opacity:.85} 55%{opacity:.95} 70%{opacity:.8} }
+.visitor-body.enter { animation: walkIn .55s ease-out; }
+.visitor-body.exit { animation: walkOut .4s ease-in forwards; }
+@keyframes walkIn { from{transform:translateX(40px);opacity:0} to{transform:none;opacity:1} }
+@keyframes walkOut { from{opacity:1} to{transform:translateX(-36px);opacity:0} }
+.fly-to-hands { animation: flyHands .45s ease-in forwards; }
+@keyframes flyHands { to{transform:translateY(-48px) scale(.6);opacity:.3} }
+.wobble-wrong { animation: wobble .4s ease; }
+@keyframes wobble { 0%,100%{transform:rotate(0)} 25%{transform:rotate(-8deg)} 75%{transform:rotate(8deg)} }
+.star-pop { animation: starPop .65s ease; }
+@keyframes starPop { 0%{transform:scale(.2);opacity:0} 60%{transform:scale(1.25);opacity:1} 100%{transform:scale(1)} }
+.office-bg .cat-tail { transform-origin: 8px 12px; animation: catTail 2.2s ease-in-out infinite; }
+@keyframes catTail { 0%,100%{transform:rotate(-8deg)} 50%{transform:rotate(14deg)} }
+.office-bg .plant-sway { transform-origin: 50% 100%; animation: plantSway 3.2s ease-in-out infinite; }
+@keyframes plantSway { 0%,100%{transform:rotate(-3deg)} 50%{transform:rotate(4deg)} }
 
 </style>
 </head>
@@ -393,9 +432,9 @@ function lo(hex){ return shade(hex, -32); }
 
 /** Fit content drawn in 0..64 into card safely (no edge clipping). */
 function svgWrap(inner, vb){
-  vb = vb || "0 0 64 64";
-  // scale 0.88 keeps ~4px padding after stroke; vector-effect keeps stroke readable
-  return `<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" overflow="visible"><g transform="translate(32 32) scale(0.88) translate(-32 -32)" stroke="${C.ink}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none" vector-effect="non-scaling-stroke">${inner}</g></svg>`;
+  /* Crop viewBox to zoom content; artists draw in ~8..56. Target ~75% card fill. */
+  vb = vb || "6 4 52 56";
+  return `<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><g stroke="${C.ink}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none" vector-effect="non-scaling-stroke">${inner}</g></svg>`;
 }
 function patternFill(pattern, base, pid){
   if (pattern === "cizgili") return `<defs><pattern id="${pid}" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(28)"><rect width="6" height="6" fill="${base}"/><rect width="2.8" height="6" fill="${C.ink}" opacity=".22"/></pattern></defs>`;
@@ -486,11 +525,30 @@ const ItemDraw = {
     return svgWrap(`${lenses}${bridge}<path d="M14 30 Q9 28 8 26" fill="none" stroke="${col}" stroke-width="1.8"/><path d="M50 30 Q55 28 56 26" fill="none" stroke="${col}" stroke-width="1.8"/>`);
   },
   atki(item){
+    /* Classic draped scarf: neck loop + two long hanging ends + fringe */
     const col = COLOR_HEX[item.color] || C.brick, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
-    const shape = "M18 48 Q14 36 22 28 Q30 20 30 14 Q34 10 42 16 Q50 24 48 36 Q46 46 40 50 Q32 52 18 48Z";
-    let f = "";
-    if (item.detail === "püskül" || item.detail === "tüylü") f = `<path d="M18 50 L16 56 M21 50 L21 57 M24 50 L23 56" stroke="${col}" stroke-width="1.4"/><path d="M42 14 L44 8 M39 14 L40 8" stroke="${col}" stroke-width="1.4"/>`;
-    return svgWrap(`${pat}<defs><clipPath id="at${_pid}"><path d="${shape}"/></clipPath></defs><path d="${shape}" fill="${fill}"/><g clip-path="url(#at${_pid})"><path d="M24 22 Q34 16 40 24" fill="${hi(col)}" opacity=".22" stroke="none"/></g>${f}`);
+    // Soft oval loop (worn around neck)
+    const loop = "M14 20 C14 8 50 8 50 20 C50 28 42 32 32 32 C22 32 14 28 14 20Z";
+    const left = "M16 30 L12 54 Q12 58 16 58 L28 58 Q30 54 28 30Z";
+    const right = "M36 30 L34 54 Q34 58 38 58 L52 58 Q52 54 48 30Z";
+    const knot = "M22 26 Q32 36 42 26 Q36 34 32 36 Q28 34 22 26Z";
+    let fringe = "";
+    // Always show fringe — signature of a scarf
+    fringe = `<g stroke="${lo(col)}" stroke-width="1.8">
+      <line x1="15" y1="58" x2="14" y2="64"/><line x1="20" y1="58" x2="19" y2="65"/><line x1="25" y1="58" x2="25" y2="64"/>
+      <line x1="39" y1="58" x2="38" y2="64"/><line x1="44" y1="58" x2="44" y2="65"/><line x1="49" y1="58" x2="50" y2="64"/>
+    </g>`;
+    return svgWrap(`${pat}
+      <defs><clipPath id="atL${_pid}"><path d="${left}"/></clipPath>
+      <clipPath id="atR${_pid}"><path d="${right}"/></clipPath>
+      <clipPath id="atO${_pid}"><path d="${loop}"/></clipPath></defs>
+      <path d="${loop}" fill="${fill}"/>
+      <g clip-path="url(#atO${_pid})"><path d="M22 16 Q32 12 42 16" fill="${hi(col)}" opacity=".3" stroke="none"/></g>
+      <path d="${left}" fill="${fill}"/><path d="${right}" fill="${fill}"/>
+      <g clip-path="url(#atL${_pid})"><path d="M18 32 L26 30 L26 50 L18 52Z" fill="${hi(col)}" opacity=".22" stroke="none"/></g>
+      <g clip-path="url(#atR${_pid})"><path d="M36 32 L44 30 L44 50 L36 52Z" fill="${hi(col)}" opacity=".18" stroke="none"/></g>
+      <path d="${knot}" fill="${lo(col)}" opacity=".85"/>
+      ${fringe}`);
   },
   telefon(item){
     const col = COLOR_HEX[item.color] || C.teal, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
@@ -596,18 +654,19 @@ const ItemDraw = {
     return svgWrap(`<rect x="14" y="20" width="36" height="28" rx="2" fill="${col}"/><path d="M14 20 L32 34 L50 20" fill="${hi(col)}" opacity=".4"/><path d="M14 20 L32 34 L50 20" fill="none"/>${seal}`);
   },
   yelpaze(item){
-    /* Clear folding fan — wide arc, wood handle, ribs clipped */
     const col = COLOR_HEX[item.color] || C.red, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
-    const fan = "M14 42 Q20 18 32 14 Q44 18 50 42 Q42 36 32 38 Q22 36 14 42Z";
+    const fan = "M10 44 Q16 14 32 10 Q48 14 54 44 Q42 38 32 40 Q22 38 10 44Z";
     let ribs = "";
-    for (let i = 0; i < 5; i++) {
-      const a = -0.85 + i * 0.42;
-      ribs += `<line x1="32" y1="44" x2="${(32 + Math.cos(a) * 18).toFixed(1)}" y2="${(44 + Math.sin(a) * 18 - 10).toFixed(1)}" stroke="${C.ink}" stroke-width="1" opacity=".35"/>`;
+    for (let i = 0; i < 6; i++) {
+      const a = -1.0 + i * 0.4;
+      ribs += `<line x1="32" y1="46" x2="${(32+Math.cos(a)*20).toFixed(1)}" y2="${(46+Math.sin(a)*20-12).toFixed(1)}" stroke="${C.ink}" stroke-width="1" opacity=".4"/>`;
     }
     let decor = "";
-    if (item.detail === "desenli") decor = `<path d="M22 30 Q32 24 42 30" fill="none" stroke="${C.brick}" stroke-width="1.2" opacity=".7"/>`;
-    if (item.detail === "altın") decor = `<circle cx="32" cy="28" r="3" fill="${C.mustard}" opacity=".85"/>`;
-    return svgWrap(`${pat}<defs><clipPath id="yf${_pid}"><path d="${fan}"/></clipPath></defs><path d="${fan}" fill="${fill}"/><g clip-path="url(#yf${_pid})">${ribs}${decor}</g><rect x="29" y="42" width="6" height="10" rx="1" fill="${C.wood}"/>`);
+    if (item.detail === "desenli") decor = `<path d="M20 28 Q32 22 44 28" fill="none" stroke="${C.brick}" stroke-width="1.3"/>`;
+    if (item.detail === "altın") decor = `<circle cx="32" cy="26" r="3.5" fill="${C.mustard}"/>`;
+    return svgWrap(`${pat}<defs><clipPath id="yf${_pid}"><path d="${fan}"/></clipPath></defs>
+      <path d="${fan}" fill="${fill}"/><g clip-path="url(#yf${_pid})">${ribs}${decor}</g>
+      <rect x="29" y="44" width="6" height="12" rx="1" fill="${C.wood}"/>`);
   },
   emzik(item){
     /* Clear pacifier: ring + shield + nipple */
@@ -647,9 +706,11 @@ const ItemDraw = {
   mendil(item){
     const col = COLOR_HEX[item.color] || C.white, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
     let e = "";
-    if (item.detail === "nakışlı") e = `<path d="M28 28 Q32 24 36 28 Q32 32 28 28" fill="${C.brick}"/>`;
-    if (item.detail === "katlı") e = `<line x1="20" y1="32" x2="44" y2="32" stroke="${C.ink}" stroke-width="1" opacity=".4"/>`;
-    return svgWrap(`${pat}<path d="M18 20 L46 18 L48 46 L16 44Z" fill="${fill}"/><path d="M20 22 L44 20 L42 28 L22 30Z" fill="${hi(col)}" opacity=".25" stroke="none"/>${e}`);
+    if (item.detail === "nakışlı") e = `<circle cx="32" cy="32" r="5" fill="none" stroke="${C.brick}" stroke-width="1.4"/><path d="M32 28 L32 36 M28 32 L36 32" stroke="${C.brick}" stroke-width="1.2"/>`;
+    if (item.detail === "katlı") e = `<path d="M18 32 L46 30" stroke="${C.ink}" stroke-width="1.2" opacity=".45"/>`;
+    return svgWrap(`${pat}<rect x="14" y="16" width="36" height="36" rx="2" fill="${fill}" transform="rotate(-8 32 34)"/>
+      <rect x="16" y="18" width="32" height="10" fill="${hi(col)}" opacity=".3" stroke="none" transform="rotate(-8 32 34)"/>
+      ${e}`);
   },
   canta(item){
     const col = COLOR_HEX[item.color] || C.brown, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
@@ -728,11 +789,16 @@ const ItemDraw = {
     return svgWrap(`<path d="M20 36 Q20 16 32 14 Q44 16 44 36" fill="none" stroke="${col}" stroke-width="3.5"/><rect x="18" y="36" width="28" height="12" rx="2" fill="${col}"/>${e}`);
   },
   sal(item){
-    /* Shawl — folded fabric rectangle with fringe */
+    /* Wide shawl draped over shoulders shape — triangle + fringe */
     const col = COLOR_HEX[item.color] || C.purple, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
+    const shape = "M10 22 L32 14 L54 22 L48 48 L32 42 L16 48Z";
     let f = "";
-    if (item.detail === "püskül") f = `<path d="M16 46 L14 54 M20 46 L20 55 M24 46 L22 54 M40 46 L42 54 M44 46 L44 55 M48 46 L46 54" stroke="${col}" stroke-width="1.3"/>`;
-    return svgWrap(`${pat}<path d="M14 20 L50 18 L48 46 L16 44Z" fill="${fill}"/><path d="M18 22 L46 20 L44 28 L20 30Z" fill="${hi(col)}" opacity=".25" stroke="none"/>${f}`);
+    if (item.detail === "püskül" || item.detail === "desenli" || !item.detail)
+      f = `<path d="M16 48 L14 56 M20 46 L19 55 M28 44 L28 54 M36 44 L36 54 M44 46 L45 55 M48 48 L50 56" stroke="${col}" stroke-width="1.4"/>`;
+    return svgWrap(`${pat}<defs><clipPath id="sh${_pid}"><path d="${shape}"/></clipPath></defs>
+      <path d="${shape}" fill="${fill}"/>
+      <g clip-path="url(#sh${_pid})"><path d="M18 26 Q32 18 46 26" fill="${hi(col)}" opacity=".28" stroke="none"/></g>
+      ${f}`);
   },
   ceptelefonu(item){
     /* Distinct from kılıf — bare phone thinner */
@@ -759,9 +825,37 @@ const DETAIL_TR = {
   susam:"susamlı",peyirli:"peynirli",tabakli:"tabaklı",demlik:"kulplu",nakışlı:"nakışlı",katlı:"katlanmış",zincir:"zincirli",sürtmeli:"sürtmeli",ahşap:"ahşap",fotoğraflı:"fotoğraflı",magnetik:"manyetik şeritli",
   kaktüs:"kaktüs",çiçekli:"çiçekli",çizgili:"çizgili top",sönük:"sönük",kokulu:"kokulu",şifreli:"şifreli",anahtarlı:"anahtarlı",kılıflı:"kılıflı"
 };
+/** Per-item bbox fit: silhouette fills ~72–78% of card with safe padding. */
+function fitItemSvg(svgStr){
+  if (typeof document === "undefined") return svgStr;
+  try {
+    if (!fitItemSvg._host) {
+      fitItemSvg._host = document.createElement("div");
+      fitItemSvg._host.setAttribute("aria-hidden", "true");
+      fitItemSvg._host.style.cssText = "position:absolute;left:-99999px;top:0;width:128px;height:128px;overflow:hidden;pointer-events:none;opacity:0";
+      (document.body || document.documentElement).appendChild(fitItemSvg._host);
+    }
+    const host = fitItemSvg._host;
+    host.innerHTML = svgStr;
+    const svg = host.querySelector("svg");
+    const g = svg && svg.querySelector("g");
+    if (!svg || !g) return svgStr;
+    const bb = g.getBBox();
+    if (!bb.width || !bb.height || !isFinite(bb.width)) return svgStr;
+    /* Target: content spans ~76% of square viewBox → pad ≈ 12% each side of max axis */
+    const pad = Math.max(bb.width, bb.height) * 0.14;
+    const side = Math.max(bb.width, bb.height) + pad * 2;
+    const cx = bb.x + bb.width / 2;
+    const cy = bb.y + bb.height / 2;
+    svg.setAttribute("viewBox", (cx - side / 2) + " " + (cy - side / 2) + " " + side + " " + side);
+    svg.removeAttribute("width"); svg.removeAttribute("height");
+    return host.innerHTML;
+  } catch (_) { return svgStr; }
+}
 function drawItem(item){
   const fn = ItemDraw[item.type];
-  return fn ? fn(item) : svgWrap(`<circle cx="32" cy="32" r="14" fill="${C.mustard}"/>`);
+  const raw = fn ? fn(item) : svgWrap(`<circle cx="32" cy="32" r="14" fill="${C.mustard}"/>`);
+  return fitItemSvg(raw);
 }
 
 function itemId(item){return[item.type,item.color,item.pattern||"duz",item.detail||"yok",item.tag||""].join("|")}
@@ -897,6 +991,12 @@ function weatherSky(weather){
     <ellipse cx="30" cy="24" rx="16" ry="8" fill="#E8EEF0" stroke="${C.ink}" stroke-width="1.2"/>
     <ellipse cx="48" cy="22" rx="12" ry="7" fill="#F0F4F6" stroke="${C.ink}" stroke-width="1.1"/>
     <ellipse cx="62" cy="28" rx="10" ry="5" fill="#E0E8EC" stroke="${C.ink}" stroke-width="1.1"/>`};
+  if(weather==="gece"||weather==="night")return{sky:"#1A2438",extra:`
+    <circle class="night-sky-moon" cx="58" cy="18" r="9" fill="#F5E6A8" stroke="${C.ink}" stroke-width="1.3"/>
+    <circle cx="54" cy="16" r="7" fill="#1A2438" opacity=".35" stroke="none"/>
+    <circle cx="28" cy="12" r="1.1" fill="#F5E6A8"/><circle cx="38" cy="20" r=".8" fill="#F5E6A8"/>
+    <circle cx="48" cy="10" r=".7" fill="#F5E6A8"/><circle cx="70" cy="26" r="1" fill="#F5E6A8"/>
+    <circle cx="24" cy="28" r=".6" fill="#F5E6A8"/><circle cx="66" cy="14" r=".5" fill="#F5E6A8"/>`,night:true};
   return{sky:"#A8C8D8",extra:`
     <ellipse cx="40" cy="20" rx="14" ry="6" fill="#E8F0F4" stroke="${C.ink}" stroke-width="1.1" opacity=".85"/>
     <ellipse cx="58" cy="26" rx="10" ry="5" fill="#F0F6F8" stroke="${C.ink}" stroke-width="1.1" opacity=".8"/>`};
@@ -910,12 +1010,13 @@ function clockHands(hour){
 function drawOffice(weather,hour,decors){
   const w=weatherSky(weather||"acik");
   const owned=decors||[];
+  const night=!!w.night || (hour!=null && (hour>=20 || hour<6));
   let props="";
   if(owned.includes("poster")) props+=`<g transform="translate(8,48)" stroke="${C.ink}" stroke-width="1.3"><rect width="16" height="22" fill="${C.mustard}"/><rect x="2" y="2" width="12" height="12" fill="${w.sky}"/><text x="8" y="20" text-anchor="middle" font-size="3.5" fill="${C.ink}" stroke="none" font-weight="700">KASABA</text></g>`;
   if(owned.includes("radyo")) props+=`<g transform="translate(100,58)" stroke="${C.ink}" stroke-width="1.3"><rect width="20" height="12" rx="1.5" fill="${C.wood}"/><circle cx="6" cy="6" r="2.5" fill="${C.cream}"/><circle cx="14" cy="6" r="2" fill="${C.mustard}"/></g>`;
-  if(owned.includes("bitki")) props+=`<g transform="translate(118,55)" stroke="${C.ink}" stroke-width="1.3"><rect x="3" y="14" width="10" height="8" rx="1" fill="${C.brick}"/><path d="M8 14 Q3 6 8 1 Q13 6 8 14" fill="${C.sage}"/><path d="M8 12 Q14 4 12 1" fill="${C.sage}"/></g>`;
+  if(owned.includes("bitki")) props+=`<g class="plant-sway" transform="translate(118,55)" stroke="${C.ink}" stroke-width="1.3"><rect x="3" y="14" width="10" height="8" rx="1" fill="${C.brick}"/><path d="M8 14 Q3 6 8 1 Q13 6 8 14" fill="${C.sage}"/><path d="M8 12 Q14 4 12 1" fill="${C.sage}"/></g>`;
   if(owned.includes("lamba")) props+=`<g transform="translate(4,70)" stroke="${C.ink}" stroke-width="1.3"><rect x="5" y="16" width="6" height="3" fill="${C.wood}"/><line x1="8" y1="6" x2="8" y2="16" stroke-width="1.8"/><path d="M1 8 Q8 0 15 8Z" fill="${C.mustard}"/></g>`;
-  if(owned.includes("kedi")) props+=`<g transform="translate(105,68)" stroke="${C.ink}" stroke-width="1.2"><ellipse cx="10" cy="12" rx="10" ry="4.5" fill="${C.blush}"/><circle cx="7" cy="7" r="4" fill="${C.gray}"/><path d="M4 5 L5 1 L7 5 M10 5 L12 1 L13 5" fill="${C.gray}"/><circle cx="5.5" cy="7" r=".7" fill="${C.ink}"/><circle cx="8.5" cy="7" r=".7" fill="${C.ink}"/></g>`;
+  if(owned.includes("kedi")) props+=`<g transform="translate(105,68)" stroke="${C.ink}" stroke-width="1.2"><ellipse cx="10" cy="12" rx="10" ry="4.5" fill="${C.blush}"/><circle cx="7" cy="7" r="4" fill="${C.gray}"/><path class="cat-tail" d="M18 12 Q24 6 22 2" fill="none" stroke="${C.blush}" stroke-width="2"/><path d="M4 5 L5 1 L7 5 M10 5 L12 1 L13 5" fill="${C.gray}"/><circle cx="5.5" cy="7" r=".7" fill="${C.ink}"/><circle cx="8.5" cy="7" r=".7" fill="${C.ink}"/></g>`;
   return `<svg viewBox="0 0 140 90" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
     <defs>
       <pattern id="wallTex" width="8" height="8" patternUnits="userSpaceOnUse">
@@ -930,11 +1031,13 @@ function drawOffice(weather,hour,decors){
       </pattern>
       <radialGradient id="lampWarm" cx="30%" cy="15%" r="55%"><stop offset="0" stop-color="#F0C050" stop-opacity=".28"/><stop offset="1" stop-color="#F0C050" stop-opacity="0"/></radialGradient>
     </defs>
-    <rect width="140" height="90" fill="url(#wallTex)"/>
+    <rect width="140" height="90" fill="${night?"#2A3340":"url(#wallTex)"}"/>
+    ${night?`<rect width="140" height="90" fill="#0d1218" opacity=".35"/>`:``}
     <line x1="100" y1="0" x2="100" y2="10" stroke="${C.ink}" stroke-width="1.4"/>
     <path d="M92 12 Q100 4 108 12Z" fill="${C.mustard}" stroke="${C.ink}" stroke-width="1.3"/>
     <ellipse cx="100" cy="12" rx="3" ry="1.5" fill="${C.cream}" stroke="${C.ink}" stroke-width="1"/>
-    <rect width="140" height="90" fill="url(#lampWarm)"/>
+    ${night?`<rect width="140" height="90" fill="url(#lampWarm)" opacity="1.6"/>`:`<rect width="140" height="90" fill="url(#lampWarm)"/>`}
+    ${night?`<g transform="translate(4,70)" stroke="${C.ink}" stroke-width="1.3"><rect x="5" y="16" width="6" height="3" fill="${C.wood}"/><line x1="8" y1="6" x2="8" y2="16" stroke-width="1.8"/><path d="M1 8 Q8 0 15 8Z" fill="${C.mustard}"/><ellipse cx="8" cy="20" rx="18" ry="10" fill="#F0C050" opacity=".2" stroke="none"/></g>`:``}
     <g transform="translate(6,50)" stroke="${C.ink}" stroke-width="1.2">
       <rect width="28" height="20" rx="1" fill="${C.wood}"/>
       <rect x="2" y="2" width="24" height="16" fill="${C.cream}"/>
@@ -1053,8 +1156,8 @@ const CHAPTERS = [
     mechanic:"ledger", blurb:"Fiş / kimlik ile defteri karşılaştır.", unlockRep:25 },
   { id:4, name:"Okul Bahçesi", place:"Okul", season:"sonbahar", weather:"bulutlu",
     mechanic:"vague", blurb:"Çocuklar belirsiz tarif eder.", unlockRep:40 },
-  { id:5, name:"Gece Mesaisi", place:"Büro", season:"kış", weather:"bulutlu",
-    mechanic:"night", blurb:"Loş ışık — lambayı aç, detayı gör.", unlockRep:55 },
+  { id:5, name:"Gece Mesaisi", place:"Büro", season:"kış", weather:"gece",
+    mechanic:"night", weather:"gece", blurb:"Loş ışık — lambayı aç, detayı gör.", unlockRep:55 },
   { id:6, name:"Festival", place:"Panayır", season:"yaz", weather:"gunesli",
     mechanic:"queue", blurb:"Yoğun kuyruk, temalı eşyalar.", unlockRep:70 },
   { id:7, name:"Turist Sezonu", place:"Sahil", season:"yaz", weather:"gunesli",
@@ -1124,6 +1227,40 @@ const Motion = {
     }
   }
 };
+
+Motion.ambient = {
+  tickClock(svgRoot, hour){
+    if (!svgRoot) return;
+    const hands = svgRoot.querySelectorAll('line');
+    // subtle continuous minute jitter via CSS class
+    svgRoot.classList.add('clock-live');
+  },
+  weatherClass(weather){
+    const app = document.getElementById('app');
+    if (!app) return;
+    app.classList.remove('wx-rain','wx-snow','wx-sun','wx-night');
+    if (weather === 'yagmurlu') app.classList.add('wx-rain');
+    else if (weather === 'kar' || weather === 'kış') app.classList.add('wx-snow');
+    else if (weather === 'gunesli') app.classList.add('wx-sun');
+    else if (weather === 'gece' || weather === 'night') app.classList.add('wx-night');
+  },
+  flyItemToHands(el){
+    if (!el || this.reduced) return;
+    el.classList.add('fly-to-hands');
+    setTimeout(() => el.classList.remove('fly-to-hands'), 500);
+  },
+  wobbleWrong(el){
+    if (!el || this.reduced) return;
+    el.classList.add('wobble-wrong');
+    setTimeout(() => el.classList.remove('wobble-wrong'), 450);
+  },
+  starReveal(el){
+    if (!el || this.reduced) return;
+    el.classList.add('star-pop');
+    setTimeout(() => el.classList.remove('star-pop'), 700);
+  }
+};
+Object.setPrototypeOf(Motion.ambient, Motion);
 
 const DAYS=[
 {id:1,name:"İlk Gün",weather:"acik",hour:9,visitors:[
@@ -1414,6 +1551,168 @@ const PROC_DETAILS = {
 };
 const PROC_TAGS = ["Vapur, Salı","Otobüs durağı, Pazartesi","Park, Pazar","Kafe, Dün","Pazar yeri, Sabah","Okul, Cuma","Liman, Cumartesi","Postane, Perşembe","Vapur iskelesi, Cumartesi","Market, Akşam","Kütüphane, Öğle","Otobüs, Sabah","Çay bahçesi, Öğle","Simit tezgâhı, Bugün","Gazete bayii, Salı","Festival, Akşam","Sahil, Öğle","Atölye, Cumartesi","Gece, 22:00","Park, Sabah"];
 
+/** Natural Turkish clue templates with simple vowel-harmony suffixes. */
+const TR_VOWELS_FRONT = "eiöü";
+const TR_VOWELS_BACK = "aıou";
+function lastVowel(word) {
+  const w = (word || "").toLocaleLowerCase("tr-TR");
+  for (let i = w.length - 1; i >= 0; i--) {
+    if (TR_VOWELS_FRONT.includes(w[i]) || TR_VOWELS_BACK.includes(w[i])) return w[i];
+  }
+  return "a";
+}
+function isFront(v) { return TR_VOWELS_FRONT.includes(v); }
+function isRounded(v) { return "ouöü".includes(v); }
+const PLACE_LOCATIVE = {
+  "vapur": "vapurda",
+  "otobüs durağı": "otobüs durağında",
+  "park": "parkta",
+  "kafe": "kafede",
+  "pazar yeri": "pazar yerinde",
+  "okul": "okulda",
+  "liman": "limanda",
+  "postane": "postanede",
+  "vapur iskelesi": "vapur iskelesinde",
+  "market": "markette",
+  "kütüphane": "kütüphanede",
+  "otobüs": "otobüste",
+  "çay bahçesi": "çay bahçesinde",
+  "simit tezgâhı": "simit tezgâhında",
+  "gazete bayii": "gazete bayiinde",
+  "festival": "festivalde",
+  "sahil": "sahilde",
+  "atölye": "atölyede",
+  "gece": "gece",
+  "kasaba": "kasabada",
+};
+/** Locative: prefer known places; else -da/-de/-ta/-te (vowel → -de/-da, no buffer n) */
+function locative(place) {
+  const raw = place.trim();
+  const key = raw.toLocaleLowerCase("tr-TR");
+  if (PLACE_LOCATIVE[key]) return PLACE_LOCATIVE[key];
+  const v = lastVowel(raw);
+  const front = isFront(v);
+  const soft = /[çfkpt]$/i.test(raw);
+  const suf = soft ? (front ? "te" : "ta") : (front ? "de" : "da");
+  return raw + suf;
+}
+/** Accusative-ish buffer for object mention: -ı/-i/-u/-ü with buffer y after vowel */
+function accusative(noun) {
+  const n = noun.trim();
+  const v = lastVowel(n);
+  const endsV = /[aeıioöuüâîû]$/i.test(n);
+  let suf;
+  if (isFront(v) && isRounded(v)) suf = "ü";
+  else if (isFront(v)) suf = "i";
+  else if (isRounded(v)) suf = "u";
+  else suf = "ı";
+  return n + (endsV ? "y" : "") + suf;
+}
+/** 1st person possessive: -ım/-im/-um/-üm */
+function myNoun(noun) {
+  const n = noun.trim();
+  const v = lastVowel(n);
+  const endsV = /[aeıioöuüâîû]$/i.test(n);
+  let suf;
+  if (isFront(v) && isRounded(v)) suf = "üm";
+  else if (isFront(v)) suf = "im";
+  else if (isRounded(v)) suf = "um";
+  else suf = "ım";
+  return n + (endsV ? "m" : suf); // elma+m / kitap+ım — simplify: vowel-end → +m after drop? Turkish: elma→elmam uses buffer none, just m. kitap→kitabım. Simplified:
+}
+function myThing(noun) {
+  const n = noun.trim();
+  const v = lastVowel(n);
+  const endsV = /[aeıioöuüâîû]$/i.test(n);
+  if (endsV) {
+    if (isFront(v) && isRounded(v)) return n + "m";
+    if (isFront(v)) return n + "m";
+    return n + "m";
+  }
+  if (isFront(v) && isRounded(v)) return n + "üm";
+  if (isFront(v)) return n + "im";
+  if (isRounded(v)) return n + "um";
+  return n + "ım";
+}
+function lostMy(noun) {
+  const mine = myThing(noun);
+  const v = lastVowel(mine);
+  const endsV = /[aeıioöuüâîû]$/i.test(mine);
+  let suf;
+  if (isFront(v) && isRounded(v)) suf = "ü";
+  else if (isFront(v)) suf = "i";
+  else if (isRounded(v)) suf = "u";
+  else suf = "ı";
+  return mine + (endsV ? "y" : "") + suf;
+}
+function lowerMid(s) {
+  if (!s) return s;
+  return s.charAt(0).toLocaleLowerCase("tr-TR") + s.slice(1);
+}
+/** Split "Vapur, Salı" → place, when */
+function splitTag(tag) {
+  const parts = (tag || "Kasaba, Bugün").split(",").map(x => x.trim());
+  return { place: parts[0] || "kasaba", when: parts[1] || "bugün" };
+}
+
+const CLUE_TEMPLATES = [
+  (c, typ, det, place, when) => `${lostMy(typ)} kaybettim — ${c}${det ? ", " + det : ""}. Sanırım ${locative(lowerMid(place))} unuttum, ${lowerMid(when)}.`,
+  (c, typ, det, place, when) => `${locative(lowerMid(place))} ${c} bir ${typ} bıraktım${det ? " (" + det + ")" : ""}. ${when} civarıydı.`,
+  (c, typ, det, place, when) => `Ah, ${myThing(typ)}! Rengi ${c}${det ? ", " + det : ""}. ${place} tarafında, ${lowerMid(when)}.`,
+  (c, typ, det, place, when) => `${c} ${typ} arıyorum${det ? ", " + det : ""}. ${locative(lowerMid(place))} düşürdüm; ${lowerMid(when)}.`,
+  (c, typ, det, place, when) => `Lütfen ${accusative(typ)} bulur musunuz? ${c}${det ? ", " + det : ""}. Etiket: ${lowerMid(place)}, ${lowerMid(when)}.`,
+  (c, typ, det, place, when) => `${when} ${locative(lowerMid(place))} idim… ${c} ${myThing(typ)} yok oldu${det ? " — " + det : ""}.`,
+  (c, typ, det, place, when) => `Bu ${c} ${typ} benim olmalı${det ? " (" + det + ")" : ""}. ${locative(lowerMid(place))} kaybettim, ${lowerMid(when)}.`,
+  (c, typ, det, place, when) => `Bakın, ${c} ${typ}${det ? " — " + det : ""}. ${locative(lowerMid(place))} bırakmışım; günü ${lowerMid(when)}.`,
+  (c, typ, det, place, when) => `${myThing(typ)} ${c} idi${det ? ", " + det : ""}. ${when} ${locative(lowerMid(place))} kayboldu.`,
+];
+
+const NEG_TEMPLATES = [
+  (c, typ, goodPat, badPat, place, when) =>
+    `${c} ${typ} istiyorum; ${goodPat}, ${badPat} değil. ${locative(lowerMid(place))} unuttum (${lowerMid(when)}).`,
+  (c, typ, goodPat, badPat, place, when) =>
+    `${myThing(typ)} ${goodPat} olmalı — ${badPat} olanı almayın. ${lowerMid(place)}, ${lowerMid(when)}.`,
+];
+
+function buildClue(item, diff) {
+  const c = COLOR_TR[item.color] || item.color;
+  const typ = TYPE_TR[item.type] || item.type;
+  const det = item.detail && DETAIL_TR[item.detail] ? DETAIL_TR[item.detail] : "";
+  const { place, when } = splitTag(item.tag);
+  const pat = item.pattern && item.pattern !== "duz" ? (PATTERN_TR[item.pattern] || item.pattern) : "";
+  if (diff > 4 && pat && Math.random() < 0.35) {
+    const others = PROC_PATTERNS.filter(p => p !== item.pattern && p !== "duz");
+    if (others.length) {
+      const bad = PATTERN_TR[others[Math.floor(Math.random() * others.length)]];
+      const fn = NEG_TEMPLATES[Math.floor(Math.random() * NEG_TEMPLATES.length)];
+      return cleanupClue(fn(c, typ, pat, bad, place, when));
+    }
+  }
+  const fn = CLUE_TEMPLATES[Math.floor(Math.random() * CLUE_TEMPLATES.length)];
+  const detailBit = det || (pat ? pat : "");
+  return cleanupClue(fn(c, typ, detailBit, place, when));
+}
+function cleanupClue(s) {
+  return s
+    .replace(/\s+/g, " ")
+    .replace(/\s+([,.!?])/g, "$1")
+    .replace(/,\s*,/g, ",")
+    .trim()
+    .replace(/([^.!?])$/, "$1.");
+}
+
+/** Named cast for trick / normal visitors beyond VISITORS map */
+const EXTRA_NAMES = [
+  { name: "Selim Amca", tone: "aceleci" },
+  { name: "Fulya Hanım", tone: "nazik" },
+  { name: "Cem", tone: "çekingen" },
+  { name: "Hatice Teyze", tone: "unutkan" },
+  { name: "Oğuz", tone: "şüpheli" },
+  { name: "Melis", tone: "aceleci" },
+  { name: "Rıza Usta", tone: "sert" },
+  { name: "Deniz", tone: "turist" },
+];
+
 function rand(a){return a[Math.floor(Math.random()*a.length)]}
 function shuffle(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
 function similarItem(base,hard){const v=Object.assign({},base);const which=rand(hard?["color","pattern","detail","type","tag"]:["color","pattern","detail","tag"]);
@@ -1431,7 +1730,6 @@ function generateVisitor(diff){
   const target=makeItem(type,color,pattern,detail,tag);
   const size=Math.min(5+Math.floor(diff/2)+(diff>6?2:0),9);const shelf=[target];const seen=new Set([itemId(target)]);
   let g=0;while(shelf.length<size&&g++<100){const d=similarItem(target,diff>2);const id=itemId(d);if(!seen.has(id)){seen.add(id);shelf.push(d)}}
-  // Prefer close decoys: force 1-2 same-type near-misses on hard
   if(diff>3){for(let k=0;k<2;k++){const near=Object.assign({},target);const which=rand(["color","pattern","detail","tag"]);
     if(which==="color"){let c;do{c=rand(PROC_COLORS)}while(c===target.color);near.color=c;}
     else if(which==="pattern"){let p;do{p=rand(PROC_PATTERNS)}while(p===target.pattern);near.pattern=p;}
@@ -1440,16 +1738,14 @@ function generateVisitor(diff){
     const id=itemId(near);if(!seen.has(id)){seen.add(id);if(shelf.length>=size)shelf[shelf.length-1]=near;else shelf.push(near);}
   }}
   const trick=diff>2&&Math.random()<(0.2+Math.min(diff,10)*0.03);
-  if(trick){return{visitor:"yalanci",trick:true,claim:(COLOR_TR[color]||color)+" "+(TYPE_TR[type]||type)+" benim, "+tag+" kaybettim!",extraClue:"Tarifi ezberlemiş gibi…",shelf:shuffle(shelf),payoffReject:"Başka kapıya…",wrongGive:"Bu başkasının eşyası!"}}
-  const vk=rand(Object.keys(VISITORS).filter(k=>k!=="yalanci"));
-  let clue=(COLOR_TR[color]||color)+" "+(pattern!=="duz"?PATTERN_TR[pattern]+" ":"")+(TYPE_TR[type]||type)+(detail?", "+(DETAIL_TR[detail]||detail):"")+"… "+tag+" civarı.";
-  if(diff>4&&pattern!=="duz"&&Math.random()<0.4){
-    const wrong=PROC_PATTERNS.filter(x=>x!==pattern&&x!=="duz");
-    if(wrong.length) clue=(COLOR_TR[color]||color)+" "+(TYPE_TR[type]||type)+", "+(PATTERN_TR[pattern]||pattern)+" — "+(PATTERN_TR[rand(wrong)]||"")+" değil. "+tag+".";
-  } else if(diff>5&&Math.random()<0.3){
-    clue=(TYPE_TR[type]||type)+" istiyorum; renk "+(COLOR_TR[color]||color)+", desen dikkat: "+(pattern==="duz"?"düz":PATTERN_TR[pattern])+". "+tag+".";
+  if(trick){
+    const cast=typeof EXTRA_NAMES!=="undefined"?rand(EXTRA_NAMES):{name:"Oğuz",tone:"şüpheli"};
+    const claim=typeof buildClue==="function"?buildClue(target,diff):((COLOR_TR[color]||color)+" "+(TYPE_TR[type]||type)+"…");
+    return{visitor:"yalanci",visitorName:cast.name,visitorTone:cast.tone,trick:true,target:null,claim,extraClue:"Biraz aceleye getiriyor…",shelf:shuffle(shelf),payoffReject:cast.name+" kapıdan çıktı.",wrongGive:"Bu eşya başka birine ait!"};
   }
-  let extra=detail?"Özellikle "+(DETAIL_TR[detail]||detail)+" olanı. Etiket: "+tag+".":"Etiket: "+tag+".";
+  const vk=rand(Object.keys(VISITORS).filter(k=>k!=="yalanci"));
+  const clue=typeof buildClue==="function"?buildClue(target,diff):((COLOR_TR[color]||color)+" "+(TYPE_TR[type]||type));
+  let extra=detail?"Özellikle "+(DETAIL_TR[detail]||detail)+".":"";
   return{visitor:vk,target,shelf:shuffle(shelf),clue,extraClue:extra,payoff:rand(["Ah, işte bu!","Mucize, sağ ol!","Kasabanın en iyisisin.","İçim rahatladı.","İyi ki buradasın."])};
 }
 function generateEndlessDay(round){const count=Math.min(3+Math.floor(round/2),5);const visitors=[];for(let i=0;i<count;i++)visitors.push(generateVisitor(1+round));return{id:"endless",name:"Sonsuz #"+round,weather:rand(["acik","yagmurlu","gunesli","bulutlu"]),hour:9+round%8,visitors,endless:true,round}}
@@ -1496,8 +1792,9 @@ function drawCounterProps(){
 function refreshOffice(){
   const d=state.dayData||{weather:"acik",hour:10};
   $("office-bg").innerHTML=drawOffice(d.weather,d.hour,save.decor||[]);
+  if(window.Motion&&Motion.ambient) Motion.ambient.weatherClass(d.weather);
   const cp=$("counter-props"); if(cp) cp.innerHTML=drawCounterProps();
-  const lg=$("lamp-glow"); if(lg) lg.classList.toggle("on", !!(save.decor||[]).includes("lamba") || true);
+  const lg=$("lamp-glow"); if(lg){ const night=!!(state.dayData&&state.dayData.night); lg.classList.toggle("on", night?!!state.lampLit:true); }
 }
 function setExpr(e){state.expr=e;const cv=currentVisitor();if(!cv)return;const v=VISITORS[cv.visitor];const vb=$("visitor-body");vb.innerHTML=drawVisitor(v,e);
   vb.classList.remove("react-happy","react-annoyed");
@@ -1542,6 +1839,44 @@ function renderDaySelect(){
   card.addEventListener("click",()=>{AudioSys.click();startEndless()});list.appendChild(card);
   refreshTitleCoins();
 }
+
+function runStorageTutorial(){
+  const overlay=document.createElement("div");
+  overlay.id="mechanic-overlay";
+  overlay.innerHTML=`<div class="mechanic-panel"><h3>Depo Sıralama</h3><p>Gelen kutudaki eşyaları boş gözlere yerleştir. Göz sayısı sınırlı — yanlış yer yok, ama dolunca taşıyamırsın.</p><button class="btn primary" id="mech-ok">Anladım</button></div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector("#mech-ok").onclick=()=>overlay.remove();
+}
+function runLedgerCheck(cv){
+  if(!cv||!cv.target) return true;
+  const want=cv.target.tag||"";
+  const panel=document.createElement("div");
+  panel.id="mechanic-overlay";
+  panel.innerHTML=`<div class="mechanic-panel"><h3>Defter Kontrolü</h3><p>Fişteki yer/zaman: <b>${want}</b></p><p>Eşyayı vermeden önce etiketi defterle karşılaştır.</p><button class="btn primary" id="mech-ok">Kontrol edildi</button></div>`;
+  document.body.appendChild(panel);
+  return new Promise(r=>panel.querySelector("#mech-ok").onclick=()=>{panel.remove();r(true)});
+}
+function ensureAlbumUI(){
+  if($("screen-album")) return;
+  const s=document.createElement("section");
+  s.id="screen-album"; s.className="screen";
+  s.innerHTML=`<header class="topbar"><button class="btn-back" id="album-back">←</button><h2>Koleksiyon</h2></header><div class="album-grid" id="album-grid"></div>`;
+  $("app").appendChild(s);
+  $("album-back").onclick=()=>showScreen("screen-title");
+}
+function renderAlbum(){
+  ensureAlbumUI();
+  const g=$("album-grid"); if(!g)return;
+  const album=save.album||[];
+  g.innerHTML="";
+  if(!album.length){g.innerHTML="<p class='day-meta' style='padding:16px'>Henüz hikâyeli eşya yok. Doğru teslimatlar koleksiyona eklenir.</p>";return;}
+  album.forEach(entry=>{
+    const card=document.createElement("div"); card.className="album-card";
+    card.innerHTML=`<div class="art">${drawItem(entry.item)}</div><div><b>${TYPE_TR[entry.item.type]||entry.item.type}</b><p>${entry.story||"Bir kasaba hikâyesi."}</p></div>`;
+    g.appendChild(card);
+  });
+}
+
 function startChapter(chId){
   const ch=(CHAPTERS||[]).find(c=>c.id===chId)||CHAPTERS[0];
   state.chapterId=chId; state.mechanic=ch.mechanic;
@@ -1552,10 +1887,16 @@ function startChapter(chId){
   for(let i=0;i<Math.min(3+Math.floor(chId/3),5);i++) visitors.push(generateVisitor(diff+i));
   if(ch.mechanic==="vague") visitors.forEach(v=>{ if(v.clue) v.clue=v.clue.replace(/şemsiye|cüzdan|atkı/gi,"şey").replace(/kırmızı|mavi|yeşil/gi,"renkli"); });
   if(ch.mechanic==="english") visitors.forEach(v=>{ if(!v.trick) v.clue="I lost my "+(TYPE_TR[v.target.type]||"item")+"… "+(COLOR_TR[v.target.color]||"")+" one. Please?"; });
-  state.dayData={id:"ch"+chId,name:ch.name,weather:ch.weather||"acik",hour:9+(chId%8),visitors,chapter:ch};
+  const isNight=ch.mechanic==="night"||ch.weather==="gece";
+  state.dayData={id:"ch"+chId,name:ch.name,weather:isNight?"gece":(ch.weather||"acik"),hour:isNight?22:(9+(chId%8)),visitors,chapter:ch,night:isNight};
+  state.lampLit=isNight?false:true;
   state.mode="day"; state.dayIndex=chId-1; state.visitorIndex=0; state.patience=Math.max(3,5-Math.floor(chId/4)); state.maxPatience=state.patience;
   state.asked=false; state.correct=0; state.wrong=0; state.dayCoins=0; state.failed=false; state.expr="neutral";
-  showScreen("screen-game"); $("hud-day-text").textContent=ch.name; $("hud-coin-text").textContent=String(save.coins); refreshOffice(); loadVisitor();
+  showScreen("screen-game"); $("hud-day-text").textContent=ch.name; $("hud-coin-text").textContent=String(save.coins); refreshOffice();
+  if(ch.mechanic==="storage") setTimeout(runStorageTutorial, 400);
+  if(ch.mechanic==="ledger"){ /* ledger gate on give */ state.ledgerGate=true; }
+  if(ch.mechanic==="queue"||ch.mechanic==="timer"){ state.shiftTimer=60+chId*8; state.queueLen=visitors.length; }
+  loadVisitor();
 }
 function renderShop(){
   refreshTitleCoins();
@@ -1589,7 +1930,8 @@ function currentVisitor(){return state.dayData&&state.dayData.visitors[state.vis
 
 function loadVisitor(){
   const cv=currentVisitor();if(!cv)return;
-  const v=VISITORS[cv.visitor];
+  const v=Object.assign({},VISITORS[cv.visitor]||VISITORS.yalanci||{});
+  if(cv.visitorName) v.name=cv.visitorName;
   state.patience=state.maxPatience;state.asked=false;state.expr="neutral";
   $("visitor-body").innerHTML=drawVisitor(v,"neutral");
   $("visitor-name").textContent=v.name;
@@ -1603,7 +1945,34 @@ function loadVisitor(){
   $("hud-vis-text").textContent=(state.visitorIndex+1)+"/"+state.dayData.visitors.length;
   $("payoff").classList.remove("show");$("stamp-overlay").classList.remove("show");$("between-msg").classList.remove("show");$("inspect-modal").classList.remove("show");
   renderShelf(cv.shelf||[]);
+  applyNightLamp();
 }
+function applyNightLamp(){
+  const night=!!(state.dayData&&state.dayData.night);
+  document.getElementById("app")?.classList.toggle("night-mode", night);
+  const lg=$("lamp-glow");
+  if(lg){ lg.classList.toggle("on", !night || !!state.lampLit); }
+  const shelf=$("shelf"); if(!shelf) return;
+  shelf.querySelectorAll(".cubby").forEach((c,i)=>{
+    if(!night){ c.classList.remove("dimmed","lit"); return; }
+    if(state.lampLit){ c.classList.remove("dimmed"); c.classList.add("lit"); }
+    else {
+      // only cubbies near "lamp" (first 2) start lit; others dim until tapped
+      const near=i<2;
+      c.classList.toggle("dimmed", !near);
+      c.classList.toggle("lit", near);
+      if(!c._lampBound){
+        c._lampBound=true;
+        c.addEventListener("pointerdown",()=>{
+          if(!(state.dayData&&state.dayData.night)) return;
+          c.classList.remove("dimmed"); c.classList.add("lit");
+          state.lampLit=true; if(lg) lg.classList.add("on");
+        },{passive:true});
+      }
+    }
+  });
+}
+
 function updatePatience(){const fill=$("patience-fill");fill.style.width=Math.max(0,(state.patience/state.maxPatience)*100)+"%";fill.classList.remove("warn","danger");if(state.patience<=2)fill.classList.add("danger");else if(state.patience<=3)fill.classList.add("warn")}
 
 function renderShelf(items){
@@ -1694,7 +2063,7 @@ function onCorrect(item,el,cv){
   document.querySelectorAll(".shelf-item").forEach(s=>s.classList.add("dimmed"));
   setTimeout(()=>{$("stamp-overlay").classList.remove("show");payoff.classList.remove("show");nextVisitorOrEnd()},1700);
 }
-function onWrong(el,msg){
+function onWrong(el,msg){ if(window.Motion&&Motion.ambient&&el) Motion.ambient.wobbleWrong(el);
   AudioSys.bad();setExpr("annoyed");state.wrong++;state.patience=Math.max(0,state.patience-1);updatePatience();
   $("speech").textContent=msg||rand(["Hmm, bu değil…","Yok, benimki bu değil.","Karıştırdın galiba.","Hayır, o başkasının."]);
   if(el){el.classList.add("feedback-wrong");setTimeout(()=>el.classList.remove("feedback-wrong"),400)}
@@ -1817,7 +2186,7 @@ document.querySelectorAll("button.btn, button.btn-back").forEach(b=>{
 
 renderTitle();AudioSys.init();
 
-window.Motion=Motion;window.CHAPTERS=CHAPTERS;window.__KEB__={getSave:()=>save,setSave:(s)=>{save=s;writeSave(save)},state,DAYS,VISITORS,TYPE_KEYS,DECORS,CHAPTERS,Motion,startDay,startChapter,startEndless,showScreen,itemId,currentVisitor,tryGive,askQuestion,rejectTrick,endDay,calcStars,generateEndlessDay,renderDaySelect,renderShop,openInspect,closeInspect,startTutorial,endTutorial,refreshOffice,writeSave,loadSave,SAVE_KEY,drawVisitor,drawTitleFacade,drawItem,itemLabel,TYPE_TR,DETAIL_TR,PROC_DETAILS,PROC_COLORS,PROC_PATTERNS,COLOR_TR,PATTERN_TR};
+window.Motion=Motion;window.CHAPTERS=CHAPTERS;window.generateVisitor=generateVisitor;window.buildClue=typeof buildClue!=="undefined"?buildClue:null;try{window.renderAlbum=renderAlbum;window.ensureAlbumUI=ensureAlbumUI;}catch(_e){}window.__KEB__={getSave:()=>save,setSave:(s)=>{save=s;writeSave(save)},state,DAYS,VISITORS,TYPE_KEYS,DECORS,CHAPTERS,Motion,generateVisitor,buildClue,renderAlbum,ensureAlbumUI,startDay,startChapter,startEndless,showScreen,itemId,currentVisitor,tryGive,askQuestion,rejectTrick,endDay,calcStars,generateEndlessDay,renderDaySelect,renderShop,openInspect,closeInspect,startTutorial,endTutorial,refreshOffice,writeSave,loadSave,SAVE_KEY,drawVisitor,drawTitleFacade,drawItem,itemLabel,generateVisitor,buildClue,EXTRA_NAMES,TYPE_TR,DETAIL_TR,PROC_DETAILS,PROC_COLORS,PROC_PATTERNS,COLOR_TR,PATTERN_TR};
 })();
 
 </script>
