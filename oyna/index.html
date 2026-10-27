@@ -281,6 +281,13 @@ body{display:flex;justify-content:center;align-items:stretch;padding:var(--safe-
 .repair-stage svg{width:70%;height:70%}
 .repair-dot{position:absolute;width:28px;height:28px;border-radius:50%;border:2.5px solid var(--ink);background:#C45A4A;cursor:pointer;transform:translate(-50%,-50%)}
 .repair-dot.fixed{background:#6B8F5E;pointer-events:none}
+.pet-blocker{position:absolute;inset:8% 12%;z-index:20;border:none;background:rgba(255,248,236,.55);border-radius:12px;cursor:pointer;padding:0;pointer-events:auto}
+.pet-blocker svg{width:100%;height:100%;filter:drop-shadow(1px 2px 0 rgba(0,0,0,.25))}
+.shelf-item.pet-knocked{transform:rotate(12deg) translateY(6px);opacity:.75}
+.tourist-hint{width:56px;height:56px;margin-top:6px;border:2px solid var(--ink);border-radius:10px;background:#FFF8EC;padding:2px}
+.tourist-hint svg{width:100%;height:100%}
+.festival-mode .office-bg{filter:saturate(1.2)}
+.festival-bunting{position:absolute;top:2px;left:0;right:0;text-align:center;color:#C45A4A;font-size:14px;letter-spacing:6px;z-index:3;pointer-events:none;text-shadow:1px 1px 0 #F0C050}
 
 /* 2.0.0 motion — respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
@@ -2501,6 +2508,149 @@ const RepairSys = {
 };
 const Repair = RepairSys;
 
+/** Chapter 9 — Wandering pet: sits on cubby / knocks item; tap to shoo; lost-pet visitor. */
+const PetsSys = {
+  showTutorial() {
+    return new Promise(r => {
+      const ov = document.createElement("div");
+      ov.className = "mechanic-overlay";
+      ov.innerHTML = `<div class="mechanic-panel"><h3>Kayıp Dostlar</h3>
+        <p>Kedi gözlere oturur veya eşya düşürür — dokunup kov. Bazen sahibi gelir.</p>
+        <button class="btn primary" id="pet-tut-ok" type="button">Anladım</button></div>`;
+      document.body.appendChild(ov);
+      ov.querySelector("#pet-tut-ok").onclick = () => { ov.remove(); r(); };
+    });
+  },
+  start() {
+    this.active = true;
+    this.timer = setInterval(() => this.wander(), 5000);
+    setTimeout(() => this.wander(), 1200);
+  },
+  stop() {
+    this.active = false;
+    clearInterval(this.timer);
+    document.getElementById("pet-blocker")?.remove();
+  },
+  wander() {
+    if (!this.active || state.mode === "storage") return;
+    const cubbies = [...document.querySelectorAll("#shelf .cubby")].filter(c => c.querySelector(".shelf-item"));
+    if (!cubbies.length) return;
+    const target = cubbies[Math.floor(Math.random() * cubbies.length)];
+    let pet = document.getElementById("pet-blocker");
+    if (!pet) {
+      pet = document.createElement("button");
+      pet.type = "button";
+      pet.id = "pet-blocker";
+      pet.className = "pet-blocker";
+      pet.innerHTML = `<svg viewBox="0 0 40 28" xmlns="http://www.w3.org/2000/svg"><ellipse cx="20" cy="18" rx="14" ry="8" fill="#C4A882" stroke="#3D2B1F" stroke-width="1.5"/><circle cx="14" cy="10" r="6" fill="#C4A882" stroke="#3D2B1F" stroke-width="1.5"/><circle cx="12" cy="9" r="1" fill="#3D2B1F"/><circle cx="16" cy="9" r="1" fill="#3D2B1F"/><path d="M10 6 L11 2 L13 6 M17 6 L19 2 L20 6" fill="#C4A882" stroke="#3D2B1F" stroke-width="1"/></svg>`;
+      pet.title = "Kov";
+      pet.onclick = () => {
+        pet.remove();
+        AudioSys.click && AudioSys.click();
+        $("speech").textContent = "Kedi kaçtı… göz serbest.";
+      };
+    }
+    target.style.position = "relative";
+    target.appendChild(pet);
+    pet.style.zIndex = "20";
+    // Occasionally knock: dim the item briefly
+    const item = target.querySelector(".shelf-item");
+    if (item && Math.random() < 0.45) {
+      item.classList.add("pet-knocked");
+      setTimeout(() => item.classList.remove("pet-knocked"), 2000);
+    }
+  }
+};
+const Pets = PetsSys;
+
+/** Chapter 10 — Tourist simple-English clues + picture hint. */
+const TouristSys = {
+  showTutorial() {
+    return new Promise(r => {
+      const ov = document.createElement("div");
+      ov.className = "mechanic-overlay";
+      ov.innerHTML = `<div class="mechanic-panel"><h3>Turist Sezonu</h3>
+        <p>Bazı ziyaretçiler basit İngilizce konuşur. Küçük resim ipucu da var.</p>
+        <button class="btn primary" id="tourist-tut-ok" type="button">OK</button></div>`;
+      document.body.appendChild(ov);
+      ov.querySelector("#tourist-tut-ok").onclick = () => { ov.remove(); r(); };
+    });
+  },
+  apply(cv) {
+    if (!cv || cv.trick || !cv.target) return;
+    const t = cv.target;
+    const color = COLOR_TR[t.color] || t.color;
+    const type = TYPE_TR[t.type] || t.type;
+    const templates = [
+      `I lost my ${type}… ${color} one. Please?`,
+      `Hello! My ${color} ${type} is missing.`,
+      `Excuse me — ${color} ${type}? Thank you!`,
+    ];
+    cv.clue = templates[Math.floor(Math.random() * templates.length)];
+    cv.extraClue = `Picture hint: ${color} ${type}.`;
+    cv.tourist = true;
+    cv.pictureHint = true;
+  },
+  renderHint(cv) {
+    if (!cv?.pictureHint || !cv.target) return;
+    let el = document.getElementById("tourist-hint");
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "tourist-hint";
+      el.className = "tourist-hint";
+      document.querySelector(".dialogue-panel")?.appendChild(el);
+    }
+    el.innerHTML = drawItem(cv.target);
+    el.style.display = "";
+  },
+  hideHint() {
+    const el = document.getElementById("tourist-hint");
+    if (el) el.style.display = "none";
+  }
+};
+const Tourist = TouristSys;
+
+/** Chapter 12 — Festival themed items + office decorations. */
+const FestivalSys = {
+  THEME_TYPES: ["yelpaze", "sal", "nazarlik", "simit", "caybardagi", "mum", "top"],
+  showTutorial() {
+    return new Promise(r => {
+      const ov = document.createElement("div");
+      ov.className = "mechanic-overlay";
+      ov.innerHTML = `<div class="mechanic-panel"><h3>Festival Finali</h3>
+        <p>Panayır temalı eşyalar ve süslemeler! Zorlu kuyruk — dikkatli ol.</p>
+        <button class="btn primary" id="fest-tut-ok" type="button">Başla</button></div>`;
+      document.body.appendChild(ov);
+      ov.querySelector("#fest-tut-ok").onclick = () => { ov.remove(); r(); };
+    });
+  },
+  decorate() {
+    document.getElementById("app")?.classList.add("festival-mode");
+    let b = document.getElementById("festival-bunting");
+    if (!b) {
+      b = document.createElement("div");
+      b.id = "festival-bunting";
+      b.className = "festival-bunting";
+      b.innerHTML = "▲ ▲ ▲ ▲ ▲";
+      document.getElementById("office")?.prepend(b);
+    }
+  },
+  undecorate() {
+    document.getElementById("app")?.classList.remove("festival-mode");
+    document.getElementById("festival-bunting")?.remove();
+  },
+  biasVisitor(v) {
+    if (!v || v.trick) return;
+    if (v.target && Math.random() < 0.7) {
+      const t = this.THEME_TYPES[Math.floor(Math.random() * this.THEME_TYPES.length)];
+      v.target.type = t;
+      // refresh shelf first item
+      if (v.shelf && v.shelf[0]) v.shelf[0] = Object.assign({}, v.target);
+    }
+  }
+};
+const Festival = FestivalSys;
+
 function rand(a){return a[Math.floor(Math.random()*a.length)]}
 function shuffle(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
 function similarItem(base,hard){const v=Object.assign({},base);const which=rand(hard?["color","pattern","detail","type","tag"]:["color","pattern","detail","tag"]);
@@ -2669,8 +2819,7 @@ function startChapter(chId){
   const visitors=[];
   for(let i=0;i<Math.min(3+Math.floor(chId/3),5);i++) visitors.push(generateVisitor(diff+i));
   if(ch.mechanic==="vague") visitors.forEach(v=>{ if(v.clue) v.clue=v.clue.replace(/şemsiye|cüzdan|atkı/gi,"şey").replace(/kırmızı|mavi|yeşil/gi,"renkli"); });
-  if(ch.mechanic==="english") visitors.forEach(v=>{ if(!v.trick&&v.target) v.clue="I lost my "+(TYPE_TR[v.target.type]||"item")+"… "+(COLOR_TR[v.target.color]||"")+" one. Please?"; });
-  if(ch.mechanic==="unreliable"&&typeof Memory!=="undefined"){
+    if(ch.mechanic==="unreliable"&&typeof Memory!=="undefined"){
     visitors.forEach(v=>Memory.applyToVisitor(v, diff));
     state.unreliableMode=true;
   } else { state.unreliableMode=false; }
@@ -2733,6 +2882,20 @@ function startChapter(chId){
   } else if(ch.mechanic==="repair"&&typeof Repair!=="undefined"){
     visitors.forEach(v=>{ if(v.shelf) Repair.markShelfDamaged(v.shelf); if(v.target){ v.target._damaged=true; v.target.damaged=true; }});
     Repair.showTutorial().then(()=>loadVisitor());
+  } else if(ch.mechanic==="pets"&&typeof Pets!=="undefined"){
+    // One lost-pet visitor
+    const petV=generateVisitor(diff+1); petV.trick=false; petV._lostPet=true;
+    petV.clue="Kedimi gördünüz mü? Gözlerin üstüne yatıyor olabilir…";
+    petV.extraClue="Tüy rengi: boz. İsmi Pamuk.";
+    visitors.push(petV);
+    Pets.showTutorial().then(()=>{ loadVisitor(); Pets.start(); });
+  } else if(ch.mechanic==="english"&&typeof Tourist!=="undefined"){
+    visitors.forEach(v=>Tourist.apply(v));
+    Tourist.showTutorial().then(()=>loadVisitor());
+  } else if(ch.mechanic==="festival"&&typeof Festival!=="undefined"){
+    visitors.forEach(v=>Festival.biasVisitor(v));
+    state.queueMode=true; state.shiftTimer=state.shiftTimer||100;
+    Festival.showTutorial().then(()=>{ Festival.decorate(); loadVisitor(); if(typeof Queue!=="undefined"){ Queue.begin(visitors, state.shiftTimer); }});
   } else if(ch.mechanic==="phonecall"&&typeof Phone!=="undefined"){
     // Designate last honest visitor as phone caller; ring after first visitor loads
     const honest=visitors.filter(v=>!v.trick&&v.target);
@@ -2804,6 +2967,7 @@ function loadVisitor(){
   renderShelf(cv.shelf||[]);
   applyNightLamp();
   if(typeof Storage!=="undefined"&&state.storageMap) Storage.applyShelfHints($("shelf"));
+  if(typeof Tourist!=="undefined"){ if(cv.tourist) Tourist.renderHint(cv); else Tourist.hideHint(); }
   if(state.ledgerGate&&typeof Ledger!=="undefined"){
     try{
       const seq=state.visitorIndex+1;
@@ -2990,7 +3154,7 @@ function nextVisitorOrEnd(){
   setTimeout(()=>{$("between-msg").classList.remove("show");loadVisitor()},850);
 }
 function calcStars(){if(state.failed)return state.correct>=1?1:0;const total=state.dayData.visitors.length;if(state.wrong===0&&state.correct===total)return 3;if(state.wrong<=2)return 2;return 1}
-function endDay(won){ if(typeof Queue!=="undefined"){ Queue.stopTimer(); Queue.active=false; const c=$("shift-clock"); if(c) c.style.display="none"; const r=$("queue-rail"); if(r) r.classList.remove("show"); }
+function endDay(won){ if(typeof Queue!=="undefined"){ Queue.stopTimer(); Queue.active=false; const c=$("shift-clock"); if(c) c.style.display="none"; const r=$("queue-rail"); if(r) r.classList.remove("show"); } if(typeof Pets!=="undefined") Pets.stop(); if(typeof Festival!=="undefined") Festival.undecorate();
   const stars=calcStars();const dayId=state.dayData.id;
   if(!state.dayData.endless&&won){const prev=save.dayStars[dayId]||0;if(stars>prev)save.dayStars[dayId]=stars;if(save.unlockedDay<dayId+1)save.unlockedDay=dayId+1;if(dayId>=5)save.endlessUnlocked=true;writeSave(save)}
   if(state.dayData.endless&&won){state.endlessRound=(state.dayData.round||1)+1;writeSave(save)}
@@ -3087,7 +3251,7 @@ document.querySelectorAll("button.btn, button.btn-back").forEach(b=>{
 renderTitle();AudioSys.init();
 window.__KEB_READY__=true;document.documentElement.dataset.kebReady="1";
 
-window.Motion=Motion;window.CHAPTERS=CHAPTERS;window.generateVisitor=generateVisitor;window.buildClue=typeof buildClue!=="undefined"?buildClue:null;try{window.renderAlbum=renderAlbum;window.ensureAlbumUI=ensureAlbumUI;}catch(_e){}window.Storage=Storage;window.Ledger=Ledger;window.Queue=Queue;window.Memory=Memory;window.Phone=Phone;window.Repair=Repair;window.__KEB_READY__=true;document.documentElement.dataset.kebReady="1";window.__KEB__={getSave:()=>save,setSave:(s)=>{save=s;writeSave(save)},state,DAYS,VISITORS,TYPE_KEYS,DECORS,CHAPTERS,Motion,generateVisitor,buildClue,renderAlbum,ensureAlbumUI,Storage,Ledger,Queue,Memory,Phone,Repair,startDay,startChapter,startEndless,showScreen,itemId,currentVisitor,tryGive,askQuestion,rejectTrick,endDay,calcStars,generateEndlessDay,renderDaySelect,renderShop,openInspect,closeInspect,startTutorial,endTutorial,refreshOffice,writeSave,loadSave,SAVE_KEY,drawVisitor,drawTitleFacade,drawItem,itemLabel,generateVisitor,buildClue,EXTRA_NAMES,TYPE_TR,DETAIL_TR,PROC_DETAILS,PROC_COLORS,PROC_PATTERNS,COLOR_TR,PATTERN_TR};
+window.Motion=Motion;window.CHAPTERS=CHAPTERS;window.generateVisitor=generateVisitor;window.buildClue=typeof buildClue!=="undefined"?buildClue:null;try{window.renderAlbum=renderAlbum;window.ensureAlbumUI=ensureAlbumUI;}catch(_e){}window.Storage=Storage;window.Ledger=Ledger;window.Queue=Queue;window.Memory=Memory;window.Phone=Phone;window.Repair=Repair;window.Pets=Pets;window.Tourist=Tourist;window.Festival=Festival;window.__KEB_READY__=true;document.documentElement.dataset.kebReady="1";window.__KEB__={getSave:()=>save,setSave:(s)=>{save=s;writeSave(save)},state,DAYS,VISITORS,TYPE_KEYS,DECORS,CHAPTERS,Motion,generateVisitor,buildClue,renderAlbum,ensureAlbumUI,Storage,Ledger,Queue,Memory,Phone,Repair,Pets,Tourist,Festival,startDay,startChapter,startEndless,showScreen,itemId,currentVisitor,tryGive,askQuestion,rejectTrick,endDay,calcStars,generateEndlessDay,renderDaySelect,renderShop,openInspect,closeInspect,startTutorial,endTutorial,refreshOffice,writeSave,loadSave,SAVE_KEY,drawVisitor,drawTitleFacade,drawItem,itemLabel,generateVisitor,buildClue,EXTRA_NAMES,TYPE_TR,DETAIL_TR,PROC_DETAILS,PROC_COLORS,PROC_PATTERNS,COLOR_TR,PATTERN_TR};
 })();
 
 </script>
