@@ -1204,20 +1204,20 @@ const CHAPTERS = [
     mechanic:"vague", blurb:"Çocuklar belirsiz tarif eder.", unlockRep:40 },
   { id:5, name:"Gece Mesaisi", place:"Büro", season:"kış", weather:"gece",
     mechanic:"night", weather:"gece", blurb:"Loş ışık — lambayı aç, detayı gör.", unlockRep:55 },
-  { id:6, name:"Festival", place:"Panayır", season:"yaz", weather:"gunesli",
-    mechanic:"queue", blurb:"Yoğun kuyruk, temalı eşyalar.", unlockRep:70 },
-  { id:7, name:"Turist Sezonu", place:"Sahil", season:"yaz", weather:"gunesli",
-    mechanic:"english", blurb:"Basit İngilizce ipuçları.", unlockRep:85 },
+  { id:6, name:"Unutkanlar", place:"Kasaba", season:"sonbahar", weather:"bulutlu",
+    mechanic:"unreliable", blurb:"Bir ipucu yanlış olabilir — soru sorunca netleşir.", unlockRep:70 },
+  { id:7, name:"Telefon Nöbeti", place:"Büro", season:"kış", weather:"yagmurlu",
+    mechanic:"phonecall", blurb:"Arayan eşya ayırtır; sonra gelir.", unlockRep:85 },
   { id:8, name:"Onarım Köşesi", place:"Atölye", season:"sonbahar", weather:"acik",
     mechanic:"repair", blurb:"Hasarlı eşyayı hızlı onar.", unlockRep:100 },
-  { id:9, name:"Telefon Nöbeti", place:"Büro", season:"kış", weather:"yagmurlu",
-    mechanic:"phonecall", blurb:"Metin çağrı — ayırt et, ayır.", unlockRep:120 },
-  { id:10, name:"Kayıp Dostlar", place:"Park", season:"ilkbahar", weather:"acik",
-    mechanic:"pets", blurb:"Ofiste dolaşan kedi / kuş.", unlockRep:140 },
+  { id:9, name:"Kayıp Dostlar", place:"Park", season:"ilkbahar", weather:"acik",
+    mechanic:"pets", blurb:"Ofiste dolaşan kedi; kov / kayıp hayvan.", unlockRep:120 },
+  { id:10, name:"Turist Sezonu", place:"Sahil", season:"yaz", weather:"gunesli",
+    mechanic:"english", blurb:"Basit İngilizce ipuçları + resim.", unlockRep:140 },
   { id:11, name:"Yoğun Saat", place:"Merkez", season:"sonbahar", weather:"bulutlu",
     mechanic:"timer", blurb:"Çoklu kuyruk + vardiya süresi.", unlockRep:160 },
-  { id:12, name:"Büyük Kayıp", place:"Kasaba", season:"kış", weather:"yagmurlu",
-    mechanic:"boss", blurb:"Tüm mekanikler — final boss vardiya.", unlockRep:180 }
+  { id:12, name:"Festival Finali", place:"Panayır", season:"yaz", weather:"gunesli",
+    mechanic:"festival", blurb:"Temalı eşyalar + süslemeler + boss.", unlockRep:180 }
 ];
 
 const Motion = {
@@ -2127,8 +2127,8 @@ const QueueSys = {
     this.secondsLeft = seconds || 90;
     state.visitorIndex = 0;
     this.renderRail();
-    this.startTimer();
     this.ensureSwitchUI();
+    setTimeout(() => { if (this.active) this.startTimer(); }, 100);
   },
 
   ensureSwitchUI() {
@@ -2165,7 +2165,7 @@ const QueueSys = {
       const done = v._served ? " done" : "";
       return `<button type="button" class="queue-chip${active}${low}${done}" data-qi="${i}">
         <span class="queue-name">${name}</span>
-        <span class="queue-pat">${"●".repeat(Math.max(0, this.patienceMap[i]))}</span>
+        <span class="queue-pat">${this.patienceMap[i]}</span>
       </button>`;
     }).join("");
     rail.querySelectorAll(".queue-chip").forEach(btn => {
@@ -2179,7 +2179,7 @@ const QueueSys = {
     if (!el) return;
     const m = Math.floor(this.secondsLeft / 60);
     const s = this.secondsLeft % 60;
-    el.textContent = `⏱ ${m}:${String(s).padStart(2, "0")}`;
+    el.textContent = `${m}:${String(s).padStart(2, "0")}`;
     el.classList.toggle("urgent", this.secondsLeft <= 20);
     el.style.display = this.active ? "" : "none";
   },
@@ -2256,6 +2256,66 @@ const QueueSys = {
 };
 
 const Queue = QueueSys;
+
+/** Chapter 6 — Unreliable memory: one clue attribute may be wrong; ask reveals the truth. */
+const MemorySys = {
+  applyToVisitor(cv, diff) {
+    if (!cv || cv.trick || !cv.target) return cv;
+    // ~55% chance a honest visitor misremembers one attribute
+    if (Math.random() > 0.55 && (diff || 3) < 8) return cv;
+    const attrs = ["color", "pattern", "detail"].filter(a => {
+      if (a === "detail") return cv.target.detail != null;
+      if (a === "pattern") return cv.target.pattern && cv.target.pattern !== "duz";
+      return true;
+    });
+    if (!attrs.length) attrs.push("color");
+    const wrongAttr = attrs[Math.floor(Math.random() * attrs.length)];
+    const falseTarget = Object.assign({}, cv.target);
+    if (wrongAttr === "color") {
+      let c; do { c = PROC_COLORS[Math.floor(Math.random() * PROC_COLORS.length)]; } while (c === cv.target.color);
+      falseTarget.color = c;
+    } else if (wrongAttr === "pattern") {
+      let p; do { p = PROC_PATTERNS[Math.floor(Math.random() * PROC_PATTERNS.length)]; } while (p === cv.target.pattern);
+      falseTarget.pattern = p;
+    } else {
+      const opts = (PROC_DETAILS[cv.target.type] || [null]).filter(d => d !== cv.target.detail);
+      falseTarget.detail = opts.length ? opts[Math.floor(Math.random() * opts.length)] : null;
+    }
+    cv.unreliable = true;
+    cv.wrongAttr = wrongAttr;
+    cv.falseClueItem = falseTarget;
+    // Spoken clue uses false memory
+    if (typeof buildClue === "function") {
+      cv.clue = buildClue(falseTarget, diff || 4);
+      const truthBit = wrongAttr === "color"
+        ? ("Rengi aslında " + (COLOR_TR[cv.target.color] || cv.target.color))
+        : wrongAttr === "pattern"
+          ? ("Deseni aslında " + (PATTERN_TR[cv.target.pattern] || cv.target.pattern || "düz"))
+          : ("Detayı: " + (DETAIL_TR[cv.target.detail] || cv.target.detail || "yok"));
+      cv.extraClue = "Bir dakika… " + truthBit + ". Karıştırdım!";
+      cv.trueClue = typeof buildClue === "function" ? buildClue(cv.target, diff || 4) : cv.clue;
+    }
+    return cv;
+  },
+
+  showTutorial() {
+    return new Promise(resolve => {
+      const ov = document.createElement("div");
+      ov.className = "mechanic-overlay";
+      ov.id = "memory-tut";
+      ov.innerHTML = `<div class="mechanic-panel">
+        <h3>Unutkan Hafıza</h3>
+        <p>Bazı ziyaretçiler bir özelliği yanlış hatırlar. Şüphelenirsen <b>Soru sor</b> — doğru ayrıntıyı söylerler.</p>
+        <p>Solver: rafta hâlâ tek doğru eşya vardır; yanlış ipucu seni yanıltmasın.</p>
+        <button class="btn primary" id="memory-tut-ok" type="button">Anladım</button>
+      </div>`;
+      document.body.appendChild(ov);
+      ov.querySelector("#memory-tut-ok").onclick = () => { ov.remove(); resolve(); };
+    });
+  }
+};
+
+const Memory = MemorySys;
 
 function rand(a){return a[Math.floor(Math.random()*a.length)]}
 function shuffle(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
@@ -2425,7 +2485,11 @@ function startChapter(chId){
   const visitors=[];
   for(let i=0;i<Math.min(3+Math.floor(chId/3),5);i++) visitors.push(generateVisitor(diff+i));
   if(ch.mechanic==="vague") visitors.forEach(v=>{ if(v.clue) v.clue=v.clue.replace(/şemsiye|cüzdan|atkı/gi,"şey").replace(/kırmızı|mavi|yeşil/gi,"renkli"); });
-  if(ch.mechanic==="english") visitors.forEach(v=>{ if(!v.trick) v.clue="I lost my "+(TYPE_TR[v.target.type]||"item")+"… "+(COLOR_TR[v.target.color]||"")+" one. Please?"; });
+  if(ch.mechanic==="english") visitors.forEach(v=>{ if(!v.trick&&v.target) v.clue="I lost my "+(TYPE_TR[v.target.type]||"item")+"… "+(COLOR_TR[v.target.color]||"")+" one. Please?"; });
+  if(ch.mechanic==="unreliable"&&typeof Memory!=="undefined"){
+    visitors.forEach(v=>Memory.applyToVisitor(v, diff));
+    state.unreliableMode=true;
+  } else { state.unreliableMode=false; }
   const isNight=ch.mechanic==="night"||ch.weather==="gece";
   state.dayData={id:"ch"+chId,name:ch.name,weather:isNight?"gece":(ch.weather||"acik"),hour:isNight?22:(9+(chId%8)),visitors,chapter:ch,night:isNight};
   state.lampLit=isNight?false:true;
@@ -2477,6 +2541,11 @@ function startChapter(chId){
   }
   if(ch.mechanic==="ledger"&&typeof Ledger!=="undefined"){
     Ledger.showTutorial().then(()=>loadVisitor());
+  } else if(ch.mechanic==="unreliable"&&typeof Memory!=="undefined"){
+    Memory.showTutorial().then(()=>{
+      loadVisitor();
+      if(state.queueMode&&typeof Queue!=="undefined"){ Queue.begin(visitors, state.shiftTimer||90); state.patience=Queue.patienceMap[0]||state.patience; updatePatience(); Queue.renderRail(); }
+    });
   } else {
     loadVisitor();
     if(state.queueMode&&typeof Queue!=="undefined"){
@@ -2805,8 +2874,9 @@ document.querySelectorAll("button.btn, button.btn-back").forEach(b=>{
 });
 
 renderTitle();AudioSys.init();
+window.__KEB_READY__=true;document.documentElement.dataset.kebReady="1";
 
-window.Motion=Motion;window.CHAPTERS=CHAPTERS;window.generateVisitor=generateVisitor;window.buildClue=typeof buildClue!=="undefined"?buildClue:null;try{window.renderAlbum=renderAlbum;window.ensureAlbumUI=ensureAlbumUI;}catch(_e){}window.Storage=Storage;window.Ledger=Ledger;window.Queue=Queue;window.__KEB__={getSave:()=>save,setSave:(s)=>{save=s;writeSave(save)},state,DAYS,VISITORS,TYPE_KEYS,DECORS,CHAPTERS,Motion,generateVisitor,buildClue,renderAlbum,ensureAlbumUI,Storage,Ledger,Queue,startDay,startChapter,startEndless,showScreen,itemId,currentVisitor,tryGive,askQuestion,rejectTrick,endDay,calcStars,generateEndlessDay,renderDaySelect,renderShop,openInspect,closeInspect,startTutorial,endTutorial,refreshOffice,writeSave,loadSave,SAVE_KEY,drawVisitor,drawTitleFacade,drawItem,itemLabel,generateVisitor,buildClue,EXTRA_NAMES,TYPE_TR,DETAIL_TR,PROC_DETAILS,PROC_COLORS,PROC_PATTERNS,COLOR_TR,PATTERN_TR};
+window.Motion=Motion;window.CHAPTERS=CHAPTERS;window.generateVisitor=generateVisitor;window.buildClue=typeof buildClue!=="undefined"?buildClue:null;try{window.renderAlbum=renderAlbum;window.ensureAlbumUI=ensureAlbumUI;}catch(_e){}window.Storage=Storage;window.Ledger=Ledger;window.Queue=Queue;window.Memory=Memory;window.__KEB_READY__=true;document.documentElement.dataset.kebReady="1";window.__KEB__={getSave:()=>save,setSave:(s)=>{save=s;writeSave(save)},state,DAYS,VISITORS,TYPE_KEYS,DECORS,CHAPTERS,Motion,generateVisitor,buildClue,renderAlbum,ensureAlbumUI,Storage,Ledger,Queue,Memory,startDay,startChapter,startEndless,showScreen,itemId,currentVisitor,tryGive,askQuestion,rejectTrick,endDay,calcStars,generateEndlessDay,renderDaySelect,renderShop,openInspect,closeInspect,startTutorial,endTutorial,refreshOffice,writeSave,loadSave,SAVE_KEY,drawVisitor,drawTitleFacade,drawItem,itemLabel,generateVisitor,buildClue,EXTRA_NAMES,TYPE_TR,DETAIL_TR,PROC_DETAILS,PROC_COLORS,PROC_PATTERNS,COLOR_TR,PATTERN_TR};
 })();
 
 </script>
