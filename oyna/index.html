@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Kayıp Eşya Bürosu 2.0</title>
+<title>Kayıp Eşya Bürosu 2.1</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <style>
 
@@ -45,7 +45,7 @@ body{display:flex;justify-content:center;align-items:stretch;padding:var(--safe-
 .title-scene .menu-btns{background:rgba(245,235,216,.92);padding:12px;border-radius:16px;border:2.5px solid var(--ink);box-shadow:3px 4px 0 var(--shadow)}
 .title-scene .game-title{background:rgba(245,235,216,.88);padding:8px 14px;border-radius:12px;border:2px solid var(--ink);margin-bottom:4px}
 .title-scene .title-sub{background:rgba(245,235,216,.85);padding:6px 10px;border-radius:10px;margin-bottom:10px}
-.game-title{font-size:clamp(1.6rem,7vw,2.1rem);font-weight:800;text-align:center;line-height:1.1;margin-top:6px;letter-spacing:-.02em}
+.game-title{font-size:clamp(1.6rem,7vw,2.1rem);font-weight:800;text-align:center;line-height:1.1;margin-top:6px;letter-spacing:0}
 .game-title span{display:block;font-size:.55em;font-weight:700;color:var(--brick);letter-spacing:.12em;text-transform:uppercase;margin-bottom:2px}
 .title-sub{font-size:.85rem;color:var(--ink-soft);text-align:center;margin:6px 0 14px}
 .menu-btns{display:flex;flex-direction:column;gap:9px;width:100%;max-width:280px}
@@ -71,7 +71,7 @@ body{display:flex;justify-content:center;align-items:stretch;padding:var(--safe-
 /* GAME */
 #screen-game{background:#E8DCC4}
 .game-top{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;background:var(--cream);border-bottom:2.5px solid var(--ink);flex-shrink:0;z-index:5}
-.hud-pill{display:flex;align-items:center;gap:4px;background:var(--white);border:2px solid var(--ink);border-radius:999px;padding:4px 9px;font-size:.78rem;font-weight:700}
+.hud-pill{display:flex;align-items:center;gap:4px;background:var(--white);border:2px solid var(--ink);border-radius:999px;padding:4px 9px;font-size:.78rem;font-weight:700;white-space:nowrap;flex-shrink:0;letter-spacing:0;font-stretch:100%}
 .hud-pill .hud-ico{width:16px;height:16px;display:block;flex-shrink:0}
 .hud-pill .hud-ico svg{width:100%;height:100%}
 
@@ -95,7 +95,7 @@ body{display:flex;justify-content:center;align-items:stretch;padding:var(--safe-
 .patience-bar{flex:1;height:9px;background:#D9CDB5;border:2px solid var(--ink);border-radius:5px;overflow:hidden}
 .patience-fill{height:100%;background:var(--sage);width:100%;transition:width .3s,background .3s}
 .patience-fill.warn{background:var(--mustard)}.patience-fill.danger{background:var(--brick)}
-.speech{background:var(--white);border:2.5px solid var(--ink);border-radius:12px;padding:8px 10px;font-size:.78rem;line-height:1.35;min-height:42px;max-height:none;overflow:visible;box-shadow:2px 2px 0 var(--shadow);position:relative;white-space:pre-wrap;word-break:break-word}
+.speech{background:var(--white);border:2.5px solid var(--ink);border-radius:12px;padding:8px 10px;font-size:.8rem;line-height:1.4;min-height:44px;max-height:none;overflow:visible;box-shadow:2px 2px 0 var(--shadow);position:relative;white-space:pre-wrap;word-break:break-word;letter-spacing:0;font-stretch:100%;hyphens:none}
 .action-row{display:flex;gap:7px;padding:7px 10px;background:var(--cream);flex-shrink:0}
 .action-row .btn{flex:1;padding:9px 6px;font-size:.78rem;border-radius:11px}
 .btn-ask{background:var(--teal);color:var(--white)}
@@ -106,8 +106,8 @@ body{display:flex;justify-content:center;align-items:stretch;padding:var(--safe-
 .shelf-label{font-size:.68rem;font-weight:700;color:var(--cream);letter-spacing:.04em;text-transform:uppercase;padding:0 4px 5px;opacity:.9;flex-shrink:0}
 .shelf{flex:1;min-height:0;height:100%;overflow:hidden;overscroll-behavior:none;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;align-content:stretch;align-items:stretch;padding:0}
 .cubby{min-height:0;height:100%;aspect-ratio:auto;background:linear-gradient(180deg,#6B4A18 0%,#5A3C10 40%,#4A3208 100%);border:2.5px solid var(--ink);border-radius:12px;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:inset 0 2px 4px rgba(0,0,0,.25);touch-action:manipulation;pointer-events:none}
-.cubby .shelf-item{width:min(94%,92%);aspect-ratio:1/1;height:auto;max-height:92%;background:var(--white);border:2px solid var(--ink);border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:2px 2px 0 rgba(0,0,0,.2);transition:transform .12s,box-shadow .12s;touch-action:manipulation;-webkit-user-select:none;user-select:none;overflow:hidden;pointer-events:auto;position:relative;z-index:2}
-.cubby .shelf-item svg{width:96%;height:96%;min-width:96%;min-height:96%;pointer-events:none;display:block}
+.cubby .shelf-item{width:min(92%,90%);aspect-ratio:1/1;height:auto;max-height:90%;background:linear-gradient(180deg,#FFFBF3 0%,#F5EBD8 100%);border:2px solid var(--ink);border-radius:12px;display:flex;align-items:flex-end;justify-content:center;padding:3% 3% 4%;box-sizing:border-box;cursor:pointer;box-shadow:2px 2px 0 rgba(0,0,0,.2);transition:transform .18s cubic-bezier(.2,.8,.2,1),box-shadow .18s;touch-action:manipulation;-webkit-user-select:none;user-select:none;overflow:hidden;pointer-events:auto;position:relative;z-index:2}
+.cubby .shelf-item svg{width:100%;height:100%;max-width:100%;max-height:100%;pointer-events:none;display:block;object-fit:contain}
 .cubby .shelf-item.dragging{transform:scale(1.12) rotate(-3deg);z-index:10;box-shadow:4px 8px 0 rgba(0,0,0,.28)}.cubby .shelf-item:active{transform:scale(1.06)}
 .cubby .shelf-item.bounce{animation:bouncePick .28s ease}
 @keyframes bouncePick{0%{transform:scale(1)}40%{transform:scale(1.14) rotate(-3deg)}100%{transform:scale(1.08)}}
@@ -258,7 +258,9 @@ body{display:flex;justify-content:center;align-items:stretch;padding:var(--safe-
 .queue-chip.active{background:var(--mustard,#C4A35A);font-weight:700}
 .queue-chip.low{border-color:#A63D2F}
 .queue-chip.done{opacity:.4;pointer-events:none}
-.queue-name{display:block;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.queue-name{display:block;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.68rem;line-height:1.15}
+.queue-chip{min-width:72px;flex-shrink:0}
+.queue-chip .queue-name{max-width:100%}
 .queue-pat{color:#A63D2F;letter-spacing:1px;font-size:.65rem}
 .shift-clock{display:none;align-items:center;gap:4px;background:var(--white);border:2px solid var(--ink);border-radius:999px;padding:4px 9px;font-size:.78rem;font-weight:700;margin:0;box-shadow:none;position:static;flex-shrink:0;line-height:1}
 .shift-clock.is-on{display:flex}
@@ -338,63 +340,189 @@ button.album-card .silhouette{background:#C8B8A0}
 
 .speech.typewriter::after{content:"";display:inline-block;width:2px;height:.85em;margin-left:2px;background:var(--ink);vertical-align:text-bottom;animation:twBlink .8s step-end infinite}
 
-/* 2.0.0 motion — respect reduced motion */
+/* 2.1 motion — cozy easing, grounded, reduced-motion safe */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
-.visitor-body.enter { animation: visitorEnter .55s cubic-bezier(.2,.8,.2,1) both; }
-.visitor-body.exit { animation: visitorExit .45s ease-in both; }
-@keyframes visitorEnter { from { transform: translateX(48px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-@keyframes visitorExit { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-56px); opacity: 0; } }
-.visitor-body.blink .eye { animation: blinkEye 4s ease-in-out infinite; }
-@keyframes blinkEye { 0%,92%,100%{ transform: scaleY(1);} 95%{ transform: scaleY(.1);} }
+
+/* Visitor enter/exit — soft ease-out, no bounce float */
+.visitor-body.enter { animation: visitorEnter .38s cubic-bezier(.2,.8,.2,1) both; }
+.visitor-body.exit { animation: visitorExit .32s cubic-bezier(.4,0,1,1) both; }
+@keyframes visitorEnter {
+  from { transform: translateX(28px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+@keyframes visitorExit {
+  from { transform: translateX(0); opacity: 1; }
+  to   { transform: translateX(-32px); opacity: 0; }
+}
+
+/* Blink only eyes (scaleY on .eye), never whole body */
+.visitor-body.blink .eye { animation: blinkEye 4.2s ease-in-out infinite; }
+@keyframes blinkEye {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(.08); }
+}
+
 .speech.typewriter { overflow: visible; }
-.speech .tw-cursor { display:inline-block; width:2px; height:0.9em; background:var(--ink); margin-left:2px; animation: twBlink 0.8s step-end infinite; vertical-align: text-bottom; }
-@keyframes twBlink { 50%{ opacity:0; } }
-.shelf-item.lift { transform: scale(1.1) translateY(-6px); box-shadow: 3px 8px 0 rgba(0,0,0,.25); z-index: 8; }
-.shelf-item.fly-out { animation: itemFly .5s ease-in forwards; }
-@keyframes itemFly { to { transform: translateY(-80px) scale(.4); opacity: 0; } }
-.shelf-item.wobble-back { animation: wobbleBack .5s ease; }
-@keyframes wobbleBack { 0%,100%{ transform: translateX(0);} 20%{ transform: translateX(-8px) rotate(-4deg);} 40%{ transform: translateX(8px) rotate(4deg);} 60%{ transform: translateX(-4px);} }
-.inspect-modal.show .inspect-card { animation: flipIn .4s ease; }
-@keyframes flipIn { from { transform: rotateY(90deg) scale(.9); opacity:0;} to { transform: none; opacity:1;} }
-.stamp-overlay.show ~ .office, .screen-shake { animation: screenShake .35s ease; }
-@keyframes screenShake { 0%,100%{ transform: translate(0,0);} 20%{ transform: translate(-3px,2px);} 40%{ transform: translate(3px,-2px);} 60%{ transform: translate(-2px,1px);} }
-.patience-fill.shake-low { animation: barShake .4s ease; }
-@keyframes barShake { 0%,100%{ transform: translateX(0);} 25%{ transform: translateX(-3px);} 75%{ transform: translateX(3px);} }
-.summary-stars .star-pop { display:inline-block; animation: starPop .45s cubic-bezier(.2,1.4,.3,1) both; }
-@keyframes starPop { from { transform: scale(0); opacity:0;} to { transform: scale(1); opacity:1;} }
-.office-bg .snow-flake { animation: snowFall 2.2s linear infinite; }
-@keyframes snowFall { from { transform: translateY(-6px); opacity:.9;} to { transform: translateY(14px); opacity:.15;} }
-.cat-tail { transform-origin: 10px 20px; animation: catTail 2.4s ease-in-out infinite; }
-@keyframes catTail { 0%,100%{ transform: rotate(-8deg);} 50%{ transform: rotate(12deg);} }
-.plant-sway { transform-origin: 50% 100%; animation: plantSway 3.2s ease-in-out infinite; }
-@keyframes plantSway { 0%,100%{ transform: rotate(-2deg);} 50%{ transform: rotate(2deg);} }
-.lamp-flicker.on { animation: lampFlicker 2.8s ease-in-out infinite; }
-@keyframes lampFlicker { 0%,100%{ opacity:1;} 40%{ opacity:.85;} 42%{ opacity:1;} 85%{ opacity:.9;} }
-.clock-hand { transform-origin: 32px 32px; transition: transform .6s ease; }
-.inspect-name { font-size:.85rem; font-weight:700; margin-top:4px; color:var(--ink); }
-.chapter-banner { font-size:.72rem; font-weight:700; color:var(--teal); letter-spacing:.04em; text-transform:uppercase; }
+.speech .tw-cursor {
+  display: inline-block; width: 2px; height: 0.9em;
+  background: var(--ink); margin-left: 2px;
+  animation: twBlink .8s step-end infinite; vertical-align: text-bottom;
+}
+@keyframes twBlink { 50% { opacity: 0; } }
+
+/* Pick / lift — settle, not fly */
+.shelf-item.lift {
+  transform: scale(1.06) translateY(-2px);
+  box-shadow: 3px 6px 0 rgba(0,0,0,.22);
+  z-index: 8;
+}
+.cubby .shelf-item.dragging {
+  transform: scale(1.08) rotate(-2deg);
+  z-index: 10;
+  box-shadow: 4px 10px 0 rgba(0,0,0,.26);
+}
+.cubby .shelf-item:active { transform: scale(1.04); }
+.cubby .shelf-item.bounce { animation: bouncePick .28s cubic-bezier(.2,1.2,.3,1); }
+@keyframes bouncePick {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.1); }
+  100% { transform: scale(1.05); }
+}
+
+/* Correct: arc up then squash-land feel */
+.shelf-item.fly-out,
+.fly-to-hands {
+  animation: itemArc .42s cubic-bezier(.2,.7,.2,1) forwards;
+  transform-origin: 50% 80%;
+}
+@keyframes itemArc {
+  0%   { transform: translate(0,0) scale(1); opacity: 1; }
+  45%  { transform: translate(0,-36px) scale(1.05); opacity: 1; }
+  75%  { transform: translate(0,-52px) scale(.85); opacity: .7; }
+  100% { transform: translate(0,-64px) scale(.45) ; opacity: 0; }
+}
+
+.shelf-item.wobble-back,
+.wobble-wrong {
+  animation: wobbleBack .4s cubic-bezier(.36,.07,.19,.97);
+}
+@keyframes wobbleBack {
+  0%,100% { transform: translateX(0) rotate(0); }
+  20% { transform: translateX(-6px) rotate(-3deg); }
+  40% { transform: translateX(6px) rotate(3deg); }
+  60% { transform: translateX(-3px) rotate(-1deg); }
+}
+
+.cubby .shelf-item.correct-flash {
+  animation: correctPulse .45s cubic-bezier(.2,1.2,.3,1);
+  border-color: var(--sage);
+  background: #E8F0E0;
+}
+@keyframes correctPulse {
+  0%,100% { transform: scale(1); }
+  40% { transform: scale(1.08); }
+  70% { transform: scale(.98); }
+}
+
+.inspect-modal.show .inspect-card { animation: flipIn .32s cubic-bezier(.2,.8,.2,1); }
+@keyframes flipIn {
+  from { transform: translateY(12px) scale(.94); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+
+.stamp-overlay.show ~ .office,
+.screen-shake { animation: screenShake .3s ease; }
+@keyframes screenShake {
+  0%,100% { transform: translate(0,0); }
+  25% { transform: translate(-2px,1px); }
+  50% { transform: translate(2px,-1px); }
+  75% { transform: translate(-1px,1px); }
+}
+
+.patience-fill.shake-low { animation: barShake .35s ease; }
+@keyframes barShake {
+  0%,100% { transform: translateX(0); }
+  30% { transform: translateX(-2px); }
+  70% { transform: translateX(2px); }
+}
+
+.summary-stars .star-pop,
+.star-pop {
+  display: inline-block;
+  animation: starPop .4s cubic-bezier(.2,1.4,.3,1) both;
+}
+@keyframes starPop {
+  from { transform: scale(0); opacity: 0; }
+  70%  { transform: scale(1.12); opacity: 1; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.office-bg .snow-flake { animation: snowFall 2.4s linear infinite; }
+@keyframes snowFall {
+  from { transform: translateY(-4px); opacity: .85; }
+  to   { transform: translateY(12px); opacity: .12; }
+}
+.office-bg .rain-line { animation: rainFall .65s linear infinite; }
+@keyframes rainFall {
+  from { transform: translateY(-3px); opacity: .85; }
+  to   { transform: translateY(9px); opacity: .15; }
+}
+.office-bg .sun-pulse { animation: sunPulse 3.2s ease-in-out infinite; }
+@keyframes sunPulse { 0%,100%{opacity:1} 50%{opacity:.78} }
+
+.cat-tail, .office-bg .cat-tail {
+  transform-origin: 10px 20px;
+  animation: catTail 2.6s ease-in-out infinite;
+}
+@keyframes catTail {
+  0%,100% { transform: rotate(-6deg); }
+  50% { transform: rotate(10deg); }
+}
+.plant-sway, .office-bg .plant-sway {
+  transform-origin: 50% 100%;
+  animation: plantSway 3.4s ease-in-out infinite;
+}
+@keyframes plantSway {
+  0%,100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+.lamp-flicker.on, .wx-night .lamp-glow.on {
+  animation: lampFlicker 3s ease-in-out infinite;
+}
+@keyframes lampFlicker {
+  0%,100% { opacity: 1; }
+  40% { opacity: .88; }
+  55% { opacity: .96; }
+}
+
+.chapter-banner {
+  font-size: .72rem; font-weight: 700; color: var(--teal);
+  letter-spacing: .03em; text-transform: uppercase;
+}
 .clock-live { animation: clockPulse 4s ease-in-out infinite; }
-@keyframes clockPulse { 0%,100%{opacity:1} 50%{opacity:.92} }
-.wx-rain .office-bg .rain-line { animation-duration: .55s; }
-.wx-snow .office-bg .snow-flake { animation: snowFall 2.4s linear infinite; }
-.wx-night .lamp-glow.on { animation: lampFlicker 2.8s ease-in-out infinite; }
-@keyframes lampFlicker { 0%,100%{opacity:1} 40%{opacity:.85} 55%{opacity:.95} 70%{opacity:.8} }
-.visitor-body.enter { animation: walkIn .55s ease-out; }
-.visitor-body.exit { animation: walkOut .4s ease-in forwards; }
-@keyframes walkIn { from{transform:translateX(40px);opacity:0} to{transform:none;opacity:1} }
-@keyframes walkOut { from{opacity:1} to{transform:translateX(-36px);opacity:0} }
-.fly-to-hands { animation: flyHands .45s ease-in forwards; }
-@keyframes flyHands { to{transform:translateY(-48px) scale(.6);opacity:.3} }
-.wobble-wrong { animation: wobble .4s ease; }
-@keyframes wobble { 0%,100%{transform:rotate(0)} 25%{transform:rotate(-8deg)} 75%{transform:rotate(8deg)} }
-.star-pop { animation: starPop .65s ease; }
-@keyframes starPop { 0%{transform:scale(.2);opacity:0} 60%{transform:scale(1.25);opacity:1} 100%{transform:scale(1)} }
-.office-bg .cat-tail { transform-origin: 8px 12px; animation: catTail 2.2s ease-in-out infinite; }
-@keyframes catTail { 0%,100%{transform:rotate(-8deg)} 50%{transform:rotate(14deg)} }
-.office-bg .plant-sway { transform-origin: 50% 100%; animation: plantSway 3.2s ease-in-out infinite; }
-@keyframes plantSway { 0%,100%{transform:rotate(-3deg)} 50%{transform:rotate(4deg)} }
+@keyframes clockPulse { 0%,100%{opacity:1} 50%{opacity:.93} }
+.clock-hand { transform-origin: 32px 32px; transition: transform .5s cubic-bezier(.2,.8,.2,1); }
+
+.inspect-name { font-size: .85rem; font-weight: 700; margin-top: 4px; color: var(--ink); letter-spacing: 0; }
+
+/* Coin fly — soft arc */
+.coin-fly {
+  position: fixed; width: 14px; height: 14px; border-radius: 50%;
+  background: var(--mustard); border: 2px solid var(--ink);
+  pointer-events: none; z-index: 80;
+  animation: coinFly .65s cubic-bezier(.2,.7,.2,1) forwards;
+}
+@keyframes coinFly {
+  0%   { transform: translate(0,0) scale(1); opacity: 1; }
+  60%  { transform: translate(calc(var(--dx) * .7), calc(var(--dy) * .55 - 18px)) scale(.85); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(.35); opacity: 0; }
+}
 
 </style>
 </head>
@@ -539,7 +667,7 @@ const COLOR_HEX={kirmizi:C.red,mavi:C.blue,yesil:C.green,sari:C.yellow,kahve:C.b
 const COLOR_TR={kirmizi:"kırmızı",mavi:"mavi",yesil:"yeşil",sari:"sarı",kahve:"kahverengi",pembe:"pembe",mor:"mor",turuncu:"turuncu",gri:"gri",siyah:"siyah",lacivert:"lacivert",krem:"krem"};
 const PATTERN_TR={duz:"düz",cizgili:"çizgili",benekli:"benekli",kareli:"kareli"};
 
-/* Item art 2.0 — safe padded viewBox, recognizable silhouettes */
+/* Item art 2.1 — cozy shaded SVG (see ART.md) */
 let _uid = 0;
 function nextPat(){ return "p" + (++_uid); }
 function shade(hex, amt){
@@ -550,333 +678,451 @@ function shade(hex, amt){
   r = Math.max(0, Math.min(255, r)); g = Math.max(0, Math.min(255, g)); b = Math.max(0, Math.min(255, b));
   return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
-function hi(hex){ return shade(hex, 36); }
-function lo(hex){ return shade(hex, -32); }
+function hi(hex){ return shade(hex, 42); }
+function lo(hex){ return shade(hex, -34); }
+function deep(hex){ return shade(hex, -58); }
+/** Per-item outline: darker cousin of the fill — never global ink. */
+function ol(hex){ return shade(hex, -72); }
 
-/** Fit content drawn in 0..64 into card safely (no edge clipping). */
-function svgWrap(inner, vb){
-  /* Crop viewBox to zoom content; artists draw in ~8..56. Target ~75% card fill. */
-  vb = vb || "0 0 64 64";
-  return `<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><g stroke="${C.ink}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none" vector-effect="non-scaling-stroke">${inner}</g></svg>`;
+/** Soft contact shadow under the object (grounding). */
+function contactShadow(cx, cy, rx, ry){
+  ry = ry || rx * 0.28;
+  return `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#2A2218" opacity=".22" stroke="none"/>
+    <ellipse cx="${cx}" cy="${cy}" rx="${rx*0.7}" ry="${ry*0.7}" fill="#2A2218" opacity=".12" stroke="none"/>`;
 }
+
+/** Top-left key light gradient + optional specular. */
+function matDefs(pid, col, opts){
+  opts = opts || {};
+  const h = hi(col), s = lo(col), d = deep(col);
+  let extra = "";
+  if (opts.metal) {
+    extra += `<linearGradient id="mt${pid}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="${hi(col)}"/><stop offset="45%" stop-color="${col}"/>
+      <stop offset="100%" stop-color="${deep(col)}"/></linearGradient>
+      <radialGradient id="sp${pid}" cx="32%" cy="28%" r="45%">
+      <stop offset="0%" stop-color="#fff" stop-opacity=".55"/><stop offset="55%" stop-color="#fff" stop-opacity="0"/></radialGradient>`;
+  }
+  if (opts.glass) {
+    extra += `<linearGradient id="gl${pid}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff" stop-opacity=".35"/><stop offset="100%" stop-color="${col}" stop-opacity=".15"/></linearGradient>`;
+  }
+  return `<defs>
+    <linearGradient id="lg${pid}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="${h}"/><stop offset="42%" stop-color="${col}"/>
+      <stop offset="100%" stop-color="${s}"/>
+    </linearGradient>
+    <linearGradient id="lv${pid}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${h}"/><stop offset="55%" stop-color="${col}"/>
+      <stop offset="100%" stop-color="${s}"/>
+    </linearGradient>
+    <radialGradient id="hl${pid}" cx="30%" cy="26%" r="50%">
+      <stop offset="0%" stop-color="#fff" stop-opacity=".34"/><stop offset="60%" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    ${extra}
+  </defs>`;
+}
+
 function patternFill(pattern, base, pid){
-  /* Fabric: tone-on-tone ONLY. Never C.ink. Explicit stroke=none so parent outline does not cage tiles. */
   const d = lo(base), h = hi(base);
   const sn = 'stroke="none"';
-  if (pattern === "cizgili") return `<defs><pattern id="${pid}" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(18)"><rect width="8" height="8" fill="${base}" ${sn}/><rect x="0" y="0" width="2.2" height="8" fill="${d}" opacity=".28" ${sn}/><rect x="4.5" y="0" width="0.85" height="8" fill="${h}" opacity=".22" ${sn}/></pattern></defs>`;
-  if (pattern === "benekli") return `<defs><pattern id="${pid}" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="${base}" ${sn}/><circle cx="3.5" cy="3.5" r="1.9" fill="${d}" opacity=".3" ${sn}/><circle cx="8.8" cy="8" r="1.5" fill="${h}" opacity=".32" ${sn}/><circle cx="8.2" cy="2.8" r="1.15" fill="${d}" opacity=".18" ${sn}/></pattern></defs>`;
-  if (pattern === "kareli") return `<defs><pattern id="${pid}" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="${base}" ${sn}/><rect width="6" height="6" fill="${d}" opacity=".2" ${sn}/><rect x="6" y="6" width="6" height="6" fill="${d}" opacity=".2" ${sn}/><rect x="6" y="0" width="6" height="6" fill="${h}" opacity=".12" ${sn}/><rect x="0" y="6" width="6" height="6" fill="${h}" opacity=".12" ${sn}/></pattern></defs>`;
+  if (pattern === "cizgili") return `<defs><pattern id="${pid}" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(18)"><rect width="7" height="7" fill="${base}" ${sn}/><rect x="0" y="0" width="2" height="7" fill="${d}" opacity=".3" ${sn}/><rect x="4" y="0" width="0.7" height="7" fill="${h}" opacity=".22" ${sn}/></pattern></defs>`;
+  if (pattern === "benekli") return `<defs><pattern id="${pid}" width="11" height="11" patternUnits="userSpaceOnUse"><rect width="11" height="11" fill="${base}" ${sn}/><circle cx="3.2" cy="3.2" r="1.7" fill="${d}" opacity=".32" ${sn}/><circle cx="8.2" cy="7.4" r="1.35" fill="${h}" opacity=".3" ${sn}/><circle cx="7.6" cy="2.4" r="1" fill="${d}" opacity=".18" ${sn}/></pattern></defs>`;
+  if (pattern === "kareli") return `<defs><pattern id="${pid}" width="11" height="11" patternUnits="userSpaceOnUse"><rect width="11" height="11" fill="${base}" ${sn}/><rect width="5.5" height="5.5" fill="${d}" opacity=".22" ${sn}/><rect x="5.5" y="5.5" width="5.5" height="5.5" fill="${d}" opacity=".22" ${sn}/><rect x="5.5" y="0" width="5.5" height="5.5" fill="${h}" opacity=".12" ${sn}/><rect x="0" y="5.5" width="5.5" height="5.5" fill="${h}" opacity=".12" ${sn}/></pattern></defs>`;
   return "";
 }
 function pf(pattern, pid){ return (pattern === "cizgili" || pattern === "benekli" || pattern === "kareli") ? "url(#" + pid + ")" : null; }
-/** Solid base + inset patterned fill so fabric stops short of the outline (no clipped wire edges). */
+
+/** Solid base + inset patterned fill (fabric stops short of outline). */
 function fabricPath(d, fill, col, pid, sw){
-  sw = sw || 1.6;
+  sw = sw || 1.85;
+  const o = ol(col);
   if (fill && String(fill).indexOf("url(") === 0) {
-    return `<path d="${d}" fill="${col}" stroke="${C.ink}" stroke-width="${sw}"/>
-      <defs><clipPath id="in${pid}"><path d="${d}" transform="translate(32 32) scale(0.84) translate(-32 -32)"/></clipPath></defs>
-      <path d="${d}" fill="${fill}" stroke="none" clip-path="url(#in${pid})"/>`;
+    return `<path d="${d}" fill="url(#lg${pid})" stroke="${o}" stroke-width="${sw}"/>
+      <defs><clipPath id="in${pid}"><path d="${d}" transform="translate(32 32) scale(0.82) translate(-32 -32)"/></clipPath></defs>
+      <path d="${d}" fill="${fill}" stroke="none" clip-path="url(#in${pid})" opacity=".92"/>
+      <path d="${d}" fill="url(#hl${pid})" stroke="none"/>`;
   }
-  return `<path d="${d}" fill="${fill||col}" stroke="${C.ink}" stroke-width="${sw}"/>`;
-}
-function fabricEllipse(cx,cy,rx,ry,fill,col,pid,sw){
-  sw = sw || 1.5;
-  if (fill && String(fill).indexOf("url(") === 0) {
-    return `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${col}" stroke="${C.ink}" stroke-width="${sw}"/>
-      <defs><clipPath id="ine${pid}"><ellipse cx="${cx}" cy="${cy}" rx="${rx*0.84}" ry="${ry*0.84}"/></clipPath></defs>
-      <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${fill}" stroke="none" clip-path="url(#ine${pid})"/>`;
-  }
-  return `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${fill||col}" stroke="${C.ink}" stroke-width="${sw}"/>`;
+  return `<path d="${d}" fill="url(#lg${pid})" stroke="${o}" stroke-width="${sw}"/>
+    <path d="${d}" fill="url(#hl${pid})" stroke="none"/>`;
 }
 function fabricRect(x,y,w,h,rx,fill,col,pid,sw){
-  sw = sw || 1.5; rx = rx || 0;
-  if (fill && String(fill).indexOf("url(") === 0) {
-    const inset = 0.16;
-    const ix = x + w*inset/2, iy = y + h*inset/2, iw = w*(1-inset), ih = h*(1-inset);
-    return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${col}" stroke="${C.ink}" stroke-width="${sw}"/>
-      <defs><clipPath id="inr${pid}"><rect x="${ix}" y="${iy}" width="${iw}" height="${ih}" rx="${Math.max(0,rx-1)}"/></clipPath></defs>
-      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${fill}" stroke="none" clip-path="url(#inr${pid})"/>`;
-  }
-  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${fill||col}" stroke="${C.ink}" stroke-width="${sw}"/>`;
+  sw = sw || 1.85; rx = rx || 0;
+  const o = ol(col);
+  const body = fill && String(fill).indexOf("url(") === 0
+    ? `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="url(#lg${pid})" stroke="${o}" stroke-width="${sw}"/>
+      <defs><clipPath id="inr${pid}"><rect x="${x+w*0.08}" y="${y+h*0.08}" width="${w*0.84}" height="${h*0.84}" rx="${Math.max(0,rx-1)}"/></clipPath></defs>
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${fill}" stroke="none" clip-path="url(#inr${pid})" opacity=".9"/>
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="url(#hl${pid})" stroke="none"/>`
+    : `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="url(#lg${pid})" stroke="${o}" stroke-width="${sw}"/>
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="url(#hl${pid})" stroke="none"/>`;
+  return body;
 }
+function fabricEllipse(cx,cy,rx,ry,fill,col,pid,sw){
+  sw = sw || 1.7;
+  const o = ol(col);
+  if (fill && String(fill).indexOf("url(") === 0) {
+    return `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#lg${pid})" stroke="${o}" stroke-width="${sw}"/>
+      <defs><clipPath id="ine${pid}"><ellipse cx="${cx}" cy="${cy}" rx="${rx*0.82}" ry="${ry*0.82}"/></clipPath></defs>
+      <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${fill}" stroke="none" clip-path="url(#ine${pid})" opacity=".9"/>
+      <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#hl${pid})" stroke="none"/>`;
+  }
+  return `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#lg${pid})" stroke="${o}" stroke-width="${sw}"/>
+    <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#hl${pid})" stroke="none"/>`;
+}
+
+/** Stitch dashes along a path (leather). */
+function stitches(d, col){
+  return `<path d="${d}" fill="none" stroke="${deep(col)}" stroke-width="0.7" stroke-dasharray="1.6 2.2" opacity=".55"/>`;
+}
+/** Soft SE volume wedge for 3/4 read on rect-ish bodies. */
+function volumeSERect(x, y, w, h, rx, col){
+  const ix = x + w * 0.55;
+  return `<path d="M${ix} ${y} H${x+w} ${rx?`Q${x+w} ${y} ${x+w} ${y+rx}`:''} V${y+h-(rx||0)} ${rx?`Q${x+w} ${y+h} ${x+w-(rx||0)} ${y+h}`:''} H${ix} Z" fill="${deep(col)}" opacity=".2" stroke="none"/>`;
+}
+/** Wood grain lines. */
+function woodGrain(x, y, w, h, col){
+  const c = deep(col);
+  return `<g stroke="${c}" stroke-width="0.7" opacity=".35" fill="none" stroke-linecap="round">
+    <path d="M${x+2} ${y+h*0.3} Q${x+w*0.5} ${y+h*0.25} ${x+w-2} ${y+h*0.35}"/>
+    <path d="M${x+3} ${y+h*0.55} Q${x+w*0.45} ${y+h*0.5} ${x+w-3} ${y+h*0.58}"/>
+    <path d="M${x+4} ${y+h*0.78} Q${x+w*0.5} ${y+h*0.74} ${x+w-4} ${y+h*0.8}"/>
+  </g>`;
+}
+
+function svgWrap(inner, vb){
+  vb = vb || "0 0 64 64";
+  /* No global ink stroke — each shape sets its own outline colour (ART.md). */
+  return `<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><g stroke-linecap="round" stroke-linejoin="round" fill="none">${inner}</g></svg>`;
+}
+
 
 const ItemDraw = {
   semsiye(item){
-    const col = COLOR_HEX[item.color] || C.red, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
-    const canopy = "M8 30 Q16 14 24 26 Q32 8 40 26 Q48 14 56 30 Q46 40 32 38 Q18 40 8 30Z";
-    const ribs = `<path d="M24 26 Q32 20 32 36" fill="none" stroke="${lo(col)}" stroke-width="1" opacity=".45"/><path d="M40 26 Q32 20 32 36" fill="none" stroke="${lo(col)}" stroke-width="1" opacity=".45"/><path d="M32 12 Q32 24 32 36" fill="none" stroke="${lo(col)}" stroke-width="1" opacity=".4"/>`;
-    let handle = "";
+    const col = COLOR_HEX[item.color] || C.red, pid = nextPat(), pat = patternFill(item.pattern, col, pid), fill = pf(item.pattern, pid) || ("url(#lg"+pid+")");
+    const canopy = "M8 28 Q16 12 24 24 Q32 6 40 24 Q48 12 56 28 Q46 40 32 38 Q18 40 8 28Z";
+    let handle;
     if (item.detail === "ordek") {
-      handle = `<path d="M31 40 L31 48 Q31 56 24 57 Q18 57 17 51 Q17 46 23 46 Q29 46 31 50" fill="${C.yellow}"/><circle cx="20" cy="50" r="1.2" fill="${C.ink}" stroke="none"/><path d="M17 52 L12 54 L17 55Z" fill="${C.orange}" stroke="${C.ink}" stroke-width="1"/>`;
+      handle = `<path d="M31 40 L31 48 Q31 56 24 57 Q18 57 17 51 Q17 46 23 46 Q29 46 31 50" fill="url(#lg${pid}d)" stroke="${ol(C.yellow)}" stroke-width="1.3"/>
+        ${matDefs(pid+"d", C.yellow)}
+        <circle cx="20" cy="50" r="1.3" fill="${deep(C.yellow)}" stroke="none"/>
+        <path d="M17 52 L11 54 L17 55.5Z" fill="${C.orange}" stroke="${ol(C.orange)}" stroke-width="1"/>`;
     } else if (item.detail === "j_sap") {
-      handle = `<path d="M31 40 L31 50 Q31 58 23 58" fill="none" stroke="${C.wood}" stroke-width="3.4"/><path d="M31 40 L31 50 Q31 58 23 58" fill="none" stroke="${C.ink}" stroke-width="1.6"/>`;
+      handle = `<path d="M31 40 L31 50 Q31 58 22 58" fill="none" stroke="${C.wood}" stroke-width="3.6" stroke-linecap="round"/>
+        <path d="M31 40 L31 50 Q31 58 22 58" fill="none" stroke="${ol(C.wood)}" stroke-width="1.5"/>`;
     } else {
-      /* düz_sap — straight shaft + ferrule + knob (reads as "düz sap" vs curved j) */
-      handle = `<line x1="31" y1="40" x2="31" y2="56" stroke="${C.wood}" stroke-width="3.4"/><line x1="31" y1="40" x2="31" y2="56" stroke="${C.ink}" stroke-width="1.6"/><rect x="28" y="48" width="6" height="3" rx="0.5" fill="${C.mustard}" stroke="${C.ink}" stroke-width="1"/><circle cx="31" cy="57.5" r="2.8" fill="${C.wood}" stroke="${C.ink}" stroke-width="1.2"/>`;
+      handle = `<line x1="31" y1="40" x2="31" y2="55" stroke="${C.wood}" stroke-width="3.6" stroke-linecap="round"/>
+        <line x1="31" y1="40" x2="31" y2="55" stroke="${ol(C.wood)}" stroke-width="1.4"/>
+        <rect x="28.2" y="47" width="5.6" height="2.8" rx="0.5" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width="0.9"/>
+        <circle cx="31" cy="57" r="2.8" fill="${C.wood}" stroke="${ol(C.wood)}" stroke-width="1.2"/>`;
     }
-    return svgWrap(`${pat}${fabricPath(canopy, fill, col, _pid, 1.6)}
-      <defs><clipPath id="uc${_pid}"><path d="${canopy}" transform="translate(32 32) scale(0.84) translate(-32 -32)"/></clipPath></defs>
-      <g clip-path="url(#uc${_pid})">${ribs}</g>
-      <circle cx="32" cy="12" r="2.6" fill="${lo(col)}"/>
-      <line x1="31" y1="36" x2="31" y2="40" stroke="${C.ink}" stroke-width="2.2"/>
+    return svgWrap(`${matDefs(pid, col)}${pat}${contactShadow(32,58,16,3.5)}
+      ${fabricPath(canopy, fill, col, pid, 1.9)}
+      <path d="M14 22 Q32 10 50 22" fill="${hi(col)}" opacity=".25" stroke="none"/>
+      <circle cx="32" cy="11" r="2.8" fill="${lo(col)}" stroke="${ol(col)}" stroke-width="1.1"/>
+      <line x1="31" y1="36" x2="31" y2="40" stroke="${ol(col)}" stroke-width="2"/>
       ${handle}`);
   },
   cuzdan(item){
-    const col = COLOR_HEX[item.color] || C.brown, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
-    let e = "";
-    if (item.detail === "metal") e = `<rect x="36" y="26" width="10" height="8" rx="1.5" fill="${C.mustard}" stroke="${C.ink}" stroke-width="1.1"/><rect x="38" y="28" width="6" height="2" fill="${hi(C.mustard)}" stroke="none"/>`;
-    if (item.detail === "kalpli") e = `<path d="M30 30 Q28 26 24 28 Q22 32 30 38 Q38 32 36 28 Q32 26 30 30" fill="${C.brick}" stroke="${C.ink}" stroke-width="1"/>`;
-    if (item.detail === "fermuar") e = `<line x1="18" y1="32" x2="46" y2="32" stroke="${C.mustard}" stroke-width="2"/><circle cx="46" cy="32" r="2.4" fill="${C.mustard}" stroke="${C.ink}" stroke-width="1"/><circle cx="46" cy="32" r="0.8" fill="${C.ink}" stroke="none"/>`;
-    return svgWrap(`${pat}${fabricRect(14,22,36,24,4,fill,col,_pid)}
-      <line x1="14" y1="32" x2="50" y2="32" stroke="${C.ink}" stroke-width="1.4"/>${e}`);
+    const col = COLOR_HEX[item.color] || C.brown, pid = nextPat(), pat = patternFill(item.pattern, col, pid), fill = pf(item.pattern, pid);
+    let e = stitches("M18 28 H46", col);
+    if (item.detail === "metal") e += `<rect x="36" y="26" width="10" height="8" rx="1.4" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width="1.1"/><rect x="38" y="28" width="6" height="2" fill="${hi(C.mustard)}" stroke="none"/>`;
+    if (item.detail === "kalpli") e += `<path d="M30 30 Q27 26 24 29 Q23 33 30 38 Q37 33 36 29 Q33 26 30 30" fill="${C.brick}" stroke="${ol(C.brick)}" stroke-width="1"/>`;
+    if (item.detail === "fermuar") e += `<line x1="18" y1="34" x2="46" y2="34" stroke="${C.mustard}" stroke-width="2"/><circle cx="46" cy="34" r="2.5" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width="1"/>`;
+    return svgWrap(`${matDefs(pid, col)}${pat}${contactShadow(32,52,18,3.2)}
+      ${fabricRect(14,20,36,26,4,fill,col,pid)}
+      ${volumeSERect(14,20,36,26,4,col)}
+      <path d="M16 22 H48 V28 H14 V24 Q14 22 16 22Z" fill="${hi(col)}" opacity=".3" stroke="none"/>
+      <line x1="14" y1="34" x2="50" y2="34" stroke="${ol(col)}" stroke-width="1.3"/>${e}`);
   },
   anahtarlik(item){
-    /* Ring + keys + charm — colour AND charm shape always visible; key count varies */
     const col = COLOR_HEX[item.color] || C.mustard;
-    const metal = "#A8A098";
+    const metal = "#B0A898";
+    const pid = nextPat();
     const single = item.detail === "tek" || item.detail === "tek_anahtar";
-    let charm = `<g transform="translate(46,46)"><circle r="7" fill="${col}" stroke="${C.ink}" stroke-width="1.3"/><circle cx="-1.5" cy="-1.5" r="2" fill="${hi(col)}" opacity=".4" stroke="none"/></g>`;
-    if (item.detail === "kalpli") charm = `<g transform="translate(46,46)"><path d="M0-6 Q-5-10 -8-5 Q-10-1 0 8 Q10-1 8-5 Q5-10 0-6" fill="${col}" stroke="${C.ink}" stroke-width="1.2"/></g>`;
-    if (item.detail === "yıldızlı") charm = `<g transform="translate(46,46)"><polygon points="0,-8 2,-2 8,-2 3,1 5,7 0,3 -5,7 -3,1 -8,-2 -2,-2" fill="${col}" stroke="${C.ink}" stroke-width="1.1"/></g>`;
-    if (item.detail === "madalyon") charm = `<g transform="translate(46,46)"><circle r="8" fill="${col}" stroke="${C.ink}" stroke-width="1.3"/><circle r="4.2" fill="none" stroke="${C.ink}" stroke-width="1.2"/><circle r="1.4" fill="${C.ink}" stroke="none"/></g>`;
-    if (item.detail === "nazar") charm = `<g transform="translate(46,46)"><circle r="8" fill="${col}" stroke="${C.ink}" stroke-width="1.2"/><circle r="5" fill="${C.cream}" stroke="none"/><circle r="2.8" fill="${lo(col)}" stroke="none"/><circle r="1.2" fill="${C.ink}" stroke="none"/></g>`;
-    const keyB = single ? "" : `<g stroke="${C.ink}" stroke-width="1.4" fill="${lo(metal)}">
-        <circle cx="30" cy="26" r="4.5" fill="${metal}"/>
-        <circle cx="30" cy="26" r="1.8" fill="${C.cream}" stroke-width="1"/>
-        <rect x="28.5" y="30" width="3" height="14" rx="1" fill="${metal}"/>
-        <path d="M31.5 38 h5 v2.5 h-2.5 v2.5 h2.5 v2.5 h-5" fill="${metal}"/>
+    let charm = `<g transform="translate(46,46)"><circle r="7.5" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.4"/><circle cx="-1.5" cy="-1.8" r="2.2" fill="${hi(col)}" opacity=".45" stroke="none"/></g>`;
+    if (item.detail === "kalpli") charm = `<g transform="translate(46,46)"><path d="M0-6.5 Q-5.5-11 -9-5.5 Q-11-1 0 9 Q11-1 9-5.5 Q5.5-11 0-6.5" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.3"/></g>`;
+    if (item.detail === "yıldızlı") charm = `<g transform="translate(46,46)"><polygon points="0,-9 2.2,-2.5 9,-2.5 3.5,1.5 5.5,8 0,4 -5.5,8 -3.5,1.5 -9,-2.5 -2.2,-2.5" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.2"/></g>`;
+    if (item.detail === "madalyon") charm = `<g transform="translate(46,46)"><circle r="8.2" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.4"/><circle r="4.4" fill="none" stroke="${deep(col)}" stroke-width="1.3"/><circle r="1.5" fill="${deep(col)}" stroke="none"/></g>`;
+    if (item.detail === "nazar") charm = `<g transform="translate(46,46)"><circle r="8.2" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.3"/><circle r="5.2" fill="${C.cream}" stroke="none"/><circle r="3" fill="${lo(col)}" stroke="none"/><circle r="1.3" fill="${C.ink}" stroke="none"/></g>`;
+    const keyB = single ? "" : `<g>
+        <circle cx="30" cy="26" r="4.6" fill="${metal}" stroke="${ol(metal)}" stroke-width="1.3"/>
+        <circle cx="30" cy="26" r="1.9" fill="${C.cream}" stroke="none"/>
+        <rect x="28.4" y="30" width="3.2" height="14" rx="1" fill="${metal}" stroke="${ol(metal)}" stroke-width="1.1"/>
+        <path d="M31.6 38 h5 v2.6 h-2.6 v2.6 h2.6 v2.6 h-5" fill="${metal}" stroke="${ol(metal)}" stroke-width="1"/>
       </g>`;
-    return svgWrap(`
-      <circle cx="24" cy="18" r="11" fill="none" stroke="${C.ink}" stroke-width="2.6"/>
-      <circle cx="24" cy="18" r="11" fill="none" stroke="${metal}" stroke-width="1.4" stroke-dasharray="28 6" stroke-linecap="round"/>
-      <g stroke="${C.ink}" stroke-width="1.5" fill="${metal}">
-        <circle cx="18" cy="28" r="5.5" fill="${metal}"/>
-        <circle cx="18" cy="28" r="2.2" fill="${C.cream}" stroke-width="1.1"/>
-        <rect x="16.2" y="33" width="3.6" height="16" rx="1" fill="${metal}"/>
-        <path d="M19.8 42 h6 v3 h-3 v3 h3 v3 h-6" fill="${metal}"/>
-      </g>
+    return svgWrap(`${matDefs(pid, col, {metal:true})}${contactShadow(32,58,18,3)}
+      <circle cx="24" cy="18" r="11" fill="none" stroke="${ol(metal)}" stroke-width="2.8"/>
+      <circle cx="24" cy="18" r="11" fill="none" stroke="${metal}" stroke-width="1.5" stroke-dasharray="26 7" stroke-linecap="round"/>
+      <circle cx="18" cy="28" r="5.6" fill="${metal}" stroke="${ol(metal)}" stroke-width="1.4"/>
+      <circle cx="18" cy="28" r="2.3" fill="${C.cream}" stroke="none"/>
+      <rect x="16" y="33" width="4" height="16" rx="1" fill="${metal}" stroke="${ol(metal)}" stroke-width="1.2"/>
+      <path d="M20 42 h6.5 v3 h-3 v3 h3 v3 h-6.5" fill="${metal}" stroke="${ol(metal)}" stroke-width="1.1"/>
       ${keyB}
-      <path d="M34 22 Q42 28 46 40" fill="none" stroke="${C.ink}" stroke-width="1.5"/>
+      <path d="M34 22 Q42 28 46 40" fill="none" stroke="${ol(metal)}" stroke-width="1.5"/>
       ${charm}`);
   },
   sapka(item){
-    const col = COLOR_HEX[item.color] || C.brown, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
-    const crown = "M16 42 Q16 24 32 22 Q48 24 48 42";
+    const col = COLOR_HEX[item.color] || C.brown, pid = nextPat(), pat = patternFill(item.pattern, col, pid), fill = pf(item.pattern, pid);
+    const crown = "M16 40 Q16 22 32 20 Q48 22 48 40";
     let r = "";
-    if (item.detail === "fiyonk") r = `<path d="M26 34 Q20 30 18 34 Q20 38 26 36 Q32 38 34 34 Q32 30 26 34" fill="${C.brick}"/>`;
-    if (item.detail === "tüylü") r = `<path d="M40 24 Q48 12 46 26 Q44 30 40 28" fill="${C.blush}"/>`;
-    if (item.detail === "bant") r = `<rect x="18" y="34" width="28" height="4" rx="1" fill="${C.mustard}"/>`;
-    return svgWrap(`${pat}${fabricEllipse(32,44,20,5,fill,col,_pid+"b")}
-      ${fabricPath(crown, fill, col, _pid+"c")}
-      <path d="M20 30 Q32 22 44 30" fill="${hi(col)}" opacity=".25" stroke="none"/><line x1="16" y1="40" x2="48" y2="40" stroke="${C.ink}" stroke-width="1.4"/>${r}`);
+    if (item.detail === "fiyonk") r = `<path d="M26 32 Q19 28 17 33 Q20 38 26 35 Q32 38 35 33 Q33 28 26 32" fill="${C.brick}" stroke="${ol(C.brick)}" stroke-width="1.1"/>`;
+    if (item.detail === "tüylü") r = `<path d="M40 22 Q50 8 48 24 Q45 30 40 27" fill="${C.blush}" stroke="${ol(C.blush)}" stroke-width="1.1"/>`;
+    if (item.detail === "bant") r = `<rect x="18" y="32" width="28" height="4.5" rx="1" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width="1"/>`;
+    return svgWrap(`${matDefs(pid, col)}${pat}${contactShadow(32,52,20,3.2)}
+      ${fabricEllipse(32,44,20,5.5,fill,col,pid+"b")}
+      ${fabricPath(crown, fill, col, pid+"c")}
+      <path d="M20 28 Q32 20 44 28" fill="${hi(col)}" opacity=".28" stroke="none"/>
+      <line x1="16" y1="39" x2="48" y2="39" stroke="${ol(col)}" stroke-width="1.3"/>${r}`);
   },
   eldiven(item){
-    const col = COLOR_HEX[item.color] || C.blush, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
+    const col = COLOR_HEX[item.color] || C.blush, pid = nextPat(), pat = patternFill(item.pattern, col, pid), fill = pf(item.pattern, pid);
     const shape = "M20 50 L18 32 Q16 20 22 18 Q26 16 28 24 L30 34 L32 22 Q34 14 38 18 L40 32 L42 26 Q44 18 48 22 L46 36 L48 34 Q50 28 52 32 L50 48 Q48 54 40 54 L24 54 Q20 54 20 50Z";
     let patch = "";
-    if (item.detail === "yama") patch = `<rect x="34" y="36" width="8" height="7" rx="1" fill="${C.mustard}"/>`;
-    if (item.detail === "bant") patch = `<rect x="22" y="44" width="18" height="4" rx="1" fill="${C.mustard}"/>`;
-    return svgWrap(`${pat}${fabricPath(shape, fill, col, _pid)}${patch}`);
+    if (item.detail === "yama") patch = `<rect x="34" y="36" width="9" height="7" rx="1" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width="1"/>`;
+    if (item.detail === "bant") patch = `<rect x="22" y="44" width="18" height="4" rx="1" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width="1"/>`;
+    return svgWrap(`${matDefs(pid, col)}${pat}${contactShadow(34,56,16,3)}
+      ${fabricPath(shape, fill, col, pid)}${patch}`);
   },
   kitap(item){
-    const col = COLOR_HEX[item.color] || C.brick;
+    const col = COLOR_HEX[item.color] || C.brick, pid = nextPat();
     let m = "";
-    if (item.detail === "etiket") m = `<rect x="36" y="18" width="12" height="9" rx="1" fill="${C.mustard}"/><line x1="38" y1="21" x2="46" y2="21" stroke="${C.ink}" stroke-width=".8"/><line x1="38" y1="24" x2="44" y2="24" stroke="${C.ink}" stroke-width=".8"/>`;
-    if (item.detail === "eski") m = `<path d="M18 24 L20 22 M44 48 L46 46" stroke="${C.ink}" stroke-width="1" opacity=".45"/>`;
-    if (item.detail === "yeni") m = `<rect x="24" y="20" width="18" height="2" fill="${C.cream}" stroke="none"/>`;
-    return svgWrap(`<rect x="16" y="14" width="32" height="38" rx="2" fill="${col}"/><rect x="18" y="16" width="8" height="34" fill="${lo(col)}" opacity=".32" stroke="none"/><line x1="22" y1="14" x2="22" y2="52" stroke="${C.ink}" stroke-width="1.4"/><rect x="26" y="26" width="16" height="3" fill="${C.cream}" stroke="none"/>${m}`);
+    if (item.detail === "etiket") m = `<rect x="36" y="18" width="12" height="10" rx="1" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width="1"/><line x1="38" y1="21" x2="46" y2="21" stroke="${deep(C.mustard)}" stroke-width=".8"/><line x1="38" y1="24" x2="44" y2="24" stroke="${deep(C.mustard)}" stroke-width=".8"/>`;
+    if (item.detail === "eski") m = `<path d="M18 24 L21 21 M44 48 L47 45" stroke="${deep(col)}" stroke-width="1.1" opacity=".6"/>`;
+    if (item.detail === "yeni") m = `<rect x="24" y="20" width="18" height="2.2" fill="${C.cream}" stroke="none"/>`;
+    return svgWrap(`${matDefs(pid, col)}${contactShadow(32,56,16,3)}
+      <rect x="16" y="12" width="32" height="40" rx="2" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.9"/>
+      <rect x="18" y="14" width="8" height="36" fill="${lo(col)}" opacity=".35" stroke="none"/>
+      <line x1="22" y1="12" x2="22" y2="52" stroke="${ol(col)}" stroke-width="1.4"/>
+      <rect x="26" y="26" width="16" height="3" fill="${C.cream}" stroke="none"/>${m}`);
   },
   ayi(item){
-    const col = COLOR_HEX[item.color] || C.brown;
+    const col = COLOR_HEX[item.color] || C.brown, pid = nextPat();
     let b = "";
-    if (item.detail === "fiyonk") b = `<path d="M28 36 Q22 32 22 38 Q26 42 32 38 Q38 42 42 38 Q42 32 36 36 Q32 34 28 36" fill="${C.brick}"/>`;
-    if (item.detail === "yırtık") b = `<path d="M44 40 L49 37 M46 44 L51 45" stroke="${C.ink}" stroke-width="1.2"/>`;
-    if (item.detail === "yamalı") b = `<rect x="38" y="44" width="8" height="6" rx="1" fill="${C.mustard}" opacity=".85"/>`;
-    return svgWrap(`<circle cx="20" cy="20" r="6" fill="${col}"/><circle cx="44" cy="20" r="6" fill="${col}"/><ellipse cx="32" cy="34" rx="14" ry="12" fill="${col}"/><ellipse cx="26" cy="30" rx="3" ry="2.2" fill="${hi(col)}" opacity=".3" stroke="none"/><ellipse cx="32" cy="48" rx="10" ry="8" fill="${col}"/><circle cx="26" cy="32" r="1.6" fill="${C.ink}"/><circle cx="38" cy="32" r="1.6" fill="${C.ink}"/><ellipse cx="32" cy="38" rx="2.5" ry="1.6" fill="${C.blush}"/>${b}`);
+    if (item.detail === "fiyonk") b = `<path d="M28 36 Q22 31 22 38 Q26 43 32 38 Q38 43 42 38 Q42 31 36 36 Q32 34 28 36" fill="${C.brick}" stroke="${ol(C.brick)}" stroke-width="1.1"/>`;
+    if (item.detail === "yırtık") b = `<path d="M44 40 L50 36 M46 44 L52 46" stroke="${ol(col)}" stroke-width="1.3"/>`;
+    if (item.detail === "yamalı") b = `<rect x="38" y="44" width="9" height="7" rx="1" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width="1"/>`;
+    return svgWrap(`${matDefs(pid, col)}${contactShadow(32,58,14,3)}
+      <circle cx="20" cy="20" r="6.2" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.5"/>
+      <circle cx="20" cy="20" r="3.2" fill="${hi(col)}" opacity=".35" stroke="none"/>
+      <circle cx="44" cy="20" r="6.2" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.5"/>
+      <circle cx="44" cy="20" r="3.2" fill="${hi(col)}" opacity=".35" stroke="none"/>
+      <ellipse cx="32" cy="34" rx="14.5" ry="12.5" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.8"/>
+      <ellipse cx="26" cy="30" rx="3.2" ry="2.4" fill="${hi(col)}" opacity=".4" stroke="none"/>
+      <ellipse cx="38" cy="36" rx="5" ry="4" fill="${deep(col)}" opacity=".15" stroke="none"/>
+      <ellipse cx="32" cy="48" rx="10.5" ry="8.5" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.6"/>
+      <ellipse cx="32" cy="48" rx="6" ry="5" fill="${hi(col)}" opacity=".2" stroke="none"/>
+      <circle cx="26" cy="32" r="1.7" fill="${C.ink}" stroke="none"/><circle cx="38" cy="32" r="1.7" fill="${C.ink}" stroke="none"/>
+      <ellipse cx="32" cy="38" rx="2.6" ry="1.7" fill="${C.blush}" stroke="none"/>${b}`);
   },
   gozluk(item){
-    /* Chunky glasses — shape + wear marks must differ by detail */
-    const col = COLOR_HEX[item.color] || C.black;
+    const col = COLOR_HEX[item.color] || C.black, pid = nextPat();
     let lenses;
     if (item.detail === "yuvarlak") {
-      lenses = `<circle cx="20" cy="30" r="12" fill="${C.cream}" stroke="${col}" stroke-width="2.6"/><circle cx="44" cy="30" r="12" fill="${C.cream}" stroke="${col}" stroke-width="2.6"/><path d="M12 24 Q20 20 28 24" fill="none" stroke="${hi(C.cream)}" stroke-width="1.3" opacity=".7"/>`;
+      lenses = `<circle cx="20" cy="30" r="12" fill="${C.cream}" stroke="${ol(col)}" stroke-width="2.6"/><circle cx="20" cy="30" r="12" fill="url(#hl${pid})" stroke="none"/>
+        <circle cx="44" cy="30" r="12" fill="${C.cream}" stroke="${ol(col)}" stroke-width="2.6"/><circle cx="44" cy="30" r="12" fill="url(#hl${pid})" stroke="none"/>`;
     } else if (item.detail === "eski") {
-      /* Round but scratched / taped — visibly worn */
-      lenses = `<circle cx="20" cy="30" r="12" fill="${C.cream}" stroke="${col}" stroke-width="2.4"/><circle cx="44" cy="30" r="12" fill="${C.cream}" stroke="${col}" stroke-width="2.4"/>
-        <path d="M14 26 L26 34 M16 34 L24 26" stroke="${C.ink}" stroke-width="1.1" opacity=".55"/>
-        <path d="M38 26 L50 34" stroke="${C.ink}" stroke-width="1.1" opacity=".5"/>
-        <rect x="16" y="18" width="8" height="3" rx="0.5" fill="${C.mustard}" stroke="${C.ink}" stroke-width=".8"/>`;
+      lenses = `<circle cx="20" cy="30" r="12" fill="${C.cream}" stroke="${ol(col)}" stroke-width="2.4"/><circle cx="44" cy="30" r="12" fill="${C.cream}" stroke="${ol(col)}" stroke-width="2.4"/>
+        <path d="M14 26 L26 34 M16 34 L24 26" stroke="${C.ink}" stroke-width="1.1" opacity=".5"/>
+        <rect x="16" y="18" width="8" height="3" rx="0.5" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width=".8"/>`;
     } else {
-      /* kare_cam — square lenses with corner rivets */
-      lenses = `<rect x="8" y="20" width="20" height="18" rx="2" fill="${C.cream}" stroke="${col}" stroke-width="2.8"/><rect x="36" y="20" width="20" height="18" rx="2" fill="${C.cream}" stroke="${col}" stroke-width="2.8"/>
+      lenses = `<rect x="8" y="20" width="20" height="18" rx="2" fill="${C.cream}" stroke="${ol(col)}" stroke-width="2.7"/><rect x="36" y="20" width="20" height="18" rx="2" fill="${C.cream}" stroke="${ol(col)}" stroke-width="2.7"/>
         <circle cx="10" cy="22" r="1.2" fill="${col}" stroke="none"/><circle cx="26" cy="22" r="1.2" fill="${col}" stroke="none"/>
-        <circle cx="10" cy="36" r="1.2" fill="${col}" stroke="none"/><circle cx="26" cy="36" r="1.2" fill="${col}" stroke="none"/>
-        <circle cx="38" cy="22" r="1.2" fill="${col}" stroke="none"/><circle cx="54" cy="22" r="1.2" fill="${col}" stroke="none"/>
-        <circle cx="38" cy="36" r="1.2" fill="${col}" stroke="none"/><circle cx="54" cy="36" r="1.2" fill="${col}" stroke="none"/>`;
+        <circle cx="38" cy="22" r="1.2" fill="${col}" stroke="none"/><circle cx="54" cy="22" r="1.2" fill="${col}" stroke="none"/>`;
     }
-    return svgWrap(`${lenses}<path d="M28 30 H36" stroke="${col}" stroke-width="2.4"/><path d="M8 28 Q2 22 4 14" fill="none" stroke="${col}" stroke-width="2.2"/><path d="M56 28 Q62 22 60 14" fill="none" stroke="${col}" stroke-width="2.2"/><path d="M4 14 L4 48 M60 14 L60 48" stroke="${col}" stroke-width="2"/>`);
+    return svgWrap(`${matDefs(pid, col)}${contactShadow(32,52,22,3)}
+      ${lenses}<path d="M28 30 H36" stroke="${ol(col)}" stroke-width="2.3"/>
+      <path d="M8 28 Q2 22 4 14" fill="none" stroke="${ol(col)}" stroke-width="2.1"/>
+      <path d="M56 28 Q62 22 60 14" fill="none" stroke="${ol(col)}" stroke-width="2.1"/>
+      <path d="M4 14 L4 48 M60 14 L60 48" stroke="${ol(col)}" stroke-width="1.9"/>`);
   },
+
   atki(item){
-    /* Long draped scarf: clear loop + two tapered ends; fringe varies by detail */
-    const col = COLOR_HEX[item.color] || C.brick, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
+    const col = COLOR_HEX[item.color] || C.brick, pid = nextPat(), pat = patternFill(item.pattern, col, pid), fill = pf(item.pattern, pid);
     const loop = "M14 16 C14 4 50 4 50 16 C50 24 42 30 32 30 C22 30 14 24 14 16Z";
     const left = "M18 28 C16 40 12 50 14 58 L24 58 C26 48 24 38 26 28Z";
     const right = "M38 28 C40 40 44 50 42 58 L52 58 C54 48 50 38 48 28Z";
     const knot = "M24 26 C30 34 36 34 40 26 C36 36 32 38 28 36Z";
     let fringe = `<g stroke="${lo(col)}" stroke-width="1.4" stroke-linecap="round">
         <line x1="15" y1="58" x2="14" y2="62"/><line x1="19" y1="58" x2="19" y2="62"/><line x1="23" y1="58" x2="23" y2="62"/>
-        <line x1="43" y1="58" x2="43" y2="62"/><line x1="47" y1="58" x2="47" y2="62"/><line x1="51" y1="58" x2="52" y2="62"/>
-      </g>`;
+        <line x1="43" y1="58" x2="43" y2="62"/><line x1="47" y1="58" x2="47" y2="62"/><line x1="51" y1="58" x2="52" y2="62"/></g>`;
     if (item.detail === "püskül") {
-      fringe = `<g stroke="${col}" stroke-width="1.8" stroke-linecap="round">
+      fringe = `<g stroke="${col}" stroke-width="1.9" stroke-linecap="round">
         <line x1="14" y1="58" x2="11" y2="68"/><line x1="17" y1="58" x2="15" y2="70"/><line x1="20" y1="58" x2="20" y2="69"/><line x1="23" y1="58" x2="25" y2="68"/>
-        <line x1="41" y1="58" x2="39" y2="68"/><line x1="44" y1="58" x2="44" y2="70"/><line x1="47" y1="58" x2="49" y2="69"/><line x1="50" y1="58" x2="53" y2="68"/>
-      </g>
-      <circle cx="18" cy="58" r="2.2" fill="${lo(col)}" stroke="${C.ink}" stroke-width="1"/><circle cx="46" cy="58" r="2.2" fill="${lo(col)}" stroke="${C.ink}" stroke-width="1"/>`;
+        <line x1="41" y1="58" x2="39" y2="68"/><line x1="44" y1="58" x2="44" y2="70"/><line x1="47" y1="58" x2="49" y2="69"/><line x1="50" y1="58" x2="53" y2="68"/></g>
+        <circle cx="18" cy="58" r="2.3" fill="${lo(col)}" stroke="${ol(col)}" stroke-width="1"/><circle cx="46" cy="58" r="2.3" fill="${lo(col)}" stroke="${ol(col)}" stroke-width="1"/>`;
     } else if (item.detail === "tüylü") {
-      fringe = `<ellipse cx="18" cy="60" rx="7" ry="5" fill="${hi(col)}" stroke="${C.ink}" stroke-width="1.1" opacity=".9"/>
-        <ellipse cx="46" cy="60" rx="7" ry="5" fill="${hi(col)}" stroke="${C.ink}" stroke-width="1.1" opacity=".9"/>
-        <circle cx="15" cy="58" r="1.6" fill="${col}" stroke="none"/><circle cx="21" cy="62" r="1.4" fill="${col}" stroke="none"/>
-        <circle cx="43" cy="58" r="1.6" fill="${col}" stroke="none"/><circle cx="49" cy="62" r="1.4" fill="${col}" stroke="none"/>`;
+      fringe = `<ellipse cx="18" cy="60" rx="7" ry="5" fill="${hi(col)}" stroke="${ol(col)}" stroke-width="1.1"/>
+        <ellipse cx="46" cy="60" rx="7" ry="5" fill="${hi(col)}" stroke="${ol(col)}" stroke-width="1.1"/>`;
     }
-    return svgWrap(`${pat}
-      ${fabricPath(loop, fill, col, _pid+"o", 1.6)}
-      ${fabricPath(left, fill, col, _pid+"l", 1.5)}
-      ${fabricPath(right, fill, col, _pid+"r", 1.5)}
-      <path d="${knot}" fill="${lo(col)}" stroke="${C.ink}" stroke-width="1.2"/>
-      ${fringe}`);
+    return svgWrap(`${matDefs(pid, col)}${pat}${contactShadow(32,62,20,3)}
+      ${fabricPath(loop, fill, col, pid+"o", 1.7)}
+      ${fabricPath(left, fill, col, pid+"l", 1.6)}
+      ${fabricPath(right, fill, col, pid+"r", 1.6)}
+      <path d="${knot}" fill="${lo(col)}" stroke="${ol(col)}" stroke-width="1.2"/>${fringe}`);
   },
   telefon(item){
-    const col = COLOR_HEX[item.color] || C.teal, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
-    const body=`M20 12 h24 a4 4 0 0 1 4 4 v32 a4 4 0 0 1-4 4 h-24 a4 4 0 0 1-4-4 v-32 a4 4 0 0 1 4-4Z`;
+    const col = COLOR_HEX[item.color] || C.teal, pid = nextPat(), pat = patternFill(item.pattern, col, pid), fill = pf(item.pattern, pid);
+    const body = "M20 12 h24 a4 4 0 0 1 4 4 v32 a4 4 0 0 1-4 4 h-24 a4 4 0 0 1-4-4 v-32 a4 4 0 0 1 4-4Z";
     let d = "";
-    if (item.detail === "kalpli") d = `<path d="M32 30 Q28 26 26 30 Q28 36 32 40 Q36 36 38 30 Q36 26 32 30" fill="${C.brick}"/>`;
-    if (item.detail === "yıldızlı") d = `<polygon points="32,25 34,31 40,31 35,35 37,41 32,37 27,41 29,35 24,31 30,31" fill="${C.mustard}"/>`;
-    if (item.detail === "şeffaf") d = `<rect x="24" y="20" width="16" height="22" rx="1" fill="${C.cream}" opacity=".35" stroke="none"/>`;
-    return svgWrap(`${pat}${fabricPath(body, fill, col, _pid, 1.5)}
-      <rect x="24" y="18" width="16" height="24" rx="2" fill="${C.cream}" stroke="${C.ink}" stroke-width="1"/><circle cx="32" cy="48" r="1.8" fill="${C.ink}" stroke="none"/>${d}`);
+    if (item.detail === "kalpli") d = `<path d="M32 30 Q28 26 26 30 Q28 36 32 40 Q36 36 38 30 Q36 26 32 30" fill="${C.brick}" stroke="${ol(C.brick)}" stroke-width="1"/>`;
+    if (item.detail === "yıldızlı") d = `<polygon points="32,25 34,31 40,31 35,35 37,41 32,37 27,41 29,35 24,31 30,31" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width="1"/>`;
+    if (item.detail === "şeffaf") d = `<rect x="24" y="20" width="16" height="22" rx="1" fill="${C.cream}" opacity=".4" stroke="none"/>`;
+    return svgWrap(`${matDefs(pid, col)}${pat}${contactShadow(32,56,12,3)}
+      ${fabricPath(body, fill, col, pid, 1.7)}
+      <rect x="24" y="18" width="16" height="24" rx="2" fill="${C.cream}" stroke="${ol(col)}" stroke-width="1"/>
+      <circle cx="32" cy="48" r="1.8" fill="${deep(col)}" stroke="none"/>${d}`);
   },
-  /* —— Turkish / daily —— */
   tespih(item){
-    const col = COLOR_HEX[item.color] || C.brown;
+    const col = COLOR_HEX[item.color] || C.brown, pid = nextPat();
     const beads = [];
     for (let i = 0; i < 12; i++) {
       const a = -Math.PI * 0.85 + i * (Math.PI * 1.7 / 11);
       const x = 32 + Math.cos(a) * 18;
       const y = 28 + Math.sin(a) * 16;
-      beads.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.2" fill="${col}"/>`);
+      beads.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.3" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.2"/>
+        <circle cx="${(x-1.2).toFixed(1)}" cy="${(y-1.2).toFixed(1)}" r="1.3" fill="${hi(col)}" opacity=".4" stroke="none"/>`);
     }
-    let tip = `<ellipse cx="32" cy="50" rx="4.5" ry="6.5" fill="${lo(col)}"/><circle cx="32" cy="58" r="3.2" fill="${C.mustard}"/><circle cx="32" cy="58" r="1.2" fill="${C.cream}" stroke="none"/>`;
-    if (item.detail === "gumus") tip = `<rect x="27" y="44" width="10" height="14" rx="2" fill="${C.gray}" stroke="${C.ink}" stroke-width="1.3"/><circle cx="32" cy="58" r="3" fill="${C.cream}" stroke="${C.ink}" stroke-width="1.1"/>`;
-    if (item.detail === "imame") tip = `<ellipse cx="32" cy="48" rx="6" ry="8" fill="${hi(col)}"/><ellipse cx="32" cy="48" rx="6" ry="8" fill="none"/><circle cx="32" cy="58" r="3.4" fill="${C.brick}"/>`;
-    if (item.detail === "boncuk") tip = `<circle cx="32" cy="52" r="5" fill="${C.mustard}"/><circle cx="32" cy="58" r="3" fill="${C.brick}"/>`;
-    return svgWrap(`${beads.join("")}${tip}`);
+    let tip = `<ellipse cx="32" cy="50" rx="4.6" ry="6.6" fill="${lo(col)}" stroke="${ol(col)}" stroke-width="1.2"/><circle cx="32" cy="58" r="3.3" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width="1"/><circle cx="32" cy="58" r="1.2" fill="${hi(C.mustard)}" stroke="none"/>`;
+    if (item.detail === "gumus") tip = `<rect x="27" y="44" width="10" height="14" rx="2" fill="${C.gray}" stroke="${ol(C.gray)}" stroke-width="1.3"/><circle cx="32" cy="58" r="3" fill="${C.cream}" stroke="${ol(C.gray)}" stroke-width="1"/>`;
+    if (item.detail === "imame") tip = `<ellipse cx="32" cy="48" rx="6" ry="8" fill="${hi(col)}" stroke="${ol(col)}" stroke-width="1.3"/><circle cx="32" cy="58" r="3.4" fill="${C.brick}" stroke="${ol(C.brick)}" stroke-width="1"/>`;
+    if (item.detail === "boncuk") tip = `<circle cx="32" cy="52" r="5" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width="1.2"/><circle cx="32" cy="58" r="3" fill="${C.brick}" stroke="${ol(C.brick)}" stroke-width="1"/>`;
+    return svgWrap(`${matDefs(pid, col)}${contactShadow(32,60,14,3)}${beads.join("")}${tip}`);
   },
   nazarlik(item){
-    /* Clear evil-eye amulet on cord — large concentric eye */
-    const col = COLOR_HEX[item.color] || C.blue;
-    let cord = `<path d="M32 10 Q18 18 22 30" fill="none" stroke="${C.ink}" stroke-width="1.6"/>`;
-    if (item.detail === "boncuk") cord += `<circle cx="24" cy="18" r="2.4" fill="${C.red}"/><circle cx="26" cy="24" r="2.1" fill="${C.yellow}"/>`;
-    if (item.detail === "ip") cord = `<path d="M32 10 Q44 18 40 30" fill="none" stroke="${C.mustard}" stroke-width="1.8"/>`;
-    return svgWrap(`${cord}<circle cx="32" cy="42" r="13" fill="${col}"/><circle cx="32" cy="42" r="9.5" fill="${C.cream}" stroke="none"/><circle cx="32" cy="42" r="6" fill="${col}" stroke="none"/><circle cx="32" cy="42" r="2.8" fill="${C.ink}" stroke="none"/><circle cx="30.5" cy="40.5" r="1" fill="${C.cream}" stroke="none"/>`);
+    const col = COLOR_HEX[item.color] || C.blue, pid = nextPat();
+    let cord = `<path d="M32 10 Q18 18 22 30" fill="none" stroke="${ol(C.ink)}" stroke-width="1.7"/>`;
+    if (item.detail === "boncuk") cord += `<circle cx="24" cy="18" r="2.5" fill="${C.red}" stroke="${ol(C.red)}" stroke-width="1"/><circle cx="26" cy="24" r="2.2" fill="${C.yellow}" stroke="${ol(C.yellow)}" stroke-width="1"/>`;
+    if (item.detail === "ip") cord = `<path d="M32 10 Q44 18 40 30" fill="none" stroke="${C.mustard}" stroke-width="2"/>`;
+    return svgWrap(`${matDefs(pid, col)}${contactShadow(32,56,12,3)}${cord}
+      <circle cx="32" cy="42" r="13.5" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.8"/>
+      <circle cx="32" cy="42" r="9.8" fill="${C.cream}" stroke="none"/>
+      <circle cx="32" cy="42" r="6.2" fill="${col}" stroke="none"/>
+      <circle cx="32" cy="42" r="2.9" fill="${C.ink}" stroke="none"/>
+      <circle cx="30.4" cy="40.4" r="1.1" fill="${C.cream}" stroke="none"/>`);
   },
   termos(item){
-    const col = COLOR_HEX[item.color] || C.teal, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
-    let extra = `<ellipse cx="32" cy="12" rx="14" ry="5" fill="${lo(col)}"/><rect x="26" y="6" width="12" height="8" rx="2" fill="${C.gray}" stroke="${C.ink}" stroke-width="1"/>`;
+    const col = COLOR_HEX[item.color] || C.teal, pid = nextPat(), pat = patternFill(item.pattern, col, pid), fill = pf(item.pattern, pid);
+    let extra = `<ellipse cx="32" cy="12" rx="14" ry="5" fill="${lo(col)}" stroke="${ol(col)}" stroke-width="1.1"/><rect x="26" y="5" width="12" height="8" rx="2" fill="${C.gray}" stroke="${ol(C.gray)}" stroke-width="1"/>`;
     if (item.detail === "kulp" || item.detail === "kulplu") {
-      extra += `<path d="M48 26 Q58 34 48 46" fill="none" stroke="${C.ink}" stroke-width="2.6"/><path d="M48 26 Q58 34 48 46" fill="none" stroke="${lo(col)}" stroke-width="1.4"/>`;
+      extra += `<path d="M48 26 Q58 34 48 46" fill="none" stroke="${ol(col)}" stroke-width="2.8"/><path d="M48 26 Q58 34 48 46" fill="none" stroke="${lo(col)}" stroke-width="1.5"/>`;
     }
     if (item.detail === "kayis") {
-      extra += `<path d="M18 18 Q8 32 18 50" fill="none" stroke="${C.mustard}" stroke-width="2.8"/><path d="M18 18 Q8 32 18 50" fill="none" stroke="${C.ink}" stroke-width="1.3"/><rect x="15" y="16" width="6" height="4" rx="1" fill="${C.mustard}" stroke="${C.ink}" stroke-width="1"/>`;
+      extra += `<path d="M18 18 Q8 32 18 50" fill="none" stroke="${C.mustard}" stroke-width="2.8"/><path d="M18 18 Q8 32 18 50" fill="none" stroke="${ol(C.mustard)}" stroke-width="1.3"/><rect x="15" y="16" width="6" height="4" rx="1" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width="1"/>`;
     }
-    return svgWrap(`${pat}${fabricRect(16,14,32,42,6,fill,col,_pid)}
-      <ellipse cx="32" cy="14" rx="16" ry="6" fill="${col}" stroke="${C.ink}" stroke-width="1.4"/>
-      <line x1="18" y1="36" x2="46" y2="36" stroke="${lo(col)}" stroke-width="1.2" opacity=".5"/>${extra}`);
+    return svgWrap(`${matDefs(pid, col)}${pat}${contactShadow(32,58,14,3)}
+      ${fabricRect(16,14,32,42,6,fill,col,pid)}
+      ${volumeSERect(16,14,32,42,6,col)}
+      <ellipse cx="32" cy="14" rx="16" ry="6" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.4"/>
+      <line x1="18" y1="36" x2="46" y2="36" stroke="${lo(col)}" stroke-width="1.2" opacity=".45"/>${extra}`);
   },
   cayseti(item){
-    const col = COLOR_HEX[item.color] || C.cream;
-    let glass = `<path d="M26 30 L28 46 Q32 50 36 46 L38 30Z" fill="${C.cream}" opacity=".95"/><ellipse cx="32" cy="30" rx="6" ry="2" fill="${hi(C.cream)}"/>`;
-    if (item.detail === "altın") glass += `<ellipse cx="32" cy="38" rx="4" ry="1.5" fill="${C.mustard}" opacity=".55" stroke="none"/>`;
-    if (item.detail === "desenli") glass += `<path d="M28 36 Q32 40 36 36" fill="none" stroke="${C.brick}" stroke-width="1"/>`;
-    return svgWrap(`<rect x="16" y="20" width="32" height="28" rx="2" fill="${col}"/><rect x="18" y="22" width="28" height="24" rx="1" fill="${hi(col)}" opacity=".3" stroke="none"/><line x1="16" y1="26" x2="48" y2="26" stroke="${C.ink}" stroke-width="1"/>${glass}<rect x="20" y="16" width="8" height="5" rx="1" fill="${C.brick}"/>`);
+    const col = COLOR_HEX[item.color] || C.cream, pid = nextPat();
+    let glass = `<path d="M26 30 L28 46 Q32 50 36 46 L38 30Z" fill="${C.cream}" opacity=".95" stroke="${ol(C.cream)}" stroke-width="1.2"/><ellipse cx="32" cy="30" rx="6" ry="2" fill="${hi(C.cream)}" stroke="none"/>`;
+    if (item.detail === "altın") glass += `<ellipse cx="32" cy="38" rx="4" ry="1.5" fill="${C.mustard}" opacity=".6" stroke="none"/>`;
+    if (item.detail === "desenli") glass += `<path d="M28 36 Q32 40 36 36" fill="none" stroke="${C.brick}" stroke-width="1.2"/>`;
+    return svgWrap(`${matDefs(pid, col)}${contactShadow(32,54,16,3)}
+      <rect x="16" y="20" width="32" height="28" rx="2" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.7"/>
+      <rect x="18" y="22" width="28" height="10" fill="${hi(col)}" opacity=".3" stroke="none"/>
+      <line x1="16" y1="26" x2="48" y2="26" stroke="${ol(col)}" stroke-width="1"/>${glass}
+      <rect x="20" y="15" width="8" height="5" rx="1" fill="${C.brick}" stroke="${ol(C.brick)}" stroke-width="1"/>`);
   },
   kolsaati(item){
-    const col = COLOR_HEX[item.color] || C.brown;
-    let face = `<circle cx="32" cy="32" r="9" fill="${C.cream}"/><circle cx="32" cy="32" r="1.4" fill="${C.ink}"/><line x1="32" y1="32" x2="32" y2="25" stroke="${C.ink}" stroke-width="1.5"/><line x1="32" y1="32" x2="37" y2="34" stroke="${C.ink}" stroke-width="1.3"/>`;
-    if (item.detail === "dijital") face = `<rect x="23" y="26" width="18" height="12" rx="2" fill="${C.black}"/><rect x="25" y="28" width="14" height="8" rx="1" fill="${C.sage}" stroke="none"/>`;
-    let strap = `<rect x="28" y="10" width="8" height="12" rx="2" fill="${col}"/><rect x="28" y="42" width="8" height="12" rx="2" fill="${col}"/>`;
+    const col = COLOR_HEX[item.color] || C.brown, pid = nextPat();
+    let face = `<circle cx="32" cy="32" r="9" fill="${C.cream}" stroke="${ol(col)}" stroke-width="1"/><circle cx="32" cy="32" r="1.5" fill="${C.ink}" stroke="none"/><line x1="32" y1="32" x2="32" y2="25" stroke="${C.ink}" stroke-width="1.5"/><line x1="32" y1="32" x2="37" y2="34" stroke="${C.ink}" stroke-width="1.3"/>`;
+    if (item.detail === "dijital") face = `<rect x="23" y="26" width="18" height="12" rx="2" fill="${C.black}" stroke="${ol(C.black)}" stroke-width="1"/><rect x="25" y="28" width="14" height="8" rx="1" fill="${C.sage}" stroke="none"/>`;
+    let strap = `<rect x="28" y="10" width="8" height="12" rx="2" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.3"/><rect x="28" y="42" width="8" height="12" rx="2" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.3"/>`;
     if (item.detail === "deri") {
-      strap = `<rect x="26" y="8" width="12" height="14" rx="2" fill="${col}" stroke="${C.ink}" stroke-width="1.2"/>
-        <rect x="26" y="42" width="12" height="14" rx="2" fill="${col}" stroke="${C.ink}" stroke-width="1.2"/>
-        <line x1="28" y1="12" x2="36" y2="12" stroke="${lo(col)}" stroke-width="1.2"/>
-        <line x1="28" y1="16" x2="36" y2="16" stroke="${lo(col)}" stroke-width="1.2"/>
-        <line x1="28" y1="48" x2="36" y2="48" stroke="${lo(col)}" stroke-width="1.2"/>
-        <rect x="30" y="52" width="4" height="3" fill="${C.mustard}" stroke="${C.ink}" stroke-width=".8"/>`;
+      strap = `<rect x="26" y="8" width="12" height="14" rx="2" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.3"/>
+        <rect x="26" y="42" width="12" height="14" rx="2" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.3"/>
+        <line x1="28" y1="12" x2="36" y2="12" stroke="${lo(col)}" stroke-width="1.2"/><line x1="28" y1="16" x2="36" y2="16" stroke="${lo(col)}" stroke-width="1.2"/>
+        <rect x="30" y="52" width="4" height="3" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width=".8"/>`;
     }
-    return svgWrap(`${strap}<circle cx="32" cy="32" r="11" fill="${lo(col)}" stroke="${C.ink}" stroke-width="1.4"/>${face}`);
+    return svgWrap(`${matDefs(pid, col)}${contactShadow(32,58,10,2.5)}${strap}
+      <circle cx="32" cy="32" r="11.5" fill="${lo(col)}" stroke="${ol(col)}" stroke-width="1.5"/>${face}`);
   },
   bere(item){
-    const col = COLOR_HEX[item.color] || C.brick, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
+    const col = COLOR_HEX[item.color] || C.brick, pid = nextPat(), pat = patternFill(item.pattern, col, pid), fill = pf(item.pattern, pid);
     const body = "M12 40 Q12 18 32 14 Q52 18 52 40 Q52 48 32 50 Q12 48 12 40Z";
     let pom = "";
-    if (item.detail === "ponpon") pom = `<circle cx="32" cy="14" r="6" fill="${hi(col)}" stroke="${C.ink}" stroke-width="1.2"/><circle cx="30" cy="12" r="2" fill="${C.cream}" opacity=".35" stroke="none"/>`;
-    if (item.detail === "katlamalı") pom = `<path d="M16 36 Q32 28 48 36" fill="none" stroke="${C.ink}" stroke-width="1.3" opacity=".35"/>`;
-    return svgWrap(`${pat}${fabricPath(body, fill, col, _pid)}
-      <path d="M14 42 Q32 46 50 42" fill="none" stroke="${C.ink}" stroke-width="1.2" opacity=".35"/>
-      ${pom}`);
+    if (item.detail === "ponpon") pom = `<circle cx="32" cy="14" r="6.5" fill="${hi(col)}" stroke="${ol(col)}" stroke-width="1.3"/><circle cx="30" cy="12" r="2.2" fill="${C.cream}" opacity=".4" stroke="none"/>`;
+    if (item.detail === "katlamalı") pom = `<path d="M16 36 Q32 28 48 36" fill="none" stroke="${ol(col)}" stroke-width="1.4" opacity=".45"/>`;
+    return svgWrap(`${matDefs(pid, col)}${pat}${contactShadow(32,54,18,3.2)}
+      ${fabricPath(body, fill, col, pid)}
+      <path d="M14 42 Q32 46 50 42" fill="none" stroke="${ol(col)}" stroke-width="1.2" opacity=".4"/>${pom}`);
   },
   cantasirt(item){
-    const col = COLOR_HEX[item.color] || C.navy, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
+    const col = COLOR_HEX[item.color] || C.navy, pid = nextPat(), pat = patternFill(item.pattern, col, pid), fill = pf(item.pattern, pid);
     const body = "M18 22 Q18 16 24 16 L40 16 Q46 16 46 22 L48 50 Q48 54 32 54 Q16 54 16 50Z";
     let e = "";
-    if (item.detail === "yama") e = `<rect x="34" y="30" width="10" height="10" rx="1" fill="${C.mustard}" stroke="${C.ink}" stroke-width="1"/>`;
-    if (item.detail === "fermuar") e = `<line x1="32" y1="22" x2="32" y2="48" stroke="${C.mustard}" stroke-width="2"/><circle cx="32" cy="24" r="1.6" fill="${C.mustard}" stroke="${C.ink}" stroke-width=".8"/>`;
-    if (item.detail === "kırık_askı") e = `<path d="M22 16 L16 8 M42 16 L48 8" stroke="${C.ink}" stroke-width="1.8"/><circle cx="16" cy="8" r="1.5" fill="${C.ink}" stroke="none"/><circle cx="48" cy="8" r="1.5" fill="${C.ink}" stroke="none"/>`;
-    return svgWrap(`${pat}${fabricPath(body, fill, col, _pid)}
-      <path d="M22 16 Q22 10 32 10 Q42 10 42 16" fill="none" stroke="${C.ink}" stroke-width="1.8"/>
+    if (item.detail === "yama") e = `<rect x="34" y="30" width="10" height="10" rx="1" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width="1"/>`;
+    if (item.detail === "fermuar") e = `<line x1="32" y1="22" x2="32" y2="48" stroke="${C.mustard}" stroke-width="2"/><circle cx="32" cy="24" r="1.7" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width=".8"/>`;
+    if (item.detail === "kırık_askı") e = `<path d="M22 16 L16 8 M42 16 L48 8" stroke="${ol(col)}" stroke-width="1.8"/><circle cx="16" cy="8" r="1.5" fill="${ol(col)}" stroke="none"/>`;
+    return svgWrap(`${matDefs(pid, col)}${pat}${contactShadow(32,56,16,3)}
+      ${fabricPath(body, fill, col, pid)}
+      <path d="M22 16 Q22 10 32 10 Q42 10 42 16" fill="none" stroke="${ol(col)}" stroke-width="1.9"/>
       <rect x="22" y="28" width="20" height="14" rx="2" fill="${lo(col)}" opacity=".3" stroke="none"/>${e}`);
   },
   ayakkabi(item){
-    const col = COLOR_HEX[item.color] || C.red;
+    const col = COLOR_HEX[item.color] || C.red, pid = nextPat();
     let e = "";
-    if (item.detail === "bağcıklı") e = `<path d="M28 28 L34 32 M30 26 L36 30" stroke="${C.cream}" stroke-width="1.3"/>`;
-    if (item.detail === "cirtli") e = `<rect x="30" y="26" width="10" height="4" rx="1" fill="${C.mustard}"/>`;
-    if (item.detail === "ışıklı") e = `<circle cx="44" cy="40" r="2" fill="${C.yellow}"/>`;
-    return svgWrap(`<path d="M14 36 Q16 24 28 22 L42 24 Q50 26 52 36 Q54 44 46 46 L18 46 Q12 44 14 36Z" fill="${col}"/><path d="M16 34 Q28 28 44 32" fill="${hi(col)}" opacity=".28" stroke="none"/><ellipse cx="32" cy="46" rx="18" ry="3" fill="${lo(col)}"/>${e}`);
+    if (item.detail === "bağcıklı") e = `<path d="M28 28 L34 32 M30 26 L36 30" stroke="${C.cream}" stroke-width="1.4"/>`;
+    if (item.detail === "cirtli") e = `<rect x="30" y="26" width="10" height="4" rx="1" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width="1"/>`;
+    if (item.detail === "ışıklı") e = `<circle cx="44" cy="40" r="2.2" fill="${C.yellow}" stroke="${ol(C.yellow)}" stroke-width="1"/>`;
+    return svgWrap(`${matDefs(pid, col)}${contactShadow(32,50,20,3)}
+      <path d="M14 36 Q16 24 28 22 L42 24 Q50 26 52 36 Q54 44 46 46 L18 46 Q12 44 14 36Z" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.8"/>
+      <path d="M16 34 Q28 28 44 32" fill="${hi(col)}" opacity=".3" stroke="none"/>
+      <ellipse cx="32" cy="46" rx="18" ry="3" fill="${lo(col)}" stroke="none"/>${e}`);
   },
   kulaklik(item){
-    const col = COLOR_HEX[item.color] || C.black;
+    const col = COLOR_HEX[item.color] || C.black, pid = nextPat();
     let e = "";
-    if (item.detail === "kablolu") e = `<path d="M32 44 Q40 52 36 56" fill="none" stroke="${C.ink}" stroke-width="1.4"/>`;
-    if (item.detail === "mikrofon") e = `<path d="M20 40 L14 48" stroke="${C.ink}" stroke-width="1.5"/><circle cx="13" cy="50" r="2.5" fill="${col}"/>`;
-    return svgWrap(`<path d="M18 28 Q18 14 32 12 Q46 14 46 28" fill="none" stroke="${col}" stroke-width="3"/><rect x="14" y="26" width="10" height="16" rx="3" fill="${col}"/><rect x="40" y="26" width="10" height="16" rx="3" fill="${col}"/><rect x="16" y="28" width="6" height="12" rx="2" fill="${hi(col)}" opacity=".3" stroke="none"/>${e}`);
+    if (item.detail === "kablolu") e = `<path d="M32 44 Q40 52 36 56" fill="none" stroke="${ol(col)}" stroke-width="1.5"/>`;
+    if (item.detail === "mikrofon") e = `<path d="M20 40 L14 48" stroke="${ol(col)}" stroke-width="1.6"/><circle cx="13" cy="50" r="2.6" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1"/>`;
+    return svgWrap(`${matDefs(pid, col)}${contactShadow(32,52,16,3)}
+      <path d="M18 28 Q18 14 32 12 Q46 14 46 28" fill="none" stroke="${ol(col)}" stroke-width="3.2"/>
+      <rect x="14" y="26" width="10" height="16" rx="3" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.5"/>
+      <rect x="40" y="26" width="10" height="16" rx="3" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.5"/>
+      <rect x="16" y="28" width="6" height="12" rx="2" fill="${hi(col)}" opacity=".35" stroke="none"/>${e}`);
   },
+
   kalemlik(item){
-    const col = COLOR_HEX[item.color] || C.wood, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
-    let pens = `<rect x="22" y="10" width="5" height="24" rx="1.5" fill="${C.brick}" stroke="${C.ink}" stroke-width="1"/><rect x="30" y="6" width="5" height="28" rx="1.5" fill="${C.teal}" stroke="${C.ink}" stroke-width="1"/><rect x="38" y="12" width="5" height="22" rx="1.5" fill="${C.mustard}" stroke="${C.ink}" stroke-width="1"/>`;
+    const col = COLOR_HEX[item.color] || C.wood, pid = nextPat(), pat = patternFill(item.pattern, col, pid), fill = pf(item.pattern, pid);
+    let pens = `<rect x="22" y="10" width="5" height="24" rx="1.5" fill="${C.brick}" stroke="${ol(C.brick)}" stroke-width="1"/><rect x="30" y="6" width="5" height="28" rx="1.5" fill="${C.teal}" stroke="${ol(C.teal)}" stroke-width="1"/><rect x="38" y="12" width="5" height="22" rx="1.5" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width="1"/>`;
     if (item.detail === "boş") pens = "";
-    if (item.detail === "cetvel") pens += `<rect x="44" y="10" width="2.4" height="20" rx="0.6" fill="${C.cream}" stroke="${C.ink}" stroke-width=".9"/>`;
-    return svgWrap(`${pat}
-      ${fabricRect(14,28,36,28,4,fill,col,_pid)}
+    if (item.detail === "cetvel") pens += `<rect x="44" y="10" width="2.5" height="20" rx="0.6" fill="${C.cream}" stroke="${ol(C.cream)}" stroke-width=".9"/>`;
+    return svgWrap(`${matDefs(pid, col)}${pat}${contactShadow(32,58,16,3)}
+      ${fabricRect(14,28,36,28,4,fill,col,pid)}
       ${pens}
-      <ellipse cx="32" cy="28" rx="18" ry="5" fill="${col}" stroke="${C.ink}" stroke-width="1.4"/>`);
+      <ellipse cx="32" cy="28" rx="18" ry="5" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.4"/>
+      ${woodGrain(16,30,32,24,col)}`);
   },
   foto(item){
-    const col = COLOR_HEX[item.color] || C.black;
-    let lens = `<circle cx="32" cy="34" r="10" fill="${C.gray}"/><circle cx="32" cy="34" r="6" fill="${C.ink}"/><circle cx="30" cy="32" r="2" fill="${C.cream}" opacity=".4" stroke="none"/>`;
-    if (item.detail === "flash") lens += `<rect x="42" y="18" width="8" height="5" rx="1" fill="${C.cream}"/>`;
-    if (item.detail === "kayis") lens += `<path d="M16 22 Q10 32 16 44" fill="none" stroke="${C.mustard}" stroke-width="1.8"/>`;
-    return svgWrap(`<rect x="12" y="16" width="40" height="32" rx="3" fill="${col}"/><rect x="14" y="18" width="12" height="6" rx="1" fill="${lo(col)}" stroke="none"/>${lens}`);
+    const col = COLOR_HEX[item.color] || C.black, pid = nextPat();
+    let lens = `<circle cx="32" cy="34" r="10.5" fill="${C.gray}" stroke="${ol(C.gray)}" stroke-width="1.4"/><circle cx="32" cy="34" r="6.5" fill="${C.ink}" stroke="none"/><circle cx="30" cy="32" r="2.2" fill="${C.cream}" opacity=".45" stroke="none"/>`;
+    if (item.detail === "flash") lens += `<rect x="42" y="18" width="8" height="5" rx="1" fill="${C.cream}" stroke="${ol(C.cream)}" stroke-width="1"/>`;
+    if (item.detail === "kayis") lens += `<path d="M16 22 Q10 32 16 44" fill="none" stroke="${C.mustard}" stroke-width="2"/>`;
+    return svgWrap(`${matDefs(pid, col)}${contactShadow(32,52,18,3)}
+      <rect x="12" y="16" width="40" height="32" rx="3" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.8"/>
+      <rect x="14" y="18" width="12" height="6" rx="1" fill="${lo(col)}" stroke="none"/>${lens}`);
   },
   mektup(item){
-    const col = COLOR_HEX[item.color] || C.cream;
-    let seal = `<circle cx="32" cy="34" r="4" fill="${C.brick}"/>`;
-    if (item.detail === "pul") seal = `<rect x="40" y="18" width="8" height="10" rx="1" fill="${C.red}"/><circle cx="32" cy="36" r="3.5" fill="${C.brick}"/>`;
-    if (item.detail === "açık") return svgWrap(`<path d="M14 26 L32 14 L50 26 L50 48 Q50 52 46 52 L18 52 Q14 52 14 48Z" fill="${col}"/><path d="M14 26 L32 36 L50 26" fill="none" stroke="${C.ink}" stroke-width="1.4"/><path d="M18 30 H42" stroke="${C.ink}" stroke-width=".9" opacity=".5"/>`);
-    return svgWrap(`<rect x="14" y="20" width="36" height="28" rx="2" fill="${col}"/><path d="M14 20 L32 34 L50 20" fill="${hi(col)}" opacity=".4"/><path d="M14 20 L32 34 L50 20" fill="none"/>${seal}`);
+    const col = COLOR_HEX[item.color] || C.cream, pid = nextPat();
+    if (item.detail === "açık") {
+      return svgWrap(`${matDefs(pid, col)}${contactShadow(32,54,18,3)}
+        <path d="M14 26 L32 14 L50 26 L50 48 Q50 52 46 52 L18 52 Q14 52 14 48Z" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.6"/>
+        <path d="M14 26 L32 36 L50 26" fill="none" stroke="${ol(col)}" stroke-width="1.4"/>
+        <path d="M18 30 H42" stroke="${deep(col)}" stroke-width=".9" opacity=".5"/>`);
+    }
+    let seal = `<circle cx="32" cy="34" r="4.2" fill="${C.brick}" stroke="${ol(C.brick)}" stroke-width="1"/>`;
+    if (item.detail === "pul") seal = `<rect x="40" y="18" width="8" height="10" rx="1" fill="${C.red}" stroke="${ol(C.red)}" stroke-width="1"/><circle cx="32" cy="36" r="3.6" fill="${C.brick}" stroke="${ol(C.brick)}" stroke-width="1"/>`;
+    return svgWrap(`${matDefs(pid, col)}${contactShadow(32,52,18,3)}
+      <rect x="14" y="20" width="36" height="28" rx="2" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.7"/>
+      <path d="M14 20 L32 34 L50 20" fill="${hi(col)}" opacity=".4" stroke="none"/>
+      <path d="M14 20 L32 34 L50 20" fill="none" stroke="${ol(col)}" stroke-width="1.2"/>${seal}`);
   },
   yelpaze(item){
-    const col = COLOR_HEX[item.color] || C.red, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
+    const col = COLOR_HEX[item.color] || C.red, pid = nextPat(), pat = patternFill(item.pattern, col, pid), fill = pf(item.pattern, pid);
     const fan = "M10 44 Q16 14 32 10 Q48 14 54 44 Q42 38 32 40 Q22 38 10 44Z";
     let ribs = "";
     for (let i = 0; i < 6; i++) {
@@ -885,252 +1131,274 @@ const ItemDraw = {
     }
     let decor = "";
     if (item.detail === "desenli") decor = `<path d="M20 28 Q32 20 44 28" fill="none" stroke="${C.brick}" stroke-width="1.6"/><circle cx="32" cy="24" r="2" fill="${C.brick}" stroke="none"/>`;
-    if (item.detail === "altın") decor = `<circle cx="32" cy="26" r="4.2" fill="${C.mustard}" stroke="${C.ink}" stroke-width="1"/><circle cx="32" cy="26" r="2" fill="${hi(C.mustard)}" stroke="none"/>`;
-    return svgWrap(`${pat}${fabricPath(fan, fill, col, _pid)}
-      <defs><clipPath id="yf${_pid}"><path d="${fan}" transform="translate(32 32) scale(0.84) translate(-32 -32)"/></clipPath></defs>
-      <g clip-path="url(#yf${_pid})">${ribs}${decor}</g>
-      <rect x="29" y="44" width="6" height="12" rx="1" fill="${C.wood}" stroke="${C.ink}" stroke-width="1"/>`);
+    if (item.detail === "altın") decor = `<circle cx="32" cy="26" r="4.2" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width="1"/><circle cx="32" cy="26" r="2" fill="${hi(C.mustard)}" stroke="none"/>`;
+    return svgWrap(`${matDefs(pid, col)}${pat}${contactShadow(32,56,16,3)}
+      ${fabricPath(fan, fill, col, pid)}
+      <defs><clipPath id="yf${pid}"><path d="${fan}" transform="translate(32 32) scale(0.82) translate(-32 -32)"/></clipPath></defs>
+      <g clip-path="url(#yf${pid})">${ribs}${decor}</g>
+      <rect x="29" y="44" width="6" height="12" rx="1" fill="${C.wood}" stroke="${ol(C.wood)}" stroke-width="1"/>`);
   },
   emzik(item){
-    /* Clear pacifier: ring + shield + nipple */
-    const col = COLOR_HEX[item.color] || C.pink;
-    let ring = `<circle cx="32" cy="16" r="5.5" fill="none" stroke="${col}" stroke-width="2.4"/>`;
-    if (item.detail === "hayvan") ring += `<circle cx="32" cy="8" r="3" fill="${C.yellow}"/><circle cx="30.5" cy="7" r=".7" fill="${C.ink}" stroke="none"/><circle cx="33.5" cy="7" r=".7" fill="${C.ink}" stroke="none"/>`;
-    if (item.detail === "ışıklı") ring += `<circle cx="40" cy="18" r="2" fill="${C.yellow}"/>`;
-    return svgWrap(`${ring}<ellipse cx="32" cy="30" rx="14" ry="9" fill="${col}"/><ellipse cx="32" cy="30" rx="8" ry="4.5" fill="${hi(col)}" opacity=".35" stroke="none"/><ellipse cx="32" cy="44" rx="5" ry="8" fill="${C.cream}"/><ellipse cx="32" cy="44" rx="5" ry="8" fill="none"/>`);
+    const col = COLOR_HEX[item.color] || C.pink, pid = nextPat();
+    let ring = `<circle cx="32" cy="16" r="5.8" fill="none" stroke="${ol(col)}" stroke-width="2.5"/>`;
+    if (item.detail === "hayvan") ring += `<circle cx="32" cy="8" r="3.2" fill="${C.yellow}" stroke="${ol(C.yellow)}" stroke-width="1"/><circle cx="30.5" cy="7" r=".7" fill="${C.ink}" stroke="none"/><circle cx="33.5" cy="7" r=".7" fill="${C.ink}" stroke="none"/>`;
+    if (item.detail === "ışıklı") ring += `<circle cx="40" cy="18" r="2.2" fill="${C.yellow}" stroke="${ol(C.yellow)}" stroke-width="1"/>`;
+    return svgWrap(`${matDefs(pid, col)}${contactShadow(32,54,12,3)}${ring}
+      <ellipse cx="32" cy="30" rx="14.5" ry="9.5" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.7"/>
+      <ellipse cx="32" cy="30" rx="8" ry="4.5" fill="${hi(col)}" opacity=".35" stroke="none"/>
+      <ellipse cx="32" cy="44" rx="5.2" ry="8.2" fill="${C.cream}" stroke="${ol(C.cream)}" stroke-width="1.3"/>`);
   },
   radyocik(item){
-    /* Clear pocket radio: box + speaker grille + dial + antenna */
-    const col = COLOR_HEX[item.color] || C.wood;
+    const col = COLOR_HEX[item.color] || C.wood, pid = nextPat();
     let e = `<rect x="18" y="28" width="14" height="12" rx="1" fill="${C.ink}" opacity=".35" stroke="none"/>
       <line x1="20" y1="31" x2="30" y2="31" stroke="${C.cream}" stroke-width=".8" opacity=".5"/>
       <line x1="20" y1="34" x2="30" y2="34" stroke="${C.cream}" stroke-width=".8" opacity=".5"/>
       <line x1="20" y1="37" x2="30" y2="37" stroke="${C.cream}" stroke-width=".8" opacity=".5"/>
-      <circle cx="42" cy="34" r="5" fill="${C.mustard}"/><circle cx="42" cy="34" r="2" fill="${C.ink}"/>`;
-    if (item.detail === "anten") e += `<line x1="46" y1="20" x2="52" y2="10" stroke="${C.ink}" stroke-width="1.6"/><circle cx="52" cy="10" r="1.6" fill="${C.ink}"/>`;
-    if (item.detail === "kırık") e += `<path d="M28 22 L34 20" stroke="${C.ink}" stroke-width="1.2"/>`;
-    return svgWrap(`<rect x="14" y="20" width="36" height="28" rx="3" fill="${col}"/><rect x="16" y="22" width="10" height="24" fill="${hi(col)}" opacity=".2" stroke="none"/>${e}`);
+      <circle cx="42" cy="34" r="5.2" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width="1.2"/><circle cx="42" cy="34" r="2.1" fill="${C.ink}" stroke="none"/>`;
+    if (item.detail === "anten") e += `<line x1="46" y1="20" x2="52" y2="10" stroke="${ol(col)}" stroke-width="1.7"/><circle cx="52" cy="10" r="1.7" fill="${ol(col)}" stroke="none"/>`;
+    if (item.detail === "kırık") e += `<path d="M28 22 L34 20" stroke="${ol(col)}" stroke-width="1.3"/>`;
+    return svgWrap(`${matDefs(pid, col)}${contactShadow(32,52,16,3)}
+      <rect x="14" y="20" width="36" height="28" rx="3" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.8"/>
+      ${woodGrain(16,22,32,24,col)}${e}`);
   },
-  /* —— NEW types (to ~40) —— */
   simit(item){
-    const col = COLOR_HEX[item.color] || C.brown, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
-    const ring = "M32 16 A16 16 0 1 1 31.9 16";
+    const col = COLOR_HEX[item.color] || C.brown, pid = nextPat(), pat = patternFill(item.pattern, col, pid), fill = pf(item.pattern, pid);
     let s = "";
     if (item.detail === "susam" || item.pattern === "benekli") {
-      s = `<circle cx="28" cy="28" r="1.3" fill="${C.cream}" stroke="none"/><circle cx="36" cy="30" r="1.1" fill="${C.cream}" stroke="none"/><circle cx="32" cy="38" r="1.2" fill="${C.cream}" stroke="none"/><circle cx="24" cy="34" r="1" fill="${C.cream}" stroke="none"/><circle cx="40" cy="34" r="1" fill="${C.cream}" stroke="none"/>`;
+      s = `<circle cx="28" cy="28" r="1.4" fill="${C.cream}" stroke="none"/><circle cx="36" cy="30" r="1.2" fill="${C.cream}" stroke="none"/><circle cx="32" cy="38" r="1.3" fill="${C.cream}" stroke="none"/><circle cx="24" cy="34" r="1.1" fill="${C.cream}" stroke="none"/><circle cx="40" cy="34" r="1.1" fill="${C.cream}" stroke="none"/>`;
     }
-    if (item.detail === "peyirli") s += `<path d="M26 32 Q32 28 38 32" fill="none" stroke="${C.cream}" stroke-width="2.2"/>`;
-    const outer = item.pattern && item.pattern !== "duz"
-      ? `${fabricEllipse(32,32,16,16,fill,col,_pid+"o",1.6)}<circle cx="32" cy="32" r="7" fill="${C.cream}" stroke="${C.ink}" stroke-width="1.4"/>`
-      : `<circle cx="32" cy="32" r="16" fill="${col}" stroke="${C.ink}" stroke-width="1.6"/><circle cx="32" cy="32" r="7" fill="${C.cream}" stroke="${C.ink}" stroke-width="1.4"/><path d="M22 26 Q32 18 42 26" fill="${hi(col)}" opacity=".3" stroke="none"/>`;
-    return svgWrap(`${pat}${outer}${s}`);
+    if (item.detail === "peyirli") s += `<path d="M26 32 Q32 28 38 32" fill="none" stroke="${C.cream}" stroke-width="2.3"/>`;
+    const outer = fill
+      ? `${fabricEllipse(32,32,16,16,fill,col,pid+"o",1.7)}<circle cx="32" cy="32" r="7" fill="${C.cream}" stroke="${ol(col)}" stroke-width="1.4"/>`
+      : `<circle cx="32" cy="32" r="16" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.7"/><circle cx="32" cy="32" r="7" fill="${C.cream}" stroke="${ol(col)}" stroke-width="1.4"/><path d="M22 26 Q32 18 42 26" fill="${hi(col)}" opacity=".3" stroke="none"/>`;
+    return svgWrap(`${matDefs(pid, col)}${pat}${contactShadow(32,50,14,3)}${outer}${s}`);
   },
   caybardagi(item){
-    const col = COLOR_HEX[item.color] || C.cream;
+    const col = COLOR_HEX[item.color] || C.cream, pid = nextPat();
     let t = `<ellipse cx="32" cy="36" rx="8" ry="3" fill="${C.brick}" opacity=".45" stroke="none"/>`;
-    if (item.detail === "tabakli") t += `<ellipse cx="32" cy="50" rx="14" ry="3" fill="${hi(col)}"/><ellipse cx="32" cy="50" rx="14" ry="3" fill="none"/>`;
-    if (item.detail === "demlik") t += `<path d="M40 28 Q48 32 40 38" fill="none" stroke="${C.ink}" stroke-width="1.5"/>`;
-    return svgWrap(`<path d="M22 22 L24 46 Q32 52 40 46 L42 22Z" fill="${col}" opacity=".9"/><ellipse cx="32" cy="22" rx="10" ry="3" fill="${hi(col)}"/><ellipse cx="32" cy="22" rx="10" ry="3" fill="none"/>${t}`);
+    if (item.detail === "tabakli") t += `<ellipse cx="32" cy="50" rx="14" ry="3.2" fill="${hi(col)}" stroke="${ol(col)}" stroke-width="1.2"/>`;
+    if (item.detail === "demlik") t += `<path d="M40 28 Q48 32 40 38" fill="none" stroke="${ol(col)}" stroke-width="1.6"/>`;
+    return svgWrap(`${matDefs(pid, col)}${contactShadow(32,54,12,3)}
+      <path d="M22 22 L24 46 Q32 52 40 46 L42 22Z" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.6" opacity=".95"/>
+      <ellipse cx="32" cy="22" rx="10" ry="3.2" fill="${hi(col)}" stroke="${ol(col)}" stroke-width="1.2"/>${t}`);
   },
   mendil(item){
-    const col = COLOR_HEX[item.color] || C.white, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
+    const col = COLOR_HEX[item.color] || C.white, pid = nextPat(), pat = patternFill(item.pattern, col, pid), fill = pf(item.pattern, pid);
     let e = "";
-    if (item.detail === "nakışlı") e = `<g transform="rotate(-8 32 34)"><path d="M32 26 Q38 32 32 38 Q26 32 32 26" fill="${C.brick}" stroke="${C.ink}" stroke-width="1"/><circle cx="32" cy="32" r="2" fill="${C.mustard}" stroke="none"/></g>`;
-    if (item.detail === "katlı") e = `<path d="M16 34 L48 30" stroke="${C.ink}" stroke-width="1.6" opacity=".55" transform="rotate(-8 32 34)"/><path d="M18 40 L46 36" stroke="${lo(col)}" stroke-width="1.2" opacity=".5" transform="rotate(-8 32 34)"/>`;
-    return svgWrap(`${pat}<g transform="rotate(-8 32 34)">${fabricRect(14,16,36,36,2,fill,col,_pid)}</g>${e}`);
+    if (item.detail === "nakışlı") e = `<g transform="rotate(-8 32 34)"><path d="M32 26 Q38 32 32 38 Q26 32 32 26" fill="${C.brick}" stroke="${ol(C.brick)}" stroke-width="1"/><circle cx="32" cy="32" r="2" fill="${C.mustard}" stroke="none"/></g>`;
+    if (item.detail === "katlı") e = `<path d="M16 34 L48 30" stroke="${ol(col)}" stroke-width="1.5" opacity=".5" transform="rotate(-8 32 34)"/>`;
+    return svgWrap(`${matDefs(pid, col)}${pat}${contactShadow(32,54,16,3)}
+      <g transform="rotate(-8 32 34)">${fabricRect(14,16,36,36,2,fill,col,pid)}</g>${e}`);
   },
   canta(item){
-    const col = COLOR_HEX[item.color] || C.brown, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
-    /* Default leather strap handle */
-    let handle = `<path d="M22 24 Q22 14 32 14 Q42 14 42 24" fill="none" stroke="${C.ink}" stroke-width="2"/>`;
-    let e = "";
+    const col = COLOR_HEX[item.color] || C.brown, pid = nextPat(), pat = patternFill(item.pattern, col, pid), fill = pf(item.pattern, pid);
+    let handle = `<path d="M22 24 Q22 14 32 14 Q42 14 42 24" fill="none" stroke="${ol(col)}" stroke-width="2.1"/>`;
+    let e = stitches("M20 32 H44", col);
     if (item.detail === "zincir") {
-      /* Unmistakable metal chain: overlapping oval links — NOT a thin strap */
-      handle = `<g fill="none" stroke="${C.mustard}" stroke-width="2.2">
-        <ellipse cx="22" cy="18" rx="3.2" ry="4.2"/><ellipse cx="27" cy="14" rx="3.2" ry="4.2"/>
-        <ellipse cx="32" cy="12" rx="3.2" ry="4.2"/><ellipse cx="37" cy="14" rx="3.2" ry="4.2"/>
-        <ellipse cx="42" cy="18" rx="3.2" ry="4.2"/>
-      </g>
-      <g fill="none" stroke="${C.ink}" stroke-width="1.1">
-        <ellipse cx="22" cy="18" rx="3.2" ry="4.2"/><ellipse cx="27" cy="14" rx="3.2" ry="4.2"/>
-        <ellipse cx="32" cy="12" rx="3.2" ry="4.2"/><ellipse cx="37" cy="14" rx="3.2" ry="4.2"/>
-        <ellipse cx="42" cy="18" rx="3.2" ry="4.2"/>
-      </g>
-      <circle cx="22" cy="24" r="1.6" fill="${C.mustard}" stroke="${C.ink}" stroke-width=".9"/>
-      <circle cx="42" cy="24" r="1.6" fill="${C.mustard}" stroke="${C.ink}" stroke-width=".9"/>`;
+      handle = `<g fill="none" stroke="${C.mustard}" stroke-width="2.3">
+        <ellipse cx="22" cy="18" rx="3.3" ry="4.3"/><ellipse cx="27" cy="14" rx="3.3" ry="4.3"/>
+        <ellipse cx="32" cy="12" rx="3.3" ry="4.3"/><ellipse cx="37" cy="14" rx="3.3" ry="4.3"/>
+        <ellipse cx="42" cy="18" rx="3.3" ry="4.3"/></g>
+        <g fill="none" stroke="${ol(C.mustard)}" stroke-width="1.1">
+        <ellipse cx="22" cy="18" rx="3.3" ry="4.3"/><ellipse cx="27" cy="14" rx="3.3" ry="4.3"/>
+        <ellipse cx="32" cy="12" rx="3.3" ry="4.3"/><ellipse cx="37" cy="14" rx="3.3" ry="4.3"/>
+        <ellipse cx="42" cy="18" rx="3.3" ry="4.3"/></g>
+        <circle cx="22" cy="24" r="1.7" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width=".9"/>
+        <circle cx="42" cy="24" r="1.7" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width=".9"/>`;
     }
     if (item.detail === "püskül") {
-      e = `<g>
-        <circle cx="46" cy="40" r="2.4" fill="${lo(col)}" stroke="${C.ink}" stroke-width="1"/>
-        <line x1="46" y1="42" x2="44" y2="54" stroke="${col}" stroke-width="1.6" stroke-linecap="round"/>
-        <line x1="46" y1="42" x2="46" y2="55" stroke="${col}" stroke-width="1.6" stroke-linecap="round"/>
-        <line x1="46" y1="42" x2="48" y2="54" stroke="${col}" stroke-width="1.6" stroke-linecap="round"/>
+      e += `<g><circle cx="46" cy="40" r="2.5" fill="${lo(col)}" stroke="${ol(col)}" stroke-width="1"/>
+        <line x1="46" y1="42" x2="44" y2="54" stroke="${col}" stroke-width="1.7" stroke-linecap="round"/>
+        <line x1="46" y1="42" x2="46" y2="55" stroke="${col}" stroke-width="1.7" stroke-linecap="round"/>
+        <line x1="46" y1="42" x2="48" y2="54" stroke="${col}" stroke-width="1.7" stroke-linecap="round"/>
         <line x1="46" y1="42" x2="50" y2="52" stroke="${lo(col)}" stroke-width="1.4" stroke-linecap="round"/>
-        <line x1="46" y1="42" x2="42" y2="52" stroke="${lo(col)}" stroke-width="1.4" stroke-linecap="round"/>
-      </g>`;
+        <line x1="46" y1="42" x2="42" y2="52" stroke="${lo(col)}" stroke-width="1.4" stroke-linecap="round"/></g>`;
     }
-    return svgWrap(`${pat}${fabricRect(16,24,32,26,3,fill,col,_pid)}
+    return svgWrap(`${matDefs(pid, col)}${pat}${contactShadow(32,54,16,3)}
+      ${fabricRect(16,24,32,26,3,fill,col,pid)}
+      ${volumeSERect(16,24,32,26,3,col)}
+      <path d="M18 26 H28 V46 H18Z" fill="${hi(col)}" opacity=".18" stroke="none"/>
       ${handle}${e}`);
   },
   oyuncak(item){
-    /* Toy car — details change silhouette clearly (van / wood block / racer) */
-    const col = COLOR_HEX[item.color] || C.red;
+    const col = COLOR_HEX[item.color] || C.red, pid = nextPat();
     if (item.detail === "ahşap") {
-      return svgWrap(`<rect x="12" y="28" width="40" height="18" rx="2" fill="${col}" stroke="${C.ink}" stroke-width="1.5"/>
-        <rect x="16" y="20" width="16" height="10" rx="1" fill="${hi(col)}" stroke="${C.ink}" stroke-width="1.2"/>
-        <circle cx="20" cy="48" r="5" fill="${C.ink}"/><circle cx="44" cy="48" r="5" fill="${C.ink}"/>
-        <circle cx="20" cy="48" r="2" fill="${C.cream}" stroke="none"/><circle cx="44" cy="48" r="2" fill="${C.cream}" stroke="none"/>
-        <line x1="14" y1="34" x2="50" y2="34" stroke="${C.ink}" stroke-width="1" opacity=".4"/>`);
+      return svgWrap(`${matDefs(pid, col)}${contactShadow(32,52,18,3)}
+        <rect x="12" y="28" width="40" height="18" rx="2" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.6"/>
+        <rect x="16" y="20" width="16" height="10" rx="1" fill="${hi(col)}" stroke="${ol(col)}" stroke-width="1.2"/>
+        ${woodGrain(14,30,36,14,col)}
+        <circle cx="20" cy="48" r="5.2" fill="${C.ink}" stroke="none"/><circle cx="44" cy="48" r="5.2" fill="${C.ink}" stroke="none"/>
+        <circle cx="20" cy="48" r="2.1" fill="${C.cream}" stroke="none"/><circle cx="44" cy="48" r="2.1" fill="${C.cream}" stroke="none"/>`);
     }
     if (item.detail === "sürtmeli") {
-      return svgWrap(`<path d="M10 38 L16 24 Q22 16 36 16 L52 20 L56 38 L54 46 L12 46Z" fill="${col}" stroke="${C.ink}" stroke-width="1.5"/>
-        <path d="M20 24 L34 24 L38 36 L18 36Z" fill="${C.sky}" opacity=".75" stroke="${C.ink}" stroke-width="1"/>
-        <rect x="40" y="26" width="8" height="5" rx="1" fill="${C.mustard}" stroke="${C.ink}" stroke-width="1"/>
-        <circle cx="20" cy="46" r="5.5" fill="${C.ink}"/><circle cx="46" cy="46" r="5.5" fill="${C.ink}"/>
-        <circle cx="20" cy="46" r="2.2" fill="${C.mustard}" stroke="none"/><circle cx="46" cy="46" r="2.2" fill="${C.mustard}" stroke="none"/>`);
+      return svgWrap(`${matDefs(pid, col)}${contactShadow(32,50,20,3)}
+        <path d="M10 38 L16 24 Q22 16 36 16 L52 20 L56 38 L54 46 L12 46Z" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.6"/>
+        <path d="M20 24 L34 24 L38 36 L18 36Z" fill="${C.sky}" opacity=".8" stroke="${ol(col)}" stroke-width="1"/>
+        <rect x="40" y="26" width="8" height="5" rx="1" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width="1"/>
+        <circle cx="20" cy="46" r="5.6" fill="${C.ink}" stroke="none"/><circle cx="46" cy="46" r="5.6" fill="${C.ink}" stroke="none"/>
+        <circle cx="20" cy="46" r="2.3" fill="${C.mustard}" stroke="none"/><circle cx="46" cy="46" r="2.3" fill="${C.mustard}" stroke="none"/>`);
     }
-    // default hatchback / city car
-    return svgWrap(`<path d="M14 36 L18 26 Q22 20 32 20 L46 22 L50 36 L48 42 L16 42Z" fill="${col}" stroke="${C.ink}" stroke-width="1.5"/>
-      <rect x="20" y="24" width="10" height="8" rx="1" fill="${C.sky}" opacity=".7" stroke="${C.ink}" stroke-width="1"/>
-      <rect x="34" y="24" width="10" height="8" rx="1" fill="${C.sky}" opacity=".7" stroke="${C.ink}" stroke-width="1"/>
-      <circle cx="22" cy="42" r="4.5" fill="${C.ink}"/><circle cx="42" cy="42" r="4.5" fill="${C.ink}"/>
-      <circle cx="22" cy="42" r="1.8" fill="${C.cream}" stroke="none"/><circle cx="42" cy="42" r="1.8" fill="${C.cream}" stroke="none"/>`);
+    return svgWrap(`${matDefs(pid, col)}${contactShadow(32,48,18,3)}
+      <path d="M14 36 L18 26 Q22 20 32 20 L46 22 L50 36 L48 42 L16 42Z" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.7"/>
+      <path d="M40 22 L48 36 L48 42 L40 42Z" fill="${deep(col)}" opacity=".25" stroke="none"/>
+      <rect x="20" y="24" width="10" height="8" rx="1" fill="${C.sky}" opacity=".8" stroke="${ol(col)}" stroke-width="1"/>
+      <rect x="34" y="24" width="10" height="8" rx="1" fill="${C.sky}" opacity=".8" stroke="${ol(col)}" stroke-width="1"/>
+      <path d="M21 25 H28" stroke="${hi(C.sky)}" stroke-width="1.2" opacity=".6"/>
+      <circle cx="46" cy="34" r="1.6" fill="${C.yellow}" stroke="${ol(C.yellow)}" stroke-width=".8"/>
+      <circle cx="22" cy="42" r="5" fill="${C.ink}" stroke="none"/><circle cx="42" cy="42" r="5" fill="${C.ink}" stroke="none"/>
+      <circle cx="22" cy="42" r="2.1" fill="${C.gray}" stroke="none"/><circle cx="42" cy="42" r="2.1" fill="${C.gray}" stroke="none"/>
+      <circle cx="22" cy="42" r="0.9" fill="${C.cream}" stroke="none"/><circle cx="42" cy="42" r="0.9" fill="${C.cream}" stroke="none"/>`);
   },
+
   biskuvikutusu(item){
-    const col = COLOR_HEX[item.color] || C.mustard;
+    const col = COLOR_HEX[item.color] || C.mustard, pid = nextPat();
     let e = "";
-    if (item.detail === "etiket") e = `<rect x="24" y="26" width="16" height="12" rx="1" fill="${C.cream}"/><text></text>`;
-    if (item.detail === "açık") e = `<path d="M16 22 L32 14 L48 22" fill="${hi(col)}" opacity=".5"/>`;
-    return svgWrap(`<rect x="16" y="20" width="32" height="28" rx="2" fill="${col}"/><rect x="18" y="22" width="10" height="24" fill="${hi(col)}" opacity=".25" stroke="none"/><line x1="16" y1="28" x2="48" y2="28" stroke="${C.ink}" stroke-width="1"/>${e}`);
+    if (item.detail === "etiket") e = `<rect x="24" y="26" width="16" height="12" rx="1" fill="${C.cream}" stroke="${ol(C.cream)}" stroke-width="1"/>`;
+    if (item.detail === "açık") e = `<path d="M16 22 L32 14 L48 22" fill="${hi(col)}" opacity=".55" stroke="${ol(col)}" stroke-width="1.2"/>`;
+    return svgWrap(`${matDefs(pid, col)}${contactShadow(32,52,16,3)}
+      <rect x="16" y="20" width="32" height="28" rx="2" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.7"/>
+      <rect x="18" y="22" width="10" height="24" fill="${hi(col)}" opacity=".28" stroke="none"/>
+      <line x1="16" y1="28" x2="48" y2="28" stroke="${ol(col)}" stroke-width="1"/>${e}`);
   },
   anahtar(item){
-    /* Classic house key — bow, shaft, bit teeth. Never a magnifying glass. */
-    const col = COLOR_HEX[item.color] || C.mustard;
-    const metal = col;
+    const col = COLOR_HEX[item.color] || C.mustard, pid = nextPat();
     let second = "";
     if (item.detail === "çift") {
-      second = `<g transform="translate(10,4) rotate(18)" opacity=".9">
-        <circle cx="18" cy="16" r="7" fill="${metal}" stroke="${C.ink}" stroke-width="1.4"/>
-        <circle cx="18" cy="16" r="3" fill="${C.cream}" stroke="${C.ink}" stroke-width="1"/>
-        <rect x="16" y="22" width="4" height="20" rx="1" fill="${metal}" stroke="${C.ink}" stroke-width="1.2"/>
-        <path d="M20 34 h7 v3 h-3 v3 h3 v3 h-7" fill="${metal}" stroke="${C.ink}" stroke-width="1.1"/>
+      second = `<g transform="translate(10,4) rotate(18)" opacity=".92">
+        <circle cx="18" cy="16" r="7" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.4"/>
+        <circle cx="18" cy="16" r="3" fill="${C.cream}" stroke="${ol(col)}" stroke-width="1"/>
+        <rect x="16" y="22" width="4" height="20" rx="1" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.2"/>
+        <path d="M20 34 h7 v3 h-3 v3 h3 v3 h-7" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.1"/>
       </g>`;
     }
-    return svgWrap(`${second}
-      <circle cx="20" cy="18" r="9" fill="${metal}" stroke="${C.ink}" stroke-width="1.6"/>
-      <circle cx="20" cy="18" r="4" fill="${C.cream}" stroke="${C.ink}" stroke-width="1.2"/>
-      <rect x="17.5" y="26" width="5" height="22" rx="1.2" fill="${metal}" stroke="${C.ink}" stroke-width="1.3"/>
-      <path d="M22.5 36 h8 v3.5 h-3.5 v3 h3.5 v3.5 h-8" fill="${metal}" stroke="${C.ink}" stroke-width="1.2"/>
+    return svgWrap(`${matDefs(pid, col, {metal:true})}${contactShadow(28,56,16,3)}${second}
+      <circle cx="20" cy="18" r="9.2" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.7"/>
+      <circle cx="20" cy="18" r="4.1" fill="${C.cream}" stroke="${ol(col)}" stroke-width="1.2"/>
+      <rect x="17.4" y="26" width="5.2" height="22" rx="1.2" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.3"/>
+      <path d="M22.6 36 h8 v3.5 h-3.5 v3 h3.5 v3.5 h-8" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.2"/>
       ${item.detail==="metal"?`<rect x="17" y="28" width="6" height="3" fill="${C.gray}" stroke="none"/>`:""}`);
   },
   cuzdan_kart(item){
-    /* Transit/ID card */
-    const col = COLOR_HEX[item.color] || C.navy;
-    let e = `<rect x="22" y="26" width="12" height="10" rx="1" fill="${C.cream}"/>`;
-    if (item.detail === "fotoğraflı") e = `<rect x="20" y="24" width="10" height="12" rx="1" fill="${C.blush}"/><rect x="34" y="26" width="12" height="3" fill="${C.cream}" stroke="none"/>`;
-    if (item.detail === "magnetik") e = `<rect x="18" y="40" width="28" height="4" fill="${C.black}"/>`;
-    return svgWrap(`<rect x="14" y="20" width="36" height="28" rx="3" fill="${col}"/><rect x="16" y="22" width="8" height="24" fill="${hi(col)}" opacity=".2" stroke="none"/>${e}`);
+    const col = COLOR_HEX[item.color] || C.navy, pid = nextPat();
+    let e = `<rect x="22" y="26" width="12" height="10" rx="1" fill="${C.cream}" stroke="${ol(C.cream)}" stroke-width="1"/>`;
+    if (item.detail === "fotoğraflı") e = `<rect x="20" y="24" width="10" height="12" rx="1" fill="${C.blush}" stroke="${ol(C.blush)}" stroke-width="1"/><rect x="34" y="26" width="12" height="3" fill="${C.cream}" stroke="none"/>`;
+    if (item.detail === "magnetik") e = `<rect x="18" y="40" width="28" height="4" fill="${C.black}" stroke="none"/>`;
+    return svgWrap(`${matDefs(pid, col)}${contactShadow(32,52,16,3)}
+      <rect x="14" y="20" width="36" height="28" rx="3" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.7"/>
+      <rect x="16" y="22" width="8" height="24" fill="${hi(col)}" opacity=".22" stroke="none"/>${e}`);
   },
   saksi(item){
-    const col = COLOR_HEX[item.color] || C.brick;
-    let leaf = `<ellipse cx="28" cy="22" rx="6" ry="10" fill="${C.green}" transform="rotate(-20 28 22)"/><ellipse cx="36" cy="20" rx="5" ry="9" fill="${C.sage}" transform="rotate(15 36 20)"/>`;
-    if (item.detail === "kaktüs") leaf = `<rect x="28" y="14" width="8" height="18" rx="2" fill="${C.green}"/><line x1="28" y1="20" x2="24" y2="18" stroke="${C.green}" stroke-width="2"/><line x1="36" y1="24" x2="40" y2="22" stroke="${C.green}" stroke-width="2"/>`;
-    if (item.detail === "çiçekli") leaf += `<circle cx="32" cy="16" r="3" fill="${C.pink}"/>`;
-    return svgWrap(`${leaf}<path d="M22 32 L26 50 Q32 54 38 50 L42 32Z" fill="${col}"/><ellipse cx="32" cy="32" rx="10" ry="3" fill="${lo(col)}"/>`);
+    const col = COLOR_HEX[item.color] || C.brick, pid = nextPat();
+    let leaf = `<ellipse cx="28" cy="22" rx="6" ry="10" fill="${C.green}" stroke="${ol(C.green)}" stroke-width="1.2" transform="rotate(-20 28 22)"/><ellipse cx="36" cy="20" rx="5" ry="9" fill="${C.sage}" stroke="${ol(C.sage)}" stroke-width="1.1" transform="rotate(15 36 20)"/>`;
+    if (item.detail === "kaktüs") leaf = `<rect x="28" y="14" width="8" height="18" rx="2" fill="${C.green}" stroke="${ol(C.green)}" stroke-width="1.3"/><line x1="28" y1="20" x2="24" y2="18" stroke="${C.green}" stroke-width="2"/><line x1="36" y1="24" x2="40" y2="22" stroke="${C.green}" stroke-width="2"/>`;
+    if (item.detail === "çiçekli") leaf += `<circle cx="32" cy="16" r="3.2" fill="${C.pink}" stroke="${ol(C.pink)}" stroke-width="1"/>`;
+    return svgWrap(`${matDefs(pid, col)}${contactShadow(32,54,12,3)}${leaf}
+      <path d="M22 32 L26 50 Q32 54 38 50 L42 32Z" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.6"/>
+      <ellipse cx="32" cy="32" rx="10" ry="3.2" fill="${lo(col)}" stroke="${ol(col)}" stroke-width="1.1"/>`);
   },
   top(item){
-    const col = COLOR_HEX[item.color] || C.red;
-    let e = `<path d="M32 16 Q40 32 32 48 Q24 32 32 16" fill="none" stroke="${C.ink}" stroke-width="1.2" opacity=".4"/><path d="M18 28 Q32 34 46 28" fill="none" stroke="${C.ink}" stroke-width="1.2" opacity=".4"/>`;
-    if (item.detail === "çizgili") e = `<path d="M16 28 H48 M16 36 H48" stroke="${C.cream}" stroke-width="2" opacity=".7"/>`;
-    if (item.detail === "yıldızlı") e = `<polygon points="32,22 34,28 40,28 35,32 37,38 32,34 27,38 29,32 24,28 30,28" fill="${C.mustard}"/>`;
-    return svgWrap(`<circle cx="32" cy="32" r="16" fill="${col}"/><path d="M20 24 Q28 18 36 22" fill="${hi(col)}" opacity=".35" stroke="none"/>${e}`);
+    const col = COLOR_HEX[item.color] || C.red, pid = nextPat();
+    let e = `<path d="M32 16 Q40 32 32 48 Q24 32 32 16" fill="none" stroke="${ol(col)}" stroke-width="1.2" opacity=".4"/><path d="M18 28 Q32 34 46 28" fill="none" stroke="${ol(col)}" stroke-width="1.2" opacity=".4"/>`;
+    if (item.detail === "çizgili") e = `<path d="M16 28 H48 M16 36 H48" stroke="${C.cream}" stroke-width="2.1" opacity=".75"/>`;
+    if (item.detail === "yıldızlı") e = `<polygon points="32,22 34,28 40,28 35,32 37,38 32,34 27,38 29,32 24,28 30,28" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width="1"/>`;
+    return svgWrap(`${matDefs(pid, col)}${contactShadow(32,50,14,3)}
+      <circle cx="32" cy="32" r="16.5" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.8"/>
+      <path d="M20 24 Q28 18 36 22" fill="${hi(col)}" opacity=".35" stroke="none"/>${e}`);
   },
   mum(item){
-    const col = COLOR_HEX[item.color] || C.cream;
-    let flame = `<ellipse cx="32" cy="16" rx="3" ry="5" fill="${C.yellow}"/><ellipse cx="32" cy="15" rx="1.5" ry="3" fill="${C.orange}" stroke="none"/>`;
-    if (item.detail === "sönük") flame = `<line x1="32" y1="18" x2="32" y2="22" stroke="${C.ink}" stroke-width="1.2"/>`;
-    if (item.detail === "kokulu") flame += `<path d="M26 28 Q32 24 38 28" fill="none" stroke="${C.pink}" stroke-width="1" opacity=".5"/>`;
-    return svgWrap(`${flame}<rect x="26" y="22" width="12" height="28" rx="2" fill="${col}"/><rect x="28" y="24" width="4" height="24" fill="${hi(col)}" opacity=".3" stroke="none"/><ellipse cx="32" cy="50" rx="10" ry="3" fill="${lo(col)}"/>`);
+    const col = COLOR_HEX[item.color] || C.cream, pid = nextPat();
+    let flame = `<ellipse cx="32" cy="16" rx="3.2" ry="5.2" fill="${C.yellow}" stroke="${ol(C.yellow)}" stroke-width="1"/><ellipse cx="32" cy="15" rx="1.6" ry="3.1" fill="${C.orange}" stroke="none"/>`;
+    if (item.detail === "sönük") flame = `<line x1="32" y1="18" x2="32" y2="22" stroke="${ol(col)}" stroke-width="1.3"/>`;
+    if (item.detail === "kokulu") flame += `<path d="M26 28 Q32 24 38 28" fill="none" stroke="${C.pink}" stroke-width="1.1" opacity=".55"/>`;
+    return svgWrap(`${matDefs(pid, col)}${contactShadow(32,54,12,3)}${flame}
+      <rect x="26" y="22" width="12" height="28" rx="2" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.6"/>
+      <rect x="28" y="24" width="4" height="24" fill="${hi(col)}" opacity=".32" stroke="none"/>
+      <ellipse cx="32" cy="50" rx="10" ry="3" fill="${lo(col)}" stroke="none"/>`);
   },
   gozluk_gunes(item){
-    const col = COLOR_HEX[item.color] || C.black;
-    let lenses = `<ellipse cx="22" cy="32" rx="10" ry="8" fill="${lo(col)}"/><ellipse cx="42" cy="32" rx="10" ry="8" fill="${lo(col)}"/>`;
+    const col = COLOR_HEX[item.color] || C.black, pid = nextPat();
+    let lenses = `<ellipse cx="22" cy="32" rx="10.5" ry="8.2" fill="${lo(col)}" stroke="${ol(col)}" stroke-width="1.6"/><ellipse cx="42" cy="32" rx="10.5" ry="8.2" fill="${lo(col)}" stroke="${ol(col)}" stroke-width="1.6"/>`;
     if (item.detail === "kare_cam") {
-      lenses = `<rect x="12" y="24" width="20" height="16" rx="2" fill="${lo(col)}"/><rect x="32" y="24" width="20" height="16" rx="2" fill="${lo(col)}"/>`;
+      lenses = `<rect x="12" y="24" width="20" height="16" rx="2" fill="${lo(col)}" stroke="${ol(col)}" stroke-width="1.7"/><rect x="32" y="24" width="20" height="16" rx="2" fill="${lo(col)}" stroke="${ol(col)}" stroke-width="1.7"/>`;
     }
-    let wear = `<path d="M16 28 Q22 26 28 28" fill="none" stroke="${hi(col)}" stroke-width="1" opacity=".5"/>`;
+    let wear = `<path d="M16 28 Q22 26 28 28" fill="none" stroke="${hi(col)}" stroke-width="1.1" opacity=".5"/>`;
     if (item.detail === "eski") {
-      wear = `<path d="M16 28 L28 36 M18 36 L26 28" stroke="${C.cream}" stroke-width="1.2" opacity=".6"/>
-        <rect x="18" y="22" width="7" height="2.5" rx="0.4" fill="${C.mustard}" stroke="${C.ink}" stroke-width=".7"/>`;
+      wear = `<path d="M16 28 L28 36 M18 36 L26 28" stroke="${C.cream}" stroke-width="1.2" opacity=".55"/>
+        <rect x="18" y="22" width="7" height="2.5" rx="0.4" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width=".7"/>`;
     }
-    return svgWrap(`<path d="M14 30 Q8 28 6 26" fill="none" stroke="${col}" stroke-width="1.8"/><path d="M50 30 Q56 28 58 26" fill="none" stroke="${col}" stroke-width="1.8"/><path d="M30 32 H34" stroke="${col}" stroke-width="2"/>${lenses}${wear}`);
+    return svgWrap(`${matDefs(pid, col)}${contactShadow(32,48,20,3)}
+      <path d="M14 30 Q8 28 6 26" fill="none" stroke="${ol(col)}" stroke-width="1.9"/>
+      <path d="M50 30 Q56 28 58 26" fill="none" stroke="${ol(col)}" stroke-width="1.9"/>
+      <path d="M30 32 H34" stroke="${ol(col)}" stroke-width="2.1"/>${lenses}${wear}`);
   },
   fener(item){
-    const col = COLOR_HEX[item.color] || C.yellow;
+    const col = COLOR_HEX[item.color] || C.yellow, pid = nextPat();
     let e = "";
-    if (item.detail === "açık") e = `<path d="M24 20 L32 8 L40 20" fill="${C.yellow}" opacity=".5" stroke="none"/>`;
-    if (item.detail === "kırık") e = `<path d="M30 28 L34 26" stroke="${C.ink}" stroke-width="1.2"/>`;
-    return svgWrap(`<rect x="24" y="22" width="16" height="10" rx="2" fill="${col}"/><rect x="26" y="32" width="12" height="18" rx="2" fill="${lo(col)}"/><circle cx="32" cy="28" r="3" fill="${C.cream}" stroke="none"/>${e}`);
+    if (item.detail === "açık") e = `<path d="M24 20 L32 8 L40 20" fill="${C.yellow}" opacity=".55" stroke="none"/>`;
+    if (item.detail === "kırık") e = `<path d="M30 28 L34 26" stroke="${ol(col)}" stroke-width="1.3"/>`;
+    return svgWrap(`${matDefs(pid, col)}${contactShadow(32,54,10,2.5)}
+      <rect x="24" y="22" width="16" height="10" rx="2" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.5"/>
+      <rect x="26" y="32" width="12" height="18" rx="2" fill="${lo(col)}" stroke="${ol(col)}" stroke-width="1.4"/>
+      <circle cx="32" cy="28" r="3.2" fill="${C.cream}" stroke="none"/>${e}`);
   },
   bisiklettok(item){
-    /* Bike lock — U shape + bar; dial / keyhole must read at card size */
-    const col = COLOR_HEX[item.color] || C.black;
+    const col = COLOR_HEX[item.color] || C.black, pid = nextPat();
     let e = "";
     if (item.detail === "şifreli") {
-      e = `<rect x="24" y="38" width="16" height="10" rx="2" fill="${C.mustard}" stroke="${C.ink}" stroke-width="1.1"/>
-        <circle cx="28" cy="43" r="2.6" fill="${C.cream}" stroke="${C.ink}" stroke-width=".9"/>
-        <circle cx="36" cy="43" r="2.6" fill="${C.cream}" stroke="${C.ink}" stroke-width=".9"/>
+      e = `<rect x="24" y="38" width="16" height="10" rx="2" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width="1.2"/>
+        <circle cx="28" cy="43" r="2.7" fill="${C.cream}" stroke="${ol(C.cream)}" stroke-width=".9"/>
+        <circle cx="36" cy="43" r="2.7" fill="${C.cream}" stroke="${ol(C.cream)}" stroke-width=".9"/>
         <line x1="28" y1="43" x2="28" y2="41" stroke="${C.ink}" stroke-width="1"/>
-        <line x1="36" y1="43" x2="37.2" y2="41.5" stroke="${C.ink}" stroke-width="1"/>
-        <text x="28" y="44.5" text-anchor="middle" font-size="3.2" fill="${C.ink}" stroke="none">3</text>
-        <text x="36" y="44.5" text-anchor="middle" font-size="3.2" fill="${C.ink}" stroke="none">7</text>`;
+        <line x1="36" y1="43" x2="37.2" y2="41.5" stroke="${C.ink}" stroke-width="1"/>`;
     }
     if (item.detail === "anahtarlı") {
-      e = `<circle cx="40" cy="42" r="3.4" fill="${C.mustard}" stroke="${C.ink}" stroke-width="1.1"/>
-        <circle cx="40" cy="42" r="1.4" fill="${C.ink}" stroke="none"/>
+      e = `<circle cx="40" cy="42" r="3.5" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width="1.2"/>
+        <circle cx="40" cy="42" r="1.5" fill="${C.ink}" stroke="none"/>
         <rect x="39" y="43.5" width="2" height="4" fill="${C.ink}" stroke="none"/>`;
     }
-    return svgWrap(`<path d="M20 36 Q20 16 32 14 Q44 16 44 36" fill="none" stroke="${col}" stroke-width="3.5"/><rect x="18" y="36" width="28" height="12" rx="2" fill="${col}" stroke="${C.ink}" stroke-width="1.3"/>${e}`);
+    return svgWrap(`${matDefs(pid, col, {metal:true})}${contactShadow(32,52,14,3)}
+      <path d="M20 36 Q20 16 32 14 Q44 16 44 36" fill="none" stroke="${ol(col)}" stroke-width="3.8"/>
+      <rect x="18" y="36" width="28" height="12" rx="2" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.4"/>${e}`);
   },
   sal(item){
-    /* Folded triangle shawl — fringe / embroidery vary by detail */
-    const col = COLOR_HEX[item.color] || C.purple, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
+    const col = COLOR_HEX[item.color] || C.purple, pid = nextPat(), pat = patternFill(item.pattern, col, pid), fill = pf(item.pattern, pid);
     const shape = "M8 24 L32 10 L56 24 L50 46 L32 40 L14 46Z";
     const fold = "M14 24 L32 16 L50 24 L32 28Z";
     let fringe = `<g stroke="${lo(col)}" stroke-width="1.3" stroke-linecap="round">
       <line x1="14" y1="46" x2="13" y2="52"/><line x1="26" y1="42" x2="26" y2="50"/>
       <line x1="32" y1="40" x2="32" y2="50"/><line x1="38" y1="42" x2="38" y2="50"/>
-      <line x1="50" y1="46" x2="51" y2="52"/>
-    </g>`;
+      <line x1="50" y1="46" x2="51" y2="52"/></g>`;
     let decor = "";
     if (item.detail === "püskül") {
-      fringe = `<g stroke="${col}" stroke-width="1.8" stroke-linecap="round">
+      fringe = `<g stroke="${col}" stroke-width="1.9" stroke-linecap="round">
         <line x1="14" y1="46" x2="10" y2="58"/><line x1="18" y1="45" x2="15" y2="58"/><line x1="22" y1="43" x2="20" y2="57"/>
         <line x1="26" y1="42" x2="26" y2="56"/><line x1="32" y1="40" x2="32" y2="56"/>
         <line x1="38" y1="42" x2="38" y2="56"/><line x1="42" y1="43" x2="44" y2="57"/>
-        <line x1="46" y1="45" x2="49" y2="58"/><line x1="50" y1="46" x2="54" y2="58"/>
-      </g>
-      <circle cx="20" cy="45" r="1.8" fill="${lo(col)}" stroke="${C.ink}" stroke-width=".8"/>
-      <circle cx="44" cy="45" r="1.8" fill="${lo(col)}" stroke="${C.ink}" stroke-width=".8"/>`;
+        <line x1="46" y1="45" x2="49" y2="58"/><line x1="50" y1="46" x2="54" y2="58"/></g>
+        <circle cx="20" cy="45" r="1.9" fill="${lo(col)}" stroke="${ol(col)}" stroke-width=".8"/>
+        <circle cx="44" cy="45" r="1.9" fill="${lo(col)}" stroke="${ol(col)}" stroke-width=".8"/>`;
     }
     if (item.detail === "desenli") {
       decor = `<path d="M20 28 Q32 22 44 28" fill="none" stroke="${C.mustard}" stroke-width="1.5"/>
         <path d="M22 34 Q32 40 42 34" fill="none" stroke="${C.mustard}" stroke-width="1.3"/>
-        <circle cx="32" cy="30" r="2.5" fill="${C.mustard}" stroke="${C.ink}" stroke-width=".9"/>`;
+        <circle cx="32" cy="30" r="2.6" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width=".9"/>`;
     }
-    return svgWrap(`${pat}${fabricPath(shape, fill, col, _pid, 1.5)}
-      <path d="${fold}" fill="${hi(col)}" opacity=".35" stroke="${C.ink}" stroke-width="1"/>
+    return svgWrap(`${matDefs(pid, col)}${pat}${contactShadow(32,54,20,3)}
+      ${fabricPath(shape, fill, col, pid, 1.7)}
+      <path d="${fold}" fill="${hi(col)}" opacity=".35" stroke="${ol(col)}" stroke-width="1.1"/>
       ${decor}${fringe}`);
   },
   ceptelefonu(item){
-    /* Distinct from kılıf — bare phone thinner */
-    const col = COLOR_HEX[item.color] || C.black;
-    let e = `<rect x="24" y="18" width="16" height="26" rx="1" fill="${C.sky}" opacity=".4" stroke="none"/>`;
-    if (item.detail === "kırık") e += `<path d="M28 24 L36 40" stroke="${C.cream}" stroke-width="1.2"/>`;
-    if (item.detail === "kılıflı") e += `<rect x="20" y="12" width="24" height="42" rx="4" fill="none" stroke="${C.brick}" stroke-width="2"/>`;
-    return svgWrap(`<rect x="22" y="12" width="20" height="42" rx="3" fill="${col}"/><circle cx="32" cy="48" r="1.5" fill="${C.cream}" stroke="none"/>${e}`);
+    const col = COLOR_HEX[item.color] || C.black, pid = nextPat();
+    let e = `<rect x="24" y="18" width="16" height="26" rx="1" fill="${C.sky}" opacity=".45" stroke="none"/>`;
+    if (item.detail === "kırık") e += `<path d="M28 24 L36 40" stroke="${C.cream}" stroke-width="1.3"/>`;
+    if (item.detail === "kılıflı") e += `<rect x="20" y="12" width="24" height="42" rx="4" fill="none" stroke="${C.brick}" stroke-width="2.2"/>`;
+    return svgWrap(`${matDefs(pid, col)}${contactShadow(32,56,10,2.5)}
+      <rect x="22" y="12" width="20" height="42" rx="3" fill="url(#lg${pid})" stroke="${ol(col)}" stroke-width="1.7"/>
+      <circle cx="32" cy="48" r="1.6" fill="${C.cream}" stroke="none"/>${e}`);
   }
 };
+
 
 const TYPE_TR = {
   semsiye:"şemsiye",cuzdan:"cüzdan",anahtarlik:"anahtarlık",sapka:"şapka",eldiven:"eldiven",kitap:"kitap",ayi:"oyuncak ayı",gozluk:"gözlük",atki:"atkı",telefon:"telefon kılıfı",
@@ -1147,7 +1415,7 @@ const DETAIL_TR = {
   susam:"susamlı",peyirli:"peynirli",tabakli:"tabaklı",demlik:"kulplu",nakışlı:"nakışlı",katlı:"katlanmış",zincir:"zincirli",sürtmeli:"sürtmeli",ahşap:"ahşap",fotoğraflı:"fotoğraflı",magnetik:"manyetik şeritli",
   kaktüs:"kaktüs",çiçekli:"çiçekli",çizgili:"çizgili top",sönük:"sönük",kokulu:"kokulu",şifreli:"şifreli",anahtarlı:"anahtarlı",tek:"tek anahtarlı",tek_anahtar:"tek anahtarlı",kılıflı:"kılıflı"
 };
-/** Per-item bbox fit: silhouette fills ~72–78% of card with safe padding. */
+/** Ground-biased fit: keep contact shadow in the bottom ~20% of the card. */
 function fitItemSvg(svgStr){
   if (typeof document === "undefined") return svgStr;
   try {
@@ -1164,19 +1432,22 @@ function fitItemSvg(svgStr){
     if (!svg || !g) return svgStr;
     const bb = g.getBBox();
     if (!bb.width || !bb.height || !isFinite(bb.width)) return svgStr;
-    /* Target: content spans ~76% of square viewBox → pad ≈ 12% each side of max axis */
-    const pad = Math.max(bb.width, bb.height) * 0.10;
+    const pad = Math.max(bb.width, bb.height) * 0.09;
     const side = Math.max(bb.width, bb.height) + pad * 2;
     const cx = bb.x + bb.width / 2;
-    const cy = bb.y + bb.height / 2;
-    svg.setAttribute("viewBox", (cx - side / 2) + " " + (cy - side / 2) + " " + side + " " + side);
+    /* Bias: content bottom sits near 90% of the square viewBox */
+    const bottom = bb.y + bb.height;
+    const top = bottom + pad * 0.35 - side;
+    const left = cx - side / 2;
+    svg.setAttribute("viewBox", left + " " + top + " " + side + " " + side);
+    svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
     svg.removeAttribute("width"); svg.removeAttribute("height");
     return host.innerHTML;
   } catch (_) { return svgStr; }
 }
 function drawItem(item){
   const fn = ItemDraw[item.type];
-  const raw = fn ? fn(item) : svgWrap(`<circle cx="32" cy="32" r="14" fill="${C.mustard}"/>`);
+  const raw = fn ? fn(item) : svgWrap(`${contactShadow(32,56,14,4)}<circle cx="32" cy="32" r="14" fill="${C.mustard}" stroke="${ol(C.mustard)}" stroke-width="1.8"/>`);
   return fitItemSvg(raw);
 }
 
@@ -1251,11 +1522,12 @@ function drawVisitor(v,expr){
   return `<svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" overflow="visible">
     <style>
       @keyframes ${bid}{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.08)}}
-      @keyframes ${breath}{0%,100%{transform:translateY(0)}50%{transform:translateY(1.1px)}}
-      .e${bid}{transform-origin:center;transform-box:fill-box;animation:${bid} 3.8s ease-in-out infinite}
-      .idle${breath}{animation:${breath} 3.1s ease-in-out infinite}
+      @keyframes ${breath}{0%,100%{transform:translateY(0)}50%{transform:translateY(0.55px)}}
+      .e${bid}{transform-origin:center;transform-box:fill-box;animation:${bid} 4.2s ease-in-out infinite}
+      .idle${breath}{animation:${breath} 3.4s ease-in-out infinite}
     </style>
-    <g transform="translate(0 ${yOff}) scale(${scale})" transform-origin="50 110" stroke="${C.ink}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="50" cy="114" rx="22" ry="4.5" fill="#2A2218" opacity=".18" stroke="none"/>
+    <g transform="translate(0 ${yOff}) scale(${scale})" transform-origin="50 110" stroke="${C.ink}" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round">
     <g class="idle${breath}">
       ${v.behind||""}
       ${torso}
@@ -1463,7 +1735,11 @@ function drawOffice(weather,hour,decors){
       <line x1="5" y1="6" x2="21" y2="6"/><line x1="5" y1="10" x2="18" y2="10"/><line x1="5" y1="14" x2="20" y2="14"/>
       <circle cx="4" cy="2" r="1.2" fill="${C.brick}"/><circle cx="24" cy="2" r="1.2" fill="${C.brick}"/>
     </g>
-    <rect y="72" width="140" height="18" fill="url(#woodGrain)" stroke="${C.ink}" stroke-width="1.2"/>
+    <rect y="70" width="140" height="20" fill="#8B6914" stroke="${C.ink}" stroke-width="1.3"/>
+    <rect y="70" width="140" height="6" fill="#A67C2A" opacity=".45" stroke="none"/>
+    <path d="M0 78 Q35 76 70 79 Q105 82 140 77" fill="none" stroke="${C.ink}" stroke-width=".6" opacity=".25"/>
+    <path d="M0 84 Q40 82 80 85 Q120 87 140 83" fill="none" stroke="${C.ink}" stroke-width=".5" opacity=".2"/>
+    <ellipse cx="70" cy="88" rx="50" ry="2.5" fill="#2A2218" opacity=".12" stroke="none"/>
     <rect x="55" y="6" width="52" height="46" rx="2" fill="${w.sky}" stroke="${C.ink}" stroke-width="2.2"/>
     <line x1="81" y1="6" x2="81" y2="52" stroke="${C.ink}" stroke-width="1.4"/>
     <line x1="55" y1="29" x2="107" y2="29" stroke="${C.ink}" stroke-width="1.4"/>
@@ -2561,11 +2837,15 @@ const QueueSys = {
     rail.innerHTML = visitors.map((v, i) => {
       if (this.patienceMap[i] <= 0 && i !== this.current) return "";
       const name = v.visitorName || (VISITORS[v.visitor] || {}).name || ("#" + (i + 1));
+      const parts = String(name).split(/\s+/);
+      const short = name.length > 13
+        ? (parts.length >= 2 ? parts[0] + " " + parts[parts.length - 1][0] + "." : name.slice(0, 12) + "…")
+        : name;
       const active = i === this.current ? " active" : "";
       const low = this.patienceMap[i] <= 2 ? " low" : "";
       const done = v._served ? " done" : "";
-      return `<button type="button" class="queue-chip${active}${low}${done}" data-qi="${i}">
-        <span class="queue-name">${name}</span>
+      return `<button type="button" class="queue-chip${active}${low}${done}" data-qi="${i}" title="${name}">
+        <span class="queue-name">${short}</span>
         <span class="queue-pat">${this.patienceMap[i]}</span>
       </button>`;
     }).join("");
@@ -3024,7 +3304,7 @@ const FestivalSys = {
         const x = 4 + i * 11.5;
         return `<path d="M${x} 8 L${x+10} 8 L${x+5} 22 Z" fill="${c}" stroke="#3D2B1F" stroke-width="1"/>`;
       }).join("");
-      b.innerHTML = `<svg viewBox="0 0 120 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="none">
+      b.innerHTML = `<svg viewBox="0 0 120 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
         <line x1="1" y1="8" x2="119" y2="8" stroke="#3D2B1F" stroke-width="2"/>
         ${flags}
         <rect x="22" y="24" width="76" height="11" rx="2.5" fill="#E85D4C" stroke="#3D2B1F" stroke-width="1.3"/>
