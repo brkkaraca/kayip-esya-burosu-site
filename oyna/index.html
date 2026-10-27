@@ -1555,7 +1555,7 @@ function startChapter(chId){
   state.dayData={id:"ch"+chId,name:ch.name,weather:ch.weather||"acik",hour:9+(chId%8),visitors,chapter:ch};
   state.mode="day"; state.dayIndex=chId-1; state.visitorIndex=0; state.patience=Math.max(3,5-Math.floor(chId/4)); state.maxPatience=state.patience;
   state.asked=false; state.correct=0; state.wrong=0; state.dayCoins=0; state.failed=false; state.expr="neutral";
-  showScreen("screen-game"); beginVisitor();
+  showScreen("screen-game"); $("hud-day-text").textContent=ch.name; $("hud-coin-text").textContent=String(save.coins); refreshOffice(); loadVisitor();
 }
 function renderShop(){
   refreshTitleCoins();
@@ -1594,8 +1594,11 @@ function loadVisitor(){
   $("visitor-body").innerHTML=drawVisitor(v,"neutral");
   $("visitor-name").textContent=v.name;
   updatePatience();
-  if(cv.trick){$("speech").textContent=cv.claim;$("btn-reject").classList.add("show");$("stamp-text").textContent="REDDEDİLDİ"}
-  else{$("speech").textContent=cv.clue;$("btn-reject").classList.remove("show");$("stamp-text").textContent="TESLİM EDİLDİ"}
+  const speechTxt=cv.trick?(cv.claim||""):(cv.clue||"");
+  if(cv.trick){$("btn-reject").classList.add("show");$("stamp-text").textContent="REDDEDİLDİ"}
+  else{$("btn-reject").classList.remove("show");$("stamp-text").textContent="TESLİM EDİLDİ"}
+  if(window.Motion){Motion.enterVisitor($("visitor-body"));Motion.typewrite($("speech"),speechTxt);}
+  else{$("speech").textContent=speechTxt;}
   $("btn-ask").disabled=false;
   $("hud-vis-text").textContent=(state.visitorIndex+1)+"/"+state.dayData.visitors.length;
   $("payoff").classList.remove("show");$("stamp-overlay").classList.remove("show");$("between-msg").classList.remove("show");$("inspect-modal").classList.remove("show");
