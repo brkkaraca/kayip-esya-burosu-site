@@ -260,8 +260,11 @@ body{display:flex;justify-content:center;align-items:stretch;padding:var(--safe-
 .queue-chip.done{opacity:.4;pointer-events:none}
 .queue-name{display:block;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .queue-pat{color:#A63D2F;letter-spacing:1px;font-size:.65rem}
-.shift-clock{font-weight:700;font-size:.85rem;padding:4px 8px;border:2px solid var(--ink);border-radius:8px;background:#FFF8EC;margin-left:6px}
+.shift-clock{display:none;align-items:center;gap:4px;background:var(--white);border:2px solid var(--ink);border-radius:999px;padding:4px 9px;font-size:.78rem;font-weight:700;margin:0;box-shadow:none;position:static;flex-shrink:0;line-height:1}
+.shift-clock.is-on{display:flex}
 .shift-clock.urgent{background:#F5D0C8;animation:lampFlicker 1s ease-in-out infinite}
+.shift-clock .hud-ico{width:16px;height:16px;color:var(--ink);display:block}
+.shift-clock .hud-ico svg{width:100%;height:100%;display:block}
 
 /* —— Phone hold —— */
 .phone-root{display:none;position:absolute;inset:0;z-index:46;background:rgba(20,30,40,.55);align-items:center;justify-content:center;padding:12px}
@@ -285,8 +288,12 @@ body{display:flex;justify-content:center;align-items:stretch;padding:var(--safe-
 .shelf-item.pet-knocked{transform:rotate(12deg) translateY(6px);opacity:.75}
 .tourist-hint{width:56px;height:56px;margin-top:6px;border:2px solid var(--ink);border-radius:10px;background:#FFF8EC;padding:2px}
 .tourist-hint svg{width:100%;height:100%}
-.festival-mode .office-bg{filter:saturate(1.2)}
-.festival-bunting{position:absolute;top:2px;left:0;right:0;text-align:center;color:#C45A4A;font-size:14px;letter-spacing:6px;z-index:3;pointer-events:none;text-shadow:1px 1px 0 #F0C050}
+.festival-mode .office-bg{filter:saturate(1.25) brightness(1.03)}
+.festival-bunting{position:absolute;top:0;left:0;right:0;height:44px;z-index:6;pointer-events:none;padding:0 2%}
+.festival-bunting svg{width:100%;height:44px;display:block;overflow:visible;filter:drop-shadow(0 1px 1px rgba(61,43,31,.35))}
+.festival-mode .office{padding-top:2px}
+.festival-mode .office-bg{margin-top:0}
+.game-top{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
 
 .album-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px;overflow:auto}
 .album-card{display:flex;gap:8px;background:#FFF8EC;border:2px solid var(--ink);border-radius:12px;padding:8px;font-size:12px}
@@ -328,6 +335,8 @@ button.album-card .silhouette{background:#C8B8A0}
 .night-mode.lamp-on #shelf::before,.night-mode:has(.lamp-glow.on) #shelf::before{opacity:1}
 .night-mode .cubby.lit{background:#4a3c28!important;box-shadow:inset 0 0 16px rgba(255,200,100,.45)!important}
 .night-mode .cubby.lit .shelf-item{filter:none;background:#FFF6E0}
+
+.speech.typewriter::after{content:"";display:inline-block;width:2px;height:.85em;margin-left:2px;background:var(--ink);vertical-align:text-bottom;animation:twBlink .8s step-end infinite}
 
 /* 2.0.0 motion — respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
@@ -609,33 +618,31 @@ const ItemDraw = {
     return svgWrap(`${pat}<rect x="14" y="22" width="36" height="24" rx="4" fill="${fill}"/><path d="M16 24 H48 V30 H14 V26 Q14 24 16 24Z" fill="${hi(col)}" opacity=".28" stroke="none"/><line x1="14" y1="32" x2="50" y2="32" stroke="${C.ink}" stroke-width="1.4"/>${e}`);
   },
   anahtarlik(item){
-    /* Unmistakable: round split-ring + 2 bit keys + charm */
+    /* Ring + keys + charm — colour AND charm shape always visible; key count varies */
     const col = COLOR_HEX[item.color] || C.mustard;
     const metal = "#A8A098";
+    const single = item.detail === "tek" || item.detail === "tek_anahtar";
     let charm = `<g transform="translate(46,46)"><circle r="7" fill="${col}" stroke="${C.ink}" stroke-width="1.3"/><circle cx="-1.5" cy="-1.5" r="2" fill="${hi(col)}" opacity=".4" stroke="none"/></g>`;
     if (item.detail === "kalpli") charm = `<g transform="translate(46,46)"><path d="M0-6 Q-5-10 -8-5 Q-10-1 0 8 Q10-1 8-5 Q5-10 0-6" fill="${col}" stroke="${C.ink}" stroke-width="1.2"/></g>`;
     if (item.detail === "yıldızlı") charm = `<g transform="translate(46,46)"><polygon points="0,-8 2,-2 8,-2 3,1 5,7 0,3 -5,7 -3,1 -8,-2 -2,-2" fill="${col}" stroke="${C.ink}" stroke-width="1.1"/></g>`;
     if (item.detail === "madalyon") charm = `<g transform="translate(46,46)"><circle r="8" fill="${col}" stroke="${C.ink}" stroke-width="1.3"/><circle r="4.2" fill="none" stroke="${C.ink}" stroke-width="1.2"/><circle r="1.4" fill="${C.ink}" stroke="none"/></g>`;
-    if (item.detail === "nazar") charm = `<g transform="translate(46,46)"><circle r="8" fill="${C.blue}" stroke="${C.ink}" stroke-width="1.2"/><circle r="5" fill="${C.cream}" stroke="none"/><circle r="2.8" fill="${C.blue}" stroke="none"/><circle r="1.2" fill="${C.ink}" stroke="none"/></g>`;
+    if (item.detail === "nazar") charm = `<g transform="translate(46,46)"><circle r="8" fill="${col}" stroke="${C.ink}" stroke-width="1.2"/><circle r="5" fill="${C.cream}" stroke="none"/><circle r="2.8" fill="${lo(col)}" stroke="none"/><circle r="1.2" fill="${C.ink}" stroke="none"/></g>`;
+    const keyB = single ? "" : `<g stroke="${C.ink}" stroke-width="1.4" fill="${lo(metal)}">
+        <circle cx="30" cy="26" r="4.5" fill="${metal}"/>
+        <circle cx="30" cy="26" r="1.8" fill="${C.cream}" stroke-width="1"/>
+        <rect x="28.5" y="30" width="3" height="14" rx="1" fill="${metal}"/>
+        <path d="M31.5 38 h5 v2.5 h-2.5 v2.5 h2.5 v2.5 h-5" fill="${metal}"/>
+      </g>`;
     return svgWrap(`
-      <!-- split ring -->
       <circle cx="24" cy="18" r="11" fill="none" stroke="${C.ink}" stroke-width="2.6"/>
       <circle cx="24" cy="18" r="11" fill="none" stroke="${metal}" stroke-width="1.4" stroke-dasharray="28 6" stroke-linecap="round"/>
-      <!-- key A -->
       <g stroke="${C.ink}" stroke-width="1.5" fill="${metal}">
         <circle cx="18" cy="28" r="5.5" fill="${metal}"/>
         <circle cx="18" cy="28" r="2.2" fill="${C.cream}" stroke-width="1.1"/>
         <rect x="16.2" y="33" width="3.6" height="16" rx="1" fill="${metal}"/>
         <path d="M19.8 42 h6 v3 h-3 v3 h3 v3 h-6" fill="${metal}"/>
       </g>
-      <!-- key B -->
-      <g stroke="${C.ink}" stroke-width="1.4" fill="${lo(metal)}">
-        <circle cx="30" cy="26" r="4.5" fill="${metal}"/>
-        <circle cx="30" cy="26" r="1.8" fill="${C.cream}" stroke-width="1"/>
-        <rect x="28.5" y="30" width="3" height="14" rx="1" fill="${metal}"/>
-        <path d="M31.5 38 h5 v2.5 h-2.5 v2.5 h2.5 v2.5 h-5" fill="${metal}"/>
-      </g>
-      <!-- charm link -->
+      ${keyB}
       <path d="M34 22 Q42 28 46 40" fill="none" stroke="${C.ink}" stroke-width="1.5"/>
       ${charm}`);
   },
@@ -720,9 +727,10 @@ const ItemDraw = {
       const y = 28 + Math.sin(a) * 16;
       beads.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.2" fill="${col}"/>`);
     }
-    let tip = `<ellipse cx="32" cy="50" rx="4" ry="6" fill="${lo(col)}"/><circle cx="32" cy="58" r="2.8" fill="${C.mustard}"/>`;
-    if (item.detail === "gumus") tip = `<rect x="28" y="46" width="8" height="12" rx="1.5" fill="${C.gray}"/><circle cx="32" cy="58" r="2.4" fill="${C.gray}"/>`;
-    if (item.detail === "imame") tip = `<ellipse cx="32" cy="50" rx="5" ry="7" fill="${lo(col)}"/><circle cx="32" cy="58" r="2.8" fill="${C.mustard}"/>`;
+    let tip = `<ellipse cx="32" cy="50" rx="4.5" ry="6.5" fill="${lo(col)}"/><circle cx="32" cy="58" r="3.2" fill="${C.mustard}"/><circle cx="32" cy="58" r="1.2" fill="${C.cream}" stroke="none"/>`;
+    if (item.detail === "gumus") tip = `<rect x="27" y="44" width="10" height="14" rx="2" fill="${C.gray}" stroke="${C.ink}" stroke-width="1.3"/><circle cx="32" cy="58" r="3" fill="${C.cream}" stroke="${C.ink}" stroke-width="1.1"/>`;
+    if (item.detail === "imame") tip = `<ellipse cx="32" cy="48" rx="6" ry="8" fill="${hi(col)}"/><ellipse cx="32" cy="48" rx="6" ry="8" fill="none"/><circle cx="32" cy="58" r="3.4" fill="${C.brick}"/>`;
+    if (item.detail === "boncuk") tip = `<circle cx="32" cy="52" r="5" fill="${C.mustard}"/><circle cx="32" cy="58" r="3" fill="${C.brick}"/>`;
     return svgWrap(`${beads.join("")}${tip}`);
   },
   nazarlik(item){
@@ -848,11 +856,18 @@ const ItemDraw = {
   },
   /* —— NEW types (to ~40) —— */
   simit(item){
-    const col = COLOR_HEX[item.color] || C.brown;
+    const col = COLOR_HEX[item.color] || C.brown, _pid = nextPat(), pat = patternFill(item.pattern, col, _pid), fill = pf(item.pattern, _pid) || col;
+    const ring = "M32 16 A16 16 0 1 1 31.9 16";
     let s = "";
-    if (item.detail === "susam") s = `<circle cx="28" cy="28" r="1.2" fill="${C.cream}" stroke="none"/><circle cx="36" cy="30" r="1" fill="${C.cream}" stroke="none"/><circle cx="32" cy="38" r="1.1" fill="${C.cream}" stroke="none"/>`;
-    if (item.detail === "peyirli") s = `<path d="M26 32 Q32 28 38 32" fill="none" stroke="${C.cream}" stroke-width="2"/>`;
-    return svgWrap(`<circle cx="32" cy="32" r="16" fill="${col}"/><circle cx="32" cy="32" r="7" fill="${C.cream}"/><circle cx="32" cy="32" r="7" fill="none"/><path d="M22 26 Q32 18 42 26" fill="${hi(col)}" opacity=".3" stroke="none"/>${s}`);
+    if (item.detail === "susam" || item.pattern === "benekli") {
+      s = `<circle cx="28" cy="28" r="1.3" fill="${C.cream}" stroke="none"/><circle cx="36" cy="30" r="1.1" fill="${C.cream}" stroke="none"/><circle cx="32" cy="38" r="1.2" fill="${C.cream}" stroke="none"/><circle cx="24" cy="34" r="1" fill="${C.cream}" stroke="none"/><circle cx="40" cy="34" r="1" fill="${C.cream}" stroke="none"/>`;
+    }
+    if (item.detail === "peyirli") s += `<path d="M26 32 Q32 28 38 32" fill="none" stroke="${C.cream}" stroke-width="2.2"/>`;
+    return svgWrap(`${pat}<defs><clipPath id="sm${_pid}"><circle cx="32" cy="32" r="16"/><circle cx="32" cy="32" r="7"/></clipPath></defs>
+      <circle cx="32" cy="32" r="16" fill="${fill}" stroke="${C.ink}" stroke-width="1.6"/>
+      <circle cx="32" cy="32" r="7" fill="${C.cream}" stroke="${C.ink}" stroke-width="1.4"/>
+      <g clip-path="url(#sm${_pid})">${item.pattern && item.pattern!=="duz" ? `<circle cx="32" cy="32" r="16" fill="${fill}" stroke="none"/>` : `<path d="M22 26 Q32 18 42 26" fill="${hi(col)}" opacity=".3" stroke="none"/>`}</g>
+      ${s}`);
   },
   caybardagi(item){
     const col = COLOR_HEX[item.color] || C.cream;
@@ -1013,7 +1028,7 @@ const DETAIL_TR = {
   kulp:"kulplu",kayis:"kayışlı",altın:"altın yaldızlı",desenli:"desenli",dijital:"dijital",deri:"deri kayışlı",ponpon:"ponponlu",katlamalı:"katlamalı",yama:"yamalı",kırık_askı:"askısı gevşek",bağcıklı:"bağcıklı",cirtli:"cırtlı",
   ışıklı:"ışıklı",kablolu:"kablolu",mikrofon:"mikrofonlu",boş:"boş",cetvel:"cetvelli",flash:"flaşlı",pul:"pullu",açık:"açık zarf",hayvan:"hayvan figürlü",anten:"antenli",kırık:"biraz çatlak",şeffaf:"şeffaf",yamalı:"yamalı",
   susam:"susamlı",peyirli:"peynirli",tabakli:"tabaklı",demlik:"kulplu",nakışlı:"nakışlı",katlı:"katlanmış",zincir:"zincirli",sürtmeli:"sürtmeli",ahşap:"ahşap",fotoğraflı:"fotoğraflı",magnetik:"manyetik şeritli",
-  kaktüs:"kaktüs",çiçekli:"çiçekli",çizgili:"çizgili top",sönük:"sönük",kokulu:"kokulu",şifreli:"şifreli",anahtarlı:"anahtarlı",kılıflı:"kılıflı"
+  kaktüs:"kaktüs",çiçekli:"çiçekli",çizgili:"çizgili top",sönük:"sönük",kokulu:"kokulu",şifreli:"şifreli",anahtarlı:"anahtarlı",tek:"tek anahtarlı",tek_anahtar:"tek anahtarlı",kılıflı:"kılıflı"
 };
 /** Per-item bbox fit: silhouette fills ~72–78% of card with safe padding. */
 function fitItemSvg(svgStr){
@@ -1200,6 +1215,17 @@ const VISITORS={
   yalanci:{id:"yalanci",name:"Şüpheli Adam",skin:"#D8B090",hair:"#3A3028",shirt:C.gray,age:"adult",face:"square",cloth:"coat",
     hairPath:"M26 38 Q28 12 50 8 Q72 12 74 38 Q64 22 50 20 Q36 22 26 38",
     extras:`<path d="M61 46 L63 52" fill="none" stroke="${C.brick}" stroke-width="1.35" stroke-linecap="round" opacity=".85"/><g transform="translate(64,82)"><rect x="0" y="0" width="15" height="18" rx="1.2" fill="${C.cream}" stroke="${C.ink}" stroke-width="1.3"/><line x1="2.5" y1="4.5" x2="12.5" y2="4.5" stroke="${C.ink}" stroke-width=".85"/><line x1="2.5" y1="8.5" x2="11.5" y2="8.5" stroke="${C.ink}" stroke-width=".85"/><line x1="2.5" y1="12.5" x2="10.5" y2="12.5" stroke="${C.ink}" stroke-width=".85"/></g>`},
+  /* Distinct trickster disguises — each has own portrait; still marked .trick */
+  sapkali_bey:{id:"sapkali_bey",name:"Şapkalı Bey",skin:"#E0B890",hair:"#2A2218",shirt:C.navy,age:"adult",face:"oval",cloth:"coat",mustache:"#2A2218",
+    hairPath:"M28 36 Q30 14 50 10 Q70 14 72 36 Q64 22 50 20 Q36 22 28 36",
+    extras:`<ellipse cx="50" cy="14" rx="18" ry="5" fill="${C.black}"/><path d="M34 16 Q34 4 50 2 Q66 4 66 16" fill="${C.black}"/><rect x="32" y="14" width="36" height="3" fill="${C.brick}"/>`},
+  gozluklu_kadin:{id:"gozluklu_kadin",name:"Gözlüklü Kadın",skin:"#C9956C",hair:"#1A1510",shirt:C.purple,age:"adult",face:"heart",cloth:"coat",
+    hairPath:"M22 48 Q16 12 50 6 Q84 12 78 48 Q70 26 50 22 Q30 26 22 48",
+    extras:`<rect x="34" y="40" width="12" height="7" rx="1" fill="none" stroke="${C.ink}" stroke-width="1.4"/><rect x="54" y="40" width="12" height="7" rx="1" fill="none" stroke="${C.ink}" stroke-width="1.4"/><line x1="46" y1="43.5" x2="54" y2="43.5" stroke="${C.ink}" stroke-width="1.2"/><circle cx="30" cy="54" r="2.2" fill="${C.mustard}"/>`},
+  acele_genc:{id:"acele_genc",name:"Acele Eden Genç",skin:"#F0D0B0",hair:"#3D2B1F",shirt:C.orange,age:"young",face:"round",cloth:"sweater",
+    hairPath:"M26 36 Q24 10 50 6 Q76 10 74 36 Q66 18 50 16 Q34 18 26 36",
+    extras:`<path d="M70 70 Q82 62 86 78 Q78 88 68 80Z" fill="${C.mustard}"/><path d="M38 58 Q50 64 62 58" fill="none" stroke="${C.ink}" stroke-width="1.3"/>`},
+
   ayse:{id:"ayse",name:"Ayşe Hanım",skin:"#E0B890",hair:"#4A3020",shirt:C.teal,age:"adult",face:"oval",cloth:"coat",
     hairPath:"M26 36 Q22 14 50 8 Q78 14 74 36 Q68 24 50 22 Q32 24 26 36",
     behind:`<ellipse cx="50" cy="36" rx="34" ry="38" fill="${C.teal}"/><path d="M18 48 Q10 72 22 90 Q34 82 28 58Z" fill="${C.teal}"/><path d="M82 48 Q90 72 78 90 Q66 82 72 58Z" fill="${C.teal}"/><path d="M30 18 Q50 8 70 18" fill="none" stroke="${C.mustard}" stroke-width="2"/>`,
@@ -1455,20 +1481,25 @@ const Motion = {
   typewrite(el, text, cps){
     cps = cps || 48;
     if (!el) return Promise.resolve();
-    el.dataset.fullSpeech = text || "";
-    if (this.reduced) { el.textContent = text; return Promise.resolve(); }
+    text = text || "";
+    el.dataset.fullSpeech = text;
+    el.classList.add("typewriter");
+    if (this.reduced || !text) { el.textContent = text || "…"; el.classList.remove("typewriter"); return Promise.resolve(); }
     return new Promise(resolve => {
-      el.textContent = "";
-      let i = 0;
+      // Never show an empty bubble: seed first glyphs (or ellipsis) immediately
+      const seed = Math.min(2, text.length);
+      let i = seed;
+      el.textContent = text.slice(0, seed) + (seed < text.length ? "" : "");
+      if (seed === 0) el.textContent = "…";
       const skip = () => { el.textContent = text; cleanup(); resolve(); };
       this._skipTypewrite = skip;
       const tick = () => {
-        if (i >= text.length) { cleanup(); resolve(); return; }
+        if (i >= text.length) { el.textContent = text; cleanup(); resolve(); return; }
         el.textContent = text.slice(0, ++i);
         timer = setTimeout(tick, 1000 / cps);
       };
-      let timer = setTimeout(tick, 20);
-      const cleanup = () => { clearTimeout(timer); el.removeEventListener("pointerdown", skip); this._skipTypewrite = null; };
+      let timer = setTimeout(tick, 16);
+      const cleanup = () => { clearTimeout(timer); el.removeEventListener("pointerdown", skip); this._skipTypewrite = null; el.classList.remove("typewriter"); };
       el.addEventListener("pointerdown", skip);
     });
   },
@@ -1815,7 +1846,7 @@ const DAYS=[
 const PROC_COLORS = ["kirmizi","mavi","yesil","sari","kahve","pembe","mor","turuncu","gri","siyah","lacivert","krem"];
 const PROC_PATTERNS = ["duz","cizgili","benekli","kareli"];
 const PROC_DETAILS = {
-  semsiye:["ordek","düz_sap","j_sap"], cuzdan:["metal","kalpli","fermuar",null], anahtarlik:["kalpli","yıldızlı","madalyon","nazar"],
+  semsiye:["ordek","düz_sap","j_sap"], cuzdan:["metal","kalpli","fermuar",null], anahtarlik:["kalpli","yıldızlı","madalyon","nazar","tek"],
   sapka:["fiyonk","tüylü","bant",null], eldiven:[null,"yama","bant"], kitap:["etiket","eski","yeni"], ayi:["fiyonk","yırtık","yamalı",null],
   gozluk:["yuvarlak","kare_cam","eski"], atki:["püskül","tüylü",null], telefon:["kalpli","yıldızlı","şeffaf",null],
   tespih:["gumus","imame",null], nazarlik:["boncuk","ip",null], termos:["kulp","kayis",null], cayseti:["altın","desenli",null],
@@ -2396,8 +2427,11 @@ const QueueSys = {
     if (!clock) {
       clock = document.createElement("div");
       clock.id = "shift-clock";
-      clock.className = "shift-clock";
-      document.querySelector(".game-hud")?.appendChild(clock) || document.getElementById("screen-game")?.prepend(clock);
+      clock.className = "hud-pill shift-clock";
+      clock.innerHTML = `<span class="hud-ico" aria-hidden="true"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 4.5 V8.2 L10.5 10" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span><span id="shift-clock-text">0:00</span>`;
+      const top = document.querySelector(".game-top");
+      if (top) top.appendChild(clock);
+      else document.getElementById("screen-game")?.querySelector(".game-top")?.appendChild(clock);
     }
   },
 
@@ -2429,9 +2463,11 @@ const QueueSys = {
     if (!el) return;
     const m = Math.floor(this.secondsLeft / 60);
     const s = this.secondsLeft % 60;
-    el.textContent = `${m}:${String(s).padStart(2, "0")}`;
+    const label = el.querySelector("#shift-clock-text") || el;
+    label.textContent = `${m}:${String(s).padStart(2, "0")}`;
     el.classList.toggle("urgent", this.secondsLeft <= 20);
-    el.style.display = this.active ? "" : "none";
+    el.classList.toggle("is-on", !!this.active);
+    el.style.display = ""; // visibility via .is-on
   },
 
   startTimer() {
@@ -2484,7 +2520,7 @@ const QueueSys = {
       this.stopTimer();
       this.active = false;
       const clock = document.getElementById("shift-clock");
-      if (clock) clock.style.display = "none";
+      if (clock) { clock.classList.remove("is-on"); }
       endDay(true);
       return true;
     }
@@ -2866,7 +2902,17 @@ const FestivalSys = {
       b = document.createElement("div");
       b.id = "festival-bunting";
       b.className = "festival-bunting";
-      b.innerHTML = "▲ ▲ ▲ ▲ ▲";
+      const colors = ["#E85D4C","#F0C050","#3D9B8C","#6A5A8A","#4A6FA5","#C47A3A","#C97A8A","#E85D4C","#F0C050","#3D9B8C"];
+      const flags = colors.map((c, i) => {
+        const x = 4 + i * 11.5;
+        return `<path d="M${x} 8 L${x+10} 8 L${x+5} 22 Z" fill="${c}" stroke="#3D2B1F" stroke-width="1"/>`;
+      }).join("");
+      b.innerHTML = `<svg viewBox="0 0 120 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="none">
+        <line x1="1" y1="8" x2="119" y2="8" stroke="#3D2B1F" stroke-width="2"/>
+        ${flags}
+        <rect x="22" y="24" width="76" height="11" rx="2.5" fill="#E85D4C" stroke="#3D2B1F" stroke-width="1.3"/>
+        <text x="60" y="32.2" text-anchor="middle" font-size="7.2" font-weight="800" fill="#FFF8EE" stroke="none" font-family="system-ui,sans-serif">✦ FESTİVAL ✦</text>
+      </svg>`;
       document.getElementById("office")?.prepend(b);
     }
   },
@@ -2878,9 +2924,23 @@ const FestivalSys = {
     if (!v || v.trick) return;
     if (v.target && Math.random() < 0.7) {
       const t = this.THEME_TYPES[Math.floor(Math.random() * this.THEME_TYPES.length)];
+      const detail = (typeof PROC_DETAILS!=="undefined" && PROC_DETAILS[t]) ? PROC_DETAILS[t][Math.floor(Math.random()*PROC_DETAILS[t].length)] : v.target.detail;
       v.target.type = t;
-      // refresh shelf first item
-      if (v.shelf && v.shelf[0]) v.shelf[0] = Object.assign({}, v.target);
+      v.target.detail = detail;
+      // Rebuild a same-type-heavy shelf then diversify so festival shelves aren't clone walls
+      if (v.shelf && v.shelf.length) {
+        const size = v.shelf.length;
+        const shelf = [Object.assign({}, v.target)];
+        for (let i = 1; i < size; i++) {
+          const d = Object.assign({}, v.target);
+          d.color = (typeof PROC_COLORS!=="undefined") ? PROC_COLORS[i % PROC_COLORS.length] : d.color;
+          d.detail = (typeof PROC_DETAILS!=="undefined" && PROC_DETAILS[t]) ? PROC_DETAILS[t][i % PROC_DETAILS[t].length] : d.detail;
+          d.tag = (v.target.tag || "Etiket") + "-" + i;
+          shelf.push(d);
+        }
+        if (typeof diversifyShelfVisuals === "function") diversifyShelfVisuals(shelf, v.target, size);
+        v.shelf = shelf;
+      }
     }
   }
 };
@@ -2941,9 +3001,10 @@ const ArcsSys = {
       if (!boss) return visitors;
       boss.trick = true;
       boss.target = null;
-      boss.visitor = "yalanci";
+      const keys = (typeof TRICKSTER_KEYS!=="undefined")?TRICKSTER_KEYS:["yalanci"];
+      boss.visitor = keys[Math.floor(Math.random()*keys.length)];
       boss.claimItem = (boss.shelf && boss.shelf[0]) || null;
-      boss.visitorName = "Panayır Dolandırıcısı"; // alias of yalanci only — not a cast member name
+      boss.visitorName = null; // use portrait's own name
       boss._boss = true;
       boss.claim = "Festival biletim var — o eşya benim! Bak, etiket aynı…";
       boss.extraClue = "Fiş numarası: SAHTE-999";
@@ -3186,6 +3247,142 @@ const Meta = MetaSys;
 
 function rand(a){return a[Math.floor(Math.random()*a.length)]}
 function shuffle(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+
+const TRICKSTER_KEYS=["yalanci","sapkali_bey","gozluklu_kadin","acele_genc"];
+function visualKey(item){
+  /* Attributes that usually affect art; tag never does */
+  return [item.type,item.color,item.pattern||"duz",item.detail||"yok"].join("|");
+}
+function svgVisualHash(item){
+  try{
+    const svg=(typeof drawItem==="function")?drawItem(item):"";
+    // Strip volatile ids + viewBox (fitItemSvg) so identical art collides
+    return String(svg)
+      .replace(/viewBox="[^"]*"/g,"")
+      .replace(/id="[^"]+"/g,"id=X")
+      .replace(/url\(#.*?\)/g,"url(#X)");
+  }catch(_e){ return visualKey(item); }
+}
+function diversifyShelfVisuals(shelf, target, size){
+  const MAX=2;
+  const hashOf=(it)=>svgVisualHash(it);
+  const recount=()=>{
+    const c={};
+    shelf.forEach(it=>{ const h=hashOf(it); c[h]=(c[h]||0)+1; });
+    return c;
+  };
+  const mutateVisible=(it)=>{
+    const near=Object.assign({},it);
+    // Prefer colour + detail — patterns are ignored by some silhouettes (anahtarlik, gozluk…)
+    const order=rand([["color","detail"],["detail","color"],["color","detail","pattern"]]) || ["color","detail"];
+    for(const which of order){
+      if(which==="color"){ let c; do{c=rand(PROC_COLORS)}while(c===near.color); near.color=c; }
+      else if(which==="detail"){
+        const opts=(PROC_DETAILS[near.type]||[null]).filter(d=>d!==near.detail);
+        if(opts.length) near.detail=rand(opts);
+      } else {
+        let p; do{p=rand(PROC_PATTERNS)}while(p===(near.pattern||"duz")); near.pattern=p;
+      }
+      if(hashOf(near)!==hashOf(it)) break;
+    }
+    // Ensure unique itemId
+    if(shelf.some(o=>itemId(o)===itemId(near))){
+      let tg; do{tg=rand(PROC_TAGS)}while(tg===near.tag); near.tag=tg;
+    }
+    return near;
+  };
+  // Iterate until every look appears <= MAX times
+  for(let pass=0; pass<40; pass++){
+    const counts=recount();
+    const offenders=[];
+    shelf.forEach((it,i)=>{ if(counts[hashOf(it)]>MAX) offenders.push(i); });
+    if(!offenders.length) break;
+    // Keep up to MAX of each hash; mutate the rest (never mutate the target's index if possible)
+    const kept={};
+    const targetHash=target?hashOf(target):null;
+    for(const i of offenders){
+      const h=hashOf(shelf[i]);
+      kept[h]=kept[h]||0;
+      const isTarget=target && itemId(shelf[i])===itemId(target);
+      if(isTarget || kept[h]<MAX){ kept[h]++; continue; }
+      let changed=false;
+      for(let t=0;t<20 && !changed;t++){
+        const near=mutateVisible(shelf[i]);
+        if(hashOf(near)===h) continue;
+        // Don't create a look that already has MAX
+        const nextCounts=recount();
+        const nh=hashOf(near);
+        if((nextCounts[nh]||0)>=MAX) continue;
+        shelf[i]=near;
+        changed=true;
+      }
+      if(!changed){
+        // Last resort: change type to a different silhouette
+        const near=Object.assign({},shelf[i]);
+        let nt; do{nt=rand(TYPE_KEYS)}while(nt===near.type);
+        near.type=nt; near.detail=rand(PROC_DETAILS[nt]||[null]); near.color=rand(PROC_COLORS);
+        let tg; do{tg=rand(PROC_TAGS)}while(shelf.some(o=>itemId(o)===itemId(near))); near.tag=tg;
+        if(!(target && itemId(shelf[i])===itemId(target))) shelf[i]=near;
+      }
+    }
+  }
+  // Ensure target still on shelf
+  if(target && !shelf.some(it=>itemId(it)===itemId(target))){
+    // Replace a non-unique slot
+    shelf[shelf.length-1]=Object.assign({},target);
+  }
+  while(shelf.length>size) shelf.pop();
+  let guard=0;
+  while(shelf.length<size && guard++<20){
+    const near=mutateVisible(Object.assign({}, target||shelf[0]));
+    const counts=recount();
+    if((counts[hashOf(near)]||0)>=MAX) continue;
+    if(shelf.some(o=>itemId(o)===itemId(near))){
+      let tg; do{tg=rand(PROC_TAGS)}while(tg===near.tag); near.tag=tg;
+    }
+    shelf.push(near);
+  }
+}
+
+function uniquifyTricksterPortraits(visitors){
+  if(!visitors) return visitors;
+  const used=new Set();
+  visitors.forEach(v=>{
+    if(!v.trick) return;
+    if(!used.has(v.visitor)){ used.add(v.visitor); return; }
+    const free=TRICKSTER_KEYS.filter(k=>!used.has(k));
+    if(free.length){ v.visitor=rand(free); used.add(v.visitor); }
+  });
+  return visitors;
+}
+function makeHonestVisitor(diff){
+  let v=null, guard=0;
+  do{ v=generateVisitor(diff||4); guard++; }while(v && v.trick && guard<12);
+  if(!v || v.trick){
+    const key=rand(Object.keys(VISITORS).filter(k=>!TRICKSTER_KEYS.includes(k)));
+    v={visitor:key,visitorName:null,trick:false,target:null,shelf:[],clue:"Bir eşyam kayıp.",extraClue:"",payoff:"Sağ ol!"};
+  }
+  v.trick=false; v.visitorName=null;
+  if(TRICKSTER_KEYS.includes(v.visitor)) v.visitor=rand(Object.keys(VISITORS).filter(k=>!TRICKSTER_KEYS.includes(k)));
+  return v;
+}
+function spaceOutTricksters(visitors){
+  /* Cap: at most 1 trickster in any 3 consecutive queue slots */
+  if(!visitors||visitors.length<2) return visitors;
+  for(let i=0;i<visitors.length;i++){
+    if(!visitors[i].trick) continue;
+    const prev=visitors.slice(Math.max(0,i-2), i);
+    if(prev.some(v=>v.trick)) visitors[i]=makeHonestVisitor(4+i);
+  }
+  for(let i=0;i<visitors.length;i++){
+    const w=visitors.slice(i, i+3);
+    const trickIdxs=[];
+    w.forEach((v,j)=>{ if(v.trick) trickIdxs.push(i+j); });
+    for(let k=1;k<trickIdxs.length;k++) visitors[trickIdxs[k]]=makeHonestVisitor(5+k);
+  }
+  return visitors;
+}
+
 function similarItem(base,hard){const v=Object.assign({},base);const which=rand(hard?["color","pattern","detail","type","tag"]:["color","pattern","detail","tag"]);
   if(which==="color"){let c;do{c=rand(PROC_COLORS)}while(c===base.color);v.color=c}
   else if(which==="pattern"){let p;do{p=rand(PROC_PATTERNS)}while(p===(base.pattern||"duz"));v.pattern=p}
@@ -3227,31 +3424,15 @@ function generateVisitor(diff){
     }
     const id=itemId(near);if(!seen.has(id)){seen.add(id);if(shelf.length>=size)shelf[shelf.length-1]=near;else shelf.push(near);}
   }}
-  // Cull soft lookalikes that only differ by tag (same type+color+pattern+detail)
-  if(["bere","eldiven","telefon","atki","sal","sapka","kalemlik"].includes(type)){
-    const vis=new Set();
-    const kept=[];
-    for(const it of shelf){
-      const vid=[it.type,it.color,it.pattern||"duz",it.detail||"yok"].join("|");
-      if(vis.has(vid)&&itemId(it)!==itemId(target)) continue;
-      vis.add(vid);kept.push(it);
-    }
-    while(kept.length<size){
-      const near=Object.assign({},target);
-      let c;do{c=rand(PROC_COLORS)}while(c===target.color||kept.some(it=>it.color===c&&(it.pattern||"duz")===(target.pattern||"duz")));
-      near.color=c;
-      const id=itemId(near);
-      if(!kept.some(it=>itemId(it)===id)) kept.push(near);
-      else break;
-    }
-    shelf.length=0;shelf.push(...kept.slice(0,size));
-  }
+  // Visual variety: at most 2 cards may share the same look (tag alone does not count)
+  diversifyShelfVisuals(shelf, target, size);
   const trick=diff>2&&Math.random()<(0.2+Math.min(diff,10)*0.03);
   if(trick){
     const claim=(typeof buildClue==="function")?buildClue(target,diff):((COLOR_TR[color]||color)+" "+(TYPE_TR[type]||type)+" benim!");
-    return{visitor:"yalanci",visitorName:null,trick:true,target:null,claimItem:target,claim,extraClue:"Biraz aceleye getiriyor…",shelf:shuffle(shelf),payoffReject:"Başka kapıya…",wrongGive:"Bu başkasının eşyası!"};
+    const tk=rand(TRICKSTER_KEYS);
+    return{visitor:tk,visitorName:null,trick:true,target:null,claimItem:target,claim,extraClue:"Biraz aceleye getiriyor…",shelf:shuffle(shelf),payoffReject:"Başka kapıya…",wrongGive:"Bu başkasının eşyası!"};
   }
-  const cast=Object.keys(VISITORS).filter(k=>k!=="yalanci");
+  const cast=Object.keys(VISITORS).filter(k=>!TRICKSTER_KEYS.includes(k));
   const vk=rand(cast);
   const visitorName=null; // name comes from VISITORS[vk] — full portrait, never rename onto wrong body
   let clue=(typeof buildClue==="function")?buildClue(target,diff):((COLOR_TR[color]||color)+" "+(TYPE_TR[type]||type));
@@ -3393,7 +3574,7 @@ function startChapter(chId){
   document.querySelectorAll('.mechanic-overlay,#memory-tut,#phone-tut,#pet-blocker,#festival-bunting,#tourist-hint,#repair-root').forEach(el=>{ if(el.id==='tourist-hint'){el.style.display='none';} else el.remove(); });
   if(typeof Storage!=='undefined'&&Storage.abort) Storage.abort();
   if(typeof Phone!=='undefined'&&Phone.reset) Phone.reset();
-  if(typeof Queue!=='undefined'){ try{ Queue.stopTimer(); Queue.active=false; }catch(_e){} const c=$('shift-clock'); if(c) c.style.display='none'; const r=$('queue-rail'); if(r) r.classList.remove('show'); }
+  if(typeof Queue!=='undefined'){ try{ Queue.stopTimer(); Queue.active=false; }catch(_e){} const c=$('shift-clock'); if(c){ c.classList.remove('is-on'); c.style.display=''; } const r=$('queue-rail'); if(r) r.classList.remove('show'); }
   if(typeof Pets!=='undefined') Pets.stop();
   if(typeof Festival!=='undefined') Festival.undecorate();
   if(typeof Repair!=='undefined'&&Repair.close) try{ Repair.close(); }catch(_e){}
@@ -3406,6 +3587,8 @@ function startChapter(chId){
   const diff=2+chId;
   const visitors=[];
   for(let i=0;i<Math.min(3+Math.floor(chId/3),5);i++) visitors.push(generateVisitor(diff+i));
+  spaceOutTricksters(visitors);
+  uniquifyTricksterPortraits(visitors);
   if(ch.mechanic==="vague") visitors.forEach(v=>{ if(v.clue) v.clue=v.clue.replace(/şemsiye|cüzdan|atkı/gi,"şey").replace(/kırmızı|mavi|yeşil/gi,"renkli"); });
     if(ch.mechanic==="unreliable"&&typeof Memory!=="undefined"){
     visitors.forEach(v=>Memory.applyToVisitor(v, diff));
@@ -3423,7 +3606,7 @@ function startChapter(chId){
     if(!visitors.some(v=>v.trick)){
       try{
         const t=generateVisitor(diff+3);
-        t.trick=true; t.target=null; t.visitor="yalanci"; t.visitorName=null;
+        t.trick=true; t.target=null; t.visitor=rand(TRICKSTER_KEYS); t.visitorName=null;
         t.claimItem=(t.shelf&&t.shelf[0])||null;
         t.claim=(typeof buildClue==="function"&&t.claimItem)?buildClue(t.claimItem,diff):"Bu benim!";
         t.payoffReject="Yakalandım…";
@@ -3484,6 +3667,8 @@ function startChapter(chId){
   } else if(ch.mechanic==="festival"&&typeof Festival!=="undefined"){
     visitors.forEach(v=>Festival.biasVisitor(v));
     if(typeof Arcs!=="undefined") Arcs.injectBoss(visitors, diff);
+    spaceOutTricksters(visitors);
+    uniquifyTricksterPortraits(visitors);
     state.queueMode=true; state.shiftTimer=state.shiftTimer||100;
     Festival.showTutorial().then(()=>{ Festival.decorate(); loadVisitor(); if(typeof Queue!=="undefined"){ Queue.begin(visitors, state.shiftTimer); }});
   } else if(ch.mechanic==="phonecall"&&typeof Phone!=="undefined"){
@@ -3928,7 +4113,7 @@ document.querySelectorAll("button.btn, button.btn-back").forEach(b=>{
 renderTitle();AudioSys.init();
 window.__KEB_READY__=true;document.documentElement.dataset.kebReady="1";
 
-window.Motion=Motion;window.CHAPTERS=CHAPTERS;window.generateVisitor=generateVisitor;window.buildClue=typeof buildClue!=="undefined"?buildClue:null;try{window.renderAlbum=renderAlbum;window.ensureAlbumUI=ensureAlbumUI;}catch(_e){}window.Storage=Storage;window.Ledger=Ledger;window.Queue=Queue;window.Memory=Memory;window.Phone=Phone;window.Repair=Repair;window.Pets=Pets;window.Tourist=Tourist;window.Festival=Festival;window.Arcs=Arcs;window.Meta=Meta;window.__KEB_READY__=true;document.documentElement.dataset.kebReady="1";window.__KEB__={getSave:()=>save,setSave:(s)=>{save=s;writeSave(save)},state,DAYS,VISITORS,TYPE_KEYS,DECORS,CHAPTERS,Motion,generateVisitor,buildClue,renderAlbum,ensureAlbumUI,Storage,Ledger,Queue,Memory,Phone,Repair,Pets,Tourist,Festival,Arcs,Meta,startDay,startChapter,startEndless,showScreen,itemId,currentVisitor,tryGive,askQuestion,rejectTrick,endDay,calcStars,generateEndlessDay,renderDaySelect,renderShop,renderAlbum,openInspect,closeInspect,startTutorial,endTutorial,refreshOffice,applyNightLamp,restoreGameChrome,writeSave,loadSave,SAVE_KEY,drawVisitor,drawTitleFacade,drawItem,itemLabel,generateVisitor,buildClue,EXTRA_NAMES,TYPE_TR,DETAIL_TR,PROC_DETAILS,PROC_COLORS,PROC_PATTERNS,COLOR_TR,PATTERN_TR,loadVisitor,resolveVisitorPortrait,mountVisitorPortrait,nextVisitorOrEnd};
+window.Motion=Motion;window.CHAPTERS=CHAPTERS;window.generateVisitor=generateVisitor;window.buildClue=typeof buildClue!=="undefined"?buildClue:null;try{window.renderAlbum=renderAlbum;window.ensureAlbumUI=ensureAlbumUI;}catch(_e){}window.Storage=Storage;window.Ledger=Ledger;window.Queue=Queue;window.Memory=Memory;window.Phone=Phone;window.Repair=Repair;window.Pets=Pets;window.Tourist=Tourist;window.Festival=Festival;window.Arcs=Arcs;window.Meta=Meta;window.__KEB_READY__=true;document.documentElement.dataset.kebReady="1";window.__KEB__={getSave:()=>save,setSave:(s)=>{save=s;writeSave(save)},state,DAYS,VISITORS,TYPE_KEYS,DECORS,CHAPTERS,Motion,generateVisitor,buildClue,renderAlbum,ensureAlbumUI,Storage,Ledger,Queue,Memory,Phone,Repair,Pets,Tourist,Festival,Arcs,Meta,startDay,startChapter,startEndless,showScreen,itemId,currentVisitor,tryGive,askQuestion,rejectTrick,endDay,calcStars,generateEndlessDay,renderDaySelect,renderShop,renderAlbum,openInspect,closeInspect,startTutorial,endTutorial,refreshOffice,applyNightLamp,restoreGameChrome,writeSave,loadSave,SAVE_KEY,drawVisitor,drawTitleFacade,drawItem,itemLabel,generateVisitor,buildClue,EXTRA_NAMES,TYPE_TR,DETAIL_TR,PROC_DETAILS,PROC_COLORS,PROC_PATTERNS,COLOR_TR,PATTERN_TR,loadVisitor,resolveVisitorPortrait,mountVisitorPortrait,nextVisitorOrEnd,visualKey,svgVisualHash,diversifyShelfVisuals,spaceOutTricksters,uniquifyTricksterPortraits,TRICKSTER_KEYS};
 })();
 
 </script>
