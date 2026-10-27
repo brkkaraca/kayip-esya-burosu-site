@@ -274,6 +274,13 @@ body{display:flex;justify-content:center;align-items:stretch;padding:var(--safe-
 .phone-actions .btn{flex:1}
 .shelf.phone-pick-mode{outline:3px dashed var(--mustard);outline-offset:2px}
 .shelf-item.phone-held{box-shadow:0 0 0 3px #3D6B6B;background:#E0F0F0}
+.repair-root{display:none;position:absolute;inset:0;z-index:47;background:rgba(30,20,10,.5);align-items:center;justify-content:center;padding:12px}
+.repair-root.show{display:flex}
+.repair-panel{background:var(--cream);border:3px solid var(--ink);border-radius:16px;padding:14px;width:min(340px,100%)}
+.repair-stage{position:relative;height:180px;background:#FFF8EC;border:2px solid var(--ink);border-radius:12px;display:flex;align-items:center;justify-content:center}
+.repair-stage svg{width:70%;height:70%}
+.repair-dot{position:absolute;width:28px;height:28px;border-radius:50%;border:2.5px solid var(--ink);background:#C45A4A;cursor:pointer;transform:translate(-50%,-50%)}
+.repair-dot.fixed{background:#6B8F5E;pointer-events:none}
 
 /* 2.0.0 motion — respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
@@ -2431,6 +2438,69 @@ const PhoneSys = {
 
 const Phone = PhoneSys;
 
+/** Chapter 8 — Quick repair: 2–3 taps on damage spots before delivery bonus. */
+const RepairSys = {
+  showTutorial() {
+    return new Promise(resolve => {
+      const ov = document.createElement("div");
+      ov.className = "mechanic-overlay";
+      ov.innerHTML = `<div class="mechanic-panel"><h3>Onarım Köşesi</h3>
+        <p>Hasarlı eşyada kırık yerlere dokun (2–3 nokta). Onarınca bonus jeton.</p>
+        <button class="btn primary" id="repair-tut-ok" type="button">Anladım</button></div>`;
+      document.body.appendChild(ov);
+      ov.querySelector("#repair-tut-ok").onclick = () => { ov.remove(); resolve(); };
+    });
+  },
+
+  needsRepair(item) {
+    return !!(item && (item.damaged || item.detail === "kırık" || item._damaged));
+  },
+
+  markShelfDamaged(shelf) {
+    // Mark ~40% of non-target items + sometimes target
+    shelf.forEach((it, i) => {
+      if (Math.random() < 0.4) { it._damaged = true; it.damaged = true; }
+    });
+  },
+
+  open(item) {
+    return new Promise(resolve => {
+      const spots = 2 + Math.floor(Math.random() * 2); // 2–3
+      let left = spots;
+      const root = document.createElement("div");
+      root.className = "repair-root show";
+      root.id = "repair-root";
+      const dots = Array.from({ length: spots }, (_, i) => {
+        const x = 20 + Math.random() * 60;
+        const y = 25 + Math.random() * 50;
+        return `<button type="button" class="repair-dot" style="left:${x}%;top:${y}%" data-i="${i}"></button>`;
+      }).join("");
+      root.innerHTML = `<div class="repair-panel">
+        <h3>Onar</h3>
+        <div class="repair-stage">${drawItem(item)}${dots}</div>
+        <p class="day-meta">Kırık yerlere dokun (<span id="repair-left">${left}</span> kaldı)</p>
+      </div>`;
+      document.getElementById("screen-game")?.appendChild(root) || document.body.appendChild(root);
+      root.querySelectorAll(".repair-dot").forEach(btn => {
+        btn.onclick = () => {
+          if (btn.classList.contains("fixed")) return;
+          btn.classList.add("fixed");
+          left--;
+          const el = document.getElementById("repair-left");
+          if (el) el.textContent = String(left);
+          AudioSys.click && AudioSys.click();
+          if (left <= 0) {
+            item._damaged = false; item.damaged = false; item._repaired = true;
+            root.remove();
+            resolve({ repaired: true, bonus: 4 + spots });
+          }
+        };
+      });
+    });
+  }
+};
+const Repair = RepairSys;
+
 function rand(a){return a[Math.floor(Math.random()*a.length)]}
 function shuffle(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
 function similarItem(base,hard){const v=Object.assign({},base);const which=rand(hard?["color","pattern","detail","type","tag"]:["color","pattern","detail","tag"]);
@@ -2660,6 +2730,9 @@ function startChapter(chId){
       loadVisitor();
       if(state.queueMode&&typeof Queue!=="undefined"){ Queue.begin(visitors, state.shiftTimer||90); state.patience=Queue.patienceMap[0]||state.patience; updatePatience(); Queue.renderRail(); }
     });
+  } else if(ch.mechanic==="repair"&&typeof Repair!=="undefined"){
+    visitors.forEach(v=>{ if(v.shelf) Repair.markShelfDamaged(v.shelf); if(v.target){ v.target._damaged=true; v.target.damaged=true; }});
+    Repair.showTutorial().then(()=>loadVisitor());
   } else if(ch.mechanic==="phonecall"&&typeof Phone!=="undefined"){
     // Designate last honest visitor as phone caller; ring after first visitor loads
     const honest=visitors.filter(v=>!v.trick&&v.target);
@@ -2855,15 +2928,23 @@ function tryGive(item,el){
   if(typeof Phone!=="undefined"&&Phone._picking){ Phone.tryTag(item,el); return; }
   const cv=currentVisitor();if(!cv)return;
   if(cv.trick){onWrong(el,cv.wrongGive||"Bu senin değil!");return}
-  if(cv._phoneCaller&&typeof Phone!=="undefined"){
-    if(Phone.holdItemId&&itemId(item)===Phone.holdItemId){ onCorrect(item,el,cv); Phone.clearHold(); return; }
-    onWrong(el,"Ayırdığın eşya bu değil…"); return;
+  const finish=(bonus)=>{
+    if(cv._phoneCaller&&typeof Phone!=="undefined"){
+      if(Phone.holdItemId&&itemId(item)===Phone.holdItemId){ onCorrect(item,el,cv,bonus); Phone.clearHold(); return; }
+      onWrong(el,"Ayırdığın eşya bu değil…"); return;
+    }
+    if(itemId(item)===itemId(cv.target)) onCorrect(item,el,cv,bonus); else onWrong(el);
+  };
+  if(itemId(item)===itemId(cv.target)&&typeof Repair!=="undefined"&&Repair.needsRepair(item)){
+    Repair.open(item).then(r=>finish(r&&r.repaired?r.bonus:0));
+    return;
   }
-  if(itemId(item)===itemId(cv.target))onCorrect(item,el,cv);else onWrong(el);
+  finish(0);
 }
-function onCorrect(item,el,cv){
+function onCorrect(item,el,cv,bonus){
+  bonus=bonus||0;
   AudioSys.ok();setExpr("happy");if(el)el.classList.add("correct-flash");
-  state.correct++;const coins=5+Math.max(1,state.patience)*2;state.dayCoins+=coins;save.coins+=coins;writeSave(save);$("hud-coin-text").textContent=String(save.coins);flyCoin();
+  state.correct++;const coins=5+Math.max(1,state.patience)*2+bonus;state.dayCoins+=coins;save.coins+=coins;writeSave(save);$("hud-coin-text").textContent=String(save.coins);flyCoin();
   $("stamp-text").textContent="TESLİM EDİLDİ";$("stamp-overlay").classList.add("show"); if(window.Motion) Motion.shakeScreen();AudioSys.stamp();
   const payoff=$("payoff");payoff.innerHTML=`<div>${cv.payoff}</div><div class="payoff-coins">+${coins} jeton</div>`;payoff.classList.add("show");
   document.querySelectorAll(".shelf-item").forEach(s=>s.classList.add("dimmed"));
@@ -3006,7 +3087,7 @@ document.querySelectorAll("button.btn, button.btn-back").forEach(b=>{
 renderTitle();AudioSys.init();
 window.__KEB_READY__=true;document.documentElement.dataset.kebReady="1";
 
-window.Motion=Motion;window.CHAPTERS=CHAPTERS;window.generateVisitor=generateVisitor;window.buildClue=typeof buildClue!=="undefined"?buildClue:null;try{window.renderAlbum=renderAlbum;window.ensureAlbumUI=ensureAlbumUI;}catch(_e){}window.Storage=Storage;window.Ledger=Ledger;window.Queue=Queue;window.Memory=Memory;window.Phone=Phone;window.__KEB_READY__=true;document.documentElement.dataset.kebReady="1";window.__KEB__={getSave:()=>save,setSave:(s)=>{save=s;writeSave(save)},state,DAYS,VISITORS,TYPE_KEYS,DECORS,CHAPTERS,Motion,generateVisitor,buildClue,renderAlbum,ensureAlbumUI,Storage,Ledger,Queue,Memory,Phone,startDay,startChapter,startEndless,showScreen,itemId,currentVisitor,tryGive,askQuestion,rejectTrick,endDay,calcStars,generateEndlessDay,renderDaySelect,renderShop,openInspect,closeInspect,startTutorial,endTutorial,refreshOffice,writeSave,loadSave,SAVE_KEY,drawVisitor,drawTitleFacade,drawItem,itemLabel,generateVisitor,buildClue,EXTRA_NAMES,TYPE_TR,DETAIL_TR,PROC_DETAILS,PROC_COLORS,PROC_PATTERNS,COLOR_TR,PATTERN_TR};
+window.Motion=Motion;window.CHAPTERS=CHAPTERS;window.generateVisitor=generateVisitor;window.buildClue=typeof buildClue!=="undefined"?buildClue:null;try{window.renderAlbum=renderAlbum;window.ensureAlbumUI=ensureAlbumUI;}catch(_e){}window.Storage=Storage;window.Ledger=Ledger;window.Queue=Queue;window.Memory=Memory;window.Phone=Phone;window.Repair=Repair;window.__KEB_READY__=true;document.documentElement.dataset.kebReady="1";window.__KEB__={getSave:()=>save,setSave:(s)=>{save=s;writeSave(save)},state,DAYS,VISITORS,TYPE_KEYS,DECORS,CHAPTERS,Motion,generateVisitor,buildClue,renderAlbum,ensureAlbumUI,Storage,Ledger,Queue,Memory,Phone,Repair,startDay,startChapter,startEndless,showScreen,itemId,currentVisitor,tryGive,askQuestion,rejectTrick,endDay,calcStars,generateEndlessDay,renderDaySelect,renderShop,openInspect,closeInspect,startTutorial,endTutorial,refreshOffice,writeSave,loadSave,SAVE_KEY,drawVisitor,drawTitleFacade,drawItem,itemLabel,generateVisitor,buildClue,EXTRA_NAMES,TYPE_TR,DETAIL_TR,PROC_DETAILS,PROC_COLORS,PROC_PATTERNS,COLOR_TR,PATTERN_TR};
 })();
 
 </script>
